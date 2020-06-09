@@ -7,7 +7,6 @@ description = "A simple configuration parsing utility with no dependencies. Work
 repository = "https://github.com/QEDK/configparser-rs"
 readme = "README.md"
 license = "MIT OR LGPLv3"
-license-file = "LICENSE-MIT"
 keywords = ["config", "ini", "settings", "configuration", "configparser"]
 categories = ["config", "encoding", "parser-implementations"]
 maintainence = { status = "experimental" }
