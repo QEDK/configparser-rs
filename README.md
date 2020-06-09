@@ -1,4 +1,4 @@
-# configparser
+# configparser [![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs)
 A simple configuration parsing utility with no dependencies built on Rust.
 
 `configparser` works on a subset of ini configuration syntax.
@@ -6,9 +6,10 @@ A simple configuration parsing utility with no dependencies built on Rust.
 Inspired by Python's `configparser`. This release is experimental, use at your own risk.
 
 ## Installation
-You can install this easily via `cargo` like:
-```bash
-$ cargo install configparser
+You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
+```yaml
+[dependencies]
+configparser = "0.1.1"
 ```
 
 ## Usage
