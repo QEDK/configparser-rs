@@ -6,7 +6,7 @@ edition = "2018"
 description = "A simple configuration parsing utility with no dependencies. Works on a subset of ini configuration syntax."
 repository = "https://github.com/QEDK/configparser-rs"
 readme = "README.md"
-license = "MIT OR LGPL"
+license = "MIT OR LGPL-3.0-or-later"
 keywords = ["config", "ini", "settings", "configuration", "configparser"]
 categories = ["config", "encoding", "parser-implementations"]
 maintainence = { status = "experimental" }
