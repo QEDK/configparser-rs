@@ -1,1 +1,1 @@
-pub mod configparser;
+pub mod Configparser;
