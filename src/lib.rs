@@ -1,1 +1,1 @@
-pub mod Configparser;
+pub mod ini;
