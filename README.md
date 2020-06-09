@@ -27,3 +27,19 @@ fn main() {
   // ...and do what you want with it. :)
 }
 ```
+
+## License
+
+Licensed under either of
+
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+ * Lesser General Public license v3.0 ([LICENSE-LGPL](LICENSE-LGPL) or https://www.gnu.org/licenses/lgpl-3.0.html)
+
+
+at your option.
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the LGPL-3.0 license, shall be dual licensed as above, without any
+additional terms or conditions.
