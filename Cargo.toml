@@ -1,0 +1,16 @@
+[package]
+name = "configparser"
+version = "0.1.0"
+authors = ["QEDK <qedk.en@gmail.com>"]
+edition = "2018"
+description = "A simple configuration parsing utility with no dependencies. Works on a subset of ini configuration syntax."
+readme = "README.md"
+license = "MIT OR LGPLv3"
+keywords = ["config", "ini", "settings", "configuration", "configparser"]
+categories = ["config"]
+maintainence = { status = "experimental" }
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "configparser"
