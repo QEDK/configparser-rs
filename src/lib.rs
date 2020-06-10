@@ -5,7 +5,7 @@ This release is experimental, use at your own risk.
 # Syntax
 
 You can get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with the `Ini` struct, like:
-```rust
+\`\`\`norun
 use configparser::ini::Ini;
 
 fn main() {
@@ -24,11 +24,11 @@ fn main() {
   }
   // ...and do what you want with it. :)
 }
-```
+\`\`\`
 The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion and variable access.
 
 As of now, there's also a public function, to load an ini-syntax file and parse it into a hashmap. Support for this will be dropped in the near future, and will be changed into a macro when it's dropped.
-```rust
+\`\`\`norun
 use configparser::ini;
 
 fn main() {
@@ -40,6 +40,6 @@ fn main() {
   }
   // ...and do what you want with it. :)
 }
-```
+\`\`\`
 */
 pub mod ini;
