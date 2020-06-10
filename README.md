@@ -27,7 +27,7 @@ fn main() {
   let map = match config.get_map() {
   	None => HashMap::new(), // or whatever you want to if the HashMap is empty
   	Some(map) => map
-  }
+  };
   for (key, value) in &map {
       println!("{:?}: {:?}", key, value);
   }
