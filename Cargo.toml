@@ -4,11 +4,15 @@ version = "0.1.1"
 authors = ["QEDK <qedk.en@gmail.com>"]
 edition = "2018"
 description = "A simple configuration parsing utility with no dependencies. Works on a subset of ini configuration syntax."
+homepage = "https://github.com/QEDK/configparser-rs"
 repository = "https://github.com/QEDK/configparser-rs"
 readme = "README.md"
 license = "MIT OR LGPL-3.0-or-later"
 keywords = ["config", "ini", "settings", "configuration", "configparser"]
 categories = ["config", "encoding", "parser-implementations"]
-maintainence = { status = "experimental" }
+
+[badges]
+travis_ci = { repository = "QEDK/configparser-rs", branch = "master" }
+maintainence = { status = "actively-developed" }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
