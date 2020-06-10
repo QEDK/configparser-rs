@@ -13,7 +13,7 @@ configparser = "0.1.1"
 ```
 
 ## Usage
-You also get a `HashMap` of type `HashMap<String, HashMap<String, String>>` via the `Ini` struct, like:
+You also get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with the `Ini` struct, like:
 ```rust
 use configparser::ini::Ini;
 

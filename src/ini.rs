@@ -1,4 +1,4 @@
-//!The ini module provides all the functions necessary to load and parse ini-syntax files.
+//!The ini module provides all the things necessary to load and parse ini-syntax files.
 //!The most important of which is the `Ini` struct.
 use std::fs::File;
 use std::io::prelude::*;
