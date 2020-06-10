@@ -4,7 +4,7 @@ This release is experimental, use at your own risk.
 
 # Syntax
 
-You also get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with the `Ini` struct, like:
+You can get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with the `Ini` struct, like:
 ```rust
 use configparser::ini::Ini;
 

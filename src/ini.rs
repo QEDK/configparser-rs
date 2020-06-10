@@ -79,7 +79,7 @@ impl Ini {
 		};
 
 		let mut s = String::new();
-		self.map = extend(match file.read_to_string(&mut s) {
+		self.map = match file.read_to_string(&mut s) {
 			Err(why) => return Err(format!("couldn't read {}: {}", display, why)),
 			Ok(_) => match self.parse(s) {
 				Err(why) => return Err(why),
