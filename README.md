@@ -9,7 +9,7 @@ Inspired by Python's `configparser`. This release is experimental, use at your o
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```yaml
 [dependencies]
-configparser = "0.2.1"
+configparser = "0.2.2"
 ```
 
 ## Usage
