@@ -9,7 +9,7 @@ You can get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with 
 use configparser::ini::Ini;
 
 fn main() {
-  let config = Ini::new();
+  let mut config = Ini::new();
   match config.load("Path/to/file...") {
       Err(why) => panic!("{}", why),
       Ok(_) => ()
