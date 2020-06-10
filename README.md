@@ -13,7 +13,30 @@ configparser = "0.1.1"
 ```
 
 ## Usage
-As of now, there's only one function, to load an ini-syntax file and parse it into a hashmap of type `HashMap<String, HashMap<String, String>>`.
+You also get a `HashMap` of type `HashMap<String, HashMap<String, String>>` via the `Ini` struct, like:
+```rust
+use configparser::ini::Ini;
+
+fn main() {
+  let config = Ini::new;
+  match ini::load("Path/to/file...") {
+      Err(why) => panic!(why),
+      Ok(_) => ()
+  };
+  // You can then access the map normally like:
+  let map = match config.get_map() {
+  	None => HashMap::new(), // or whatever you want to if the HashMap is empty
+  	Some(map) => map
+  }
+  for (key, value) in &map {
+      println!("{:?}: {:?}", key, value);
+  }
+  // ...and do what you want with it. :)
+}
+```
+The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion and variable access.
+
+As of now, there's also a public function, to load an ini-syntax file and parse it into a hashmap. Support for this will be dropped in the near future, and will be changed into a macro when it's dropped.
 ```rust
 use configparser::ini;
 
