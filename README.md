@@ -66,3 +66,19 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the LGPL-3.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
+
+## Changelog
+
+- 0.1.0 (yanked)
+ - First experimental version with only a public-facing load() function.
+- 0.1.1
+ - `configparser` module renamed to `ini`.
+- 0.2.1
+ - `Ini` struct is added along with file-loading, parsing and hashmap functions. Documentation is added.
+
+### Future plans
+
+- Support for `ini::load()` will be dropped in the next major releaser per SemVer (i.e. 1.0.0)
+ - It will be replaced with a macro for a similar functionality.
+ - It will be marked as deprecated in the next release.
+- More functions for `Ini` struct, such as reading from a string, insertion, deletion.
