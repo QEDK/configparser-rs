@@ -57,11 +57,12 @@ pub struct Ini {
 
 impl Ini {
 
-	pub fn new() -> Result<Ini, Box<dyn Error>> {
+	pub fn new() -> Ini {
 		let mut map: HashMap<String, HashMap<String, String>> = HashMap::new();
 		let mut inimap = Ini {
 			map
-		}
+		};
+		inimap
 	}
 
 	pub fn load(&mut self, path: &str) -> Result<(), String> {
@@ -86,7 +87,7 @@ impl Ini {
 		Ok(())
 	}
 
-	fn parse(&self, input: String) -> Result <HashMap<String, HashMap<String, String>>, String> {
+	fn parse(&self, input: String) -> Result<HashMap<String, HashMap<String, String>>, String> {
 		let mut map: HashMap<String, HashMap<String, String>> = HashMap::new();
 		let mut section = "DEFAULT";
 		for lines in input.lines() {
@@ -117,5 +118,9 @@ impl Ini {
 			}
 		}
 		Ok(map)
+	}
+
+	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, String>>> {
+		if self.map.is_empty() { None } else { Some(self.map.clone()) }
 	}
 }
