@@ -34,11 +34,11 @@ fn main() {
   let mut config = Ini::new();
   match config.load("Path/to/file...") {
       Err(why) => panic!("{}", why),
-      Ok(_) => ()
-  };
+      Ok(_) => println!("Yay!")
+  }
   // You can then access the map normally like:
   let map = match config.get_map() {
-  	None => HashMap::new(), // or whatever you want to if the HashMap is empty
+  	None => HashMap::new(), // or whatever you want to do if the map is empty
   	Some(map) => map
   };
   for (key, value) in &map {
