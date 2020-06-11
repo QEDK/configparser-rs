@@ -1,5 +1,5 @@
 # configparser
-[![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs) ![Crates.io](https://img.shields.io/crates/l/configparser?color=black) ![Crates.io](https://img.shields.io/crates/v/configparser?color=black) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) ![Maintenance](https://img.shields.io/maintenance/yes/2020)
+[![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2020)](https://github.com/QEDK/configparser-rs)
 
 A simple configuration parsing utility with no dependencies built on Rust.
 
@@ -82,7 +82,6 @@ Licensed under either of
 
  * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
  * Lesser General Public license v3.0 ([LICENSE-LGPL](LICENSE-LGPL) or https://www.gnu.org/licenses/lgpl-3.0.html)
-
 
 at your option.
 
