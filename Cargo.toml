@@ -11,8 +11,4 @@ license = "MIT OR LGPL-3.0-or-later"
 keywords = ["config", "ini", "settings", "configuration", "configparser"]
 categories = ["config", "encoding", "parser-implementations"]
 
-[badges]
-travis_ci = { repository = "QEDK/configparser-rs", branch = "master" }
-maintainence = { status = "actively-developed" }
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
