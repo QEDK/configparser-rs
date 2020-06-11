@@ -74,7 +74,8 @@ impl Ini {
 		inimap
 	}
 
-	///Loads a file from a defined path, parses it and adds the hashmap into our struct.
+	///Loads a file from a defined path, parses it and puts the hashmap into our struct.
+	///At one time, it only stores one file's configuration, so every call to load() will clear the existing HashMap, if present.
 	///Example: `config.load("Path/to/file...")`
 	///Returns Ok() if no erros are thrown or else Err(error_string)
 	pub fn load(&mut self, path: &str) -> Result<(), String> {
@@ -131,9 +132,9 @@ impl Ini {
 		Ok(map)
 	}
 
-	///Returns the stored value from the key stored in the defined section.
-	///Example: `let value: String = config.get("section", "key")`
-	///Returns Some(value) if value is found or else returns None.
+	///Returns a clone of the stored value from the key stored in the defined section.
+	///Example: `let value: String = config.get("section", "key");`
+	///Returns Some(value) of type String if value is found or else returns None.
 	pub fn get(&self, section: &str, key: &str) -> Option<String> {
 		match self.map.get(section) {
 			Some(innermap) => match innermap.get(key) {
@@ -145,7 +146,7 @@ impl Ini {
 	}
 
 	///Returns a clone of the `HashMap` stored in our struct.
-	///Example: `let map = config.get_map()`
+	///Example: `let map = config.get_map();`
 	///Returns Some(map) if map is non-empty or else returns None.
 	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, String>>> {
 		if self.map.is_empty() { None } else { Some(self.map.clone()) }
