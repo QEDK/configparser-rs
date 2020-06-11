@@ -131,13 +131,6 @@ impl Ini {
 		Ok(map)
 	}
 
-	///Returns a clone of the `HashMap` stored in our struct.
-	///Example: `let map = config.get_map()`
-	///Returns Some(map) if map is non-empty or else returns None.
-	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, String>>> {
-		if self.map.is_empty() { None } else { Some(self.map.clone()) }
-	}
-
 	///Returns the stored value from the key stored in the defined section.
 	///Example: `let value: String = config.get("section", "key")`
 	///Returns Some(value) if value is found or else returns None.
@@ -149,5 +142,12 @@ impl Ini {
 			},
 			None => None
 		}
+	}
+
+	///Returns a clone of the `HashMap` stored in our struct.
+	///Example: `let map = config.get_map()`
+	///Returns Some(map) if map is non-empty or else returns None.
+	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, String>>> {
+		if self.map.is_empty() { None } else { Some(self.map.clone()) }
 	}
 }
