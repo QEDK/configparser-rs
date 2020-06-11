@@ -26,7 +26,7 @@ Future releases will add support for escaping, comments and modifying default se
 ## Syntax
 
 You can get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with the `Ini` struct, like:
-```ignore
+```no-run
 use configparser::ini::Ini;
 use std::collections::HashMap;
 
@@ -50,7 +50,7 @@ fn main() {
 The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion and variable access.
 
 As of now, there's also a public function, to load an ini-syntax file and parse it into a hashmap. Support for this will be dropped in the near future, and will be changed into a macro when it's dropped.
-```ignore
+```no-run
 use configparser::ini;
 
 fn main() {
