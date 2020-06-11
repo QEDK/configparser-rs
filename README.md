@@ -31,7 +31,7 @@ Future releases will add support for escaping, comments and modifying default se
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```yaml
 [dependencies]
-configparser = "0.2.2"
+configparser = "0.3.0"
 ```
 
 ## Usage
