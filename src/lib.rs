@@ -3,7 +3,7 @@
 The current release is experimental, this means that future releases will be swift until we reach `stable` (1.0.0).
 The codebase is thus subject to change for now.
 
-# ini-style configuration
+## ini-style configuration
 
 Most `ini` files look something like this (but they don't need to be `.ini` files obviously):
 ```yaml
@@ -15,13 +15,15 @@ key2 = value2
 key3 = value3
 maybekey1aswell = value1
 ```
-Owing to how ini files usually are, this means that `[, ], =` are special symbols (this crate will allow you to use `]` sparingly).
-Key-value pairs or section headers cannot spread across multiple lines for obvious reasons as well because the parser cannot reliably parse it otherwise.
-A value on the next line could as well be a key for another.
-An important note is that key-value pairs not attached to any section are automatically put in a section called 'DEFAULT'.
-Future releases will add support for escaping, comments and modifying default sections.
+Owing to how ini files usually are, this means that `[`, `]` and `=` are special symbols (this crate will allow you to use `]` sparingly).
 
-# Syntax
+Key-value pairs or section headers cannot spread across multiple lines for obvious reasons because the parser cannot reliably parse it otherwise.
+A value on the next line could as well be a key for another.
+
+An important note is that key-value pairs not attached to any section are automatically put in a section called `DEFAULT`.
+Future releases will add support for escaping, comments and modifying default section naming.
+
+## Syntax
 
 You can get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with the `Ini` struct, like:
 ```ignore

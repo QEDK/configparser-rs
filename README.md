@@ -1,12 +1,12 @@
 # configparser [![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs)
 A simple configuration parsing utility with no dependencies built on Rust.
 
-`configparser` works on a subset of ini configuration syntax. It is inspired by Python's `configparser`.
+`configparser` works on a subset of ini configuration syntax (for now). It is inspired by Python's `configparser`.
 
 The current release is experimental, this means that future releases will be swift until we reach `stable` (1.0.0).
 The codebase is thus subject to change for now.
 
-# ini-style configuration
+## ini-style configuration
 
 Most `ini` files look something like this (but they don't need to be `.ini` files obviously):
 ```yaml
@@ -19,10 +19,12 @@ key3 = value3
 maybekey1aswell = value1
 ```
 Owing to how ini files usually are, this means that `[`, `]` and `=` are special symbols (this crate will allow you to use `]` sparingly).
-Key-value pairs or section headers cannot spread across multiple lines for obvious reasons as well because the parser cannot reliably parse it otherwise.
+
+Key-value pairs or section headers cannot spread across multiple lines for obvious reasons because the parser cannot reliably parse it otherwise.
 A value on the next line could as well be a key for another.
-An important note is that key-value pairs not attached to any section are automatically put in a section called 'DEFAULT'.
-Future releases will add support for escaping, comments and modifying default sections.
+
+An important note is that key-value pairs not attached to any section are automatically put in a section called `DEFAULT`.
+Future releases will add support for escaping, comments and modifying default section naming.
 
 
 ## Installation
@@ -96,6 +98,11 @@ additional terms or conditions.
   - `configparser` module renamed to `ini`.
 - 0.2.1
   - `Ini` struct is added along with file-loading, parsing and hashmap functions. Documentation is added.
+- 0.2.2
+  - Fixed docs.
+- 0.3.0
+  - Added `get()` for getting values from the map directly. Docs expanded as well.
+  - Mark `ini::load()` for deprecation.
 
 ### Future plans
 
