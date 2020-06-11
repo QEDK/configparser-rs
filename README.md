@@ -1,5 +1,5 @@
 # configparser
-[![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs) ![Crates.io](https://img.shields.io/crates/l/configparser?color=black) ![Crates.io](https://img.shields.io/crates/v/configparser?color=black) [![Released API docs](https://docs.rs/queen/badge.svg)](https://docs.rs/queen) ![Maintenance](https://img.shields.io/maintenance/yes/2020)
+[![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs) ![Crates.io](https://img.shields.io/crates/l/configparser?color=black) ![Crates.io](https://img.shields.io/crates/v/configparser?color=black) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) ![Maintenance](https://img.shields.io/maintenance/yes/2020)
 
 A simple configuration parsing utility with no dependencies built on Rust.
 
