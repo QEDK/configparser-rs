@@ -1,4 +1,4 @@
-# configparser [![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs)![Crates.io](https://img.shields.io/crates/l/configparser?color=black)![Crates.io](https://img.shields.io/crates/v/configparser?color=black)![Maintenance](https://img.shields.io/maintenance/yes/2020)
+# configparser [![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs) ![Crates.io](https://img.shields.io/crates/l/configparser?color=black) ![Crates.io](https://img.shields.io/crates/v/configparser?color=black) ![Maintenance](https://img.shields.io/maintenance/yes/2020)
 A simple configuration parsing utility with no dependencies built on Rust.
 
 `configparser` works on a subset of ini configuration syntax (for now). It is inspired by Python's `configparser`.
@@ -108,5 +108,5 @@ additional terms or conditions.
 
 - Support for `ini::load()` will be dropped in the next major releaser per SemVer (i.e. 1.0.0)
   - It will be replaced with a macro for a similar functionality.
-  - It will be marked as deprecated in the next release.
+  - It has been marked as deprecated.
 - More functions for `Ini` struct, such as reading from a string, insertion, deletion.
