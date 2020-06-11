@@ -7,6 +7,10 @@ use std::collections::HashMap;
 
 ///A public function of the module to load and parse files into a hashmap.
 ///Support for this function will be dropped in the near future and replaced with a macro.
+#[deprecated(
+    since = "0.3.0",
+    note = "Please use the Ini struct instead."
+)]
 pub fn load(path: &str) -> HashMap<String, HashMap<String, String>> {
 	let path = Path::new(path);
 	let display = path.display();
@@ -59,7 +63,9 @@ pub struct Ini {
 }
 
 impl Ini {
-	///Creates a new `HashMap` for the struct and stores the struct in the calling variable.
+	///Creates a new `HashMap` for the struct.
+	///Example: `let config = Ini::new();`
+	///Returns the struct and stores it in the calling variable.
 	pub fn new() -> Ini {
 		let map: HashMap<String, HashMap<String, String>> = HashMap::new();
 		let inimap = Ini {
@@ -69,6 +75,8 @@ impl Ini {
 	}
 
 	///Loads a file from a defined path, parses it and adds the hashmap into our struct.
+	///Example: `config.load("Path/to/file...")`
+	///Returns Ok() if no erros are thrown or else Err(error_string)
 	pub fn load(&mut self, path: &str) -> Result<(), String> {
 		let path = Path::new(path);
 		let display = path.display();
@@ -89,6 +97,7 @@ impl Ini {
 		Ok(())
 	}
 
+	///Private function that parses ini-style syntax into a HashMap.
 	fn parse(&self, input: String) -> Result<HashMap<String, HashMap<String, String>>, String> {
 		let mut map: HashMap<String, HashMap<String, String>> = HashMap::new();
 		let mut section = "DEFAULT";
@@ -123,7 +132,22 @@ impl Ini {
 	}
 
 	///Returns a clone of the `HashMap` stored in our struct.
+	///Example: `let map = config.get_map()`
+	///Returns Some(map) if map is non-empty or else returns None.
 	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, String>>> {
 		if self.map.is_empty() { None } else { Some(self.map.clone()) }
+	}
+
+	///Returns the stored value from the key stored in the defined section.
+	///Example: `let value: String = config.get("section", "key")`
+	///Returns Some(value) if value is found or else returns None.
+	pub fn get(&self, section: &str, key: &str) -> Option<String> {
+		match self.map.get(section) {
+			Some(innermap) => match innermap.get(key) {
+				Some(val) => Some(val.clone()),
+				None => None
+			},
+			None => None
+		}
 	}
 }

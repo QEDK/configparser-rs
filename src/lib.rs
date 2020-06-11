@@ -5,8 +5,9 @@ This release is experimental, use at your own risk.
 # Syntax
 
 You can get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with the `Ini` struct, like:
-\`\`\`norun
+```ignore
 use configparser::ini::Ini;
+use std::collections::HashMap;
 
 fn main() {
   let mut config = Ini::new();
@@ -24,11 +25,11 @@ fn main() {
   }
   // ...and do what you want with it. :)
 }
-\`\`\`
+```
 The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion and variable access.
 
 As of now, there's also a public function, to load an ini-syntax file and parse it into a hashmap. Support for this will be dropped in the near future, and will be changed into a macro when it's dropped.
-\`\`\`norun
+```ignore
 use configparser::ini;
 
 fn main() {
@@ -40,6 +41,6 @@ fn main() {
   }
   // ...and do what you want with it. :)
 }
-\`\`\`
+```
 */
 pub mod ini;

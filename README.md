@@ -16,6 +16,7 @@ configparser = "0.2.2"
 You can get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with the `Ini` struct, like:
 ```rust
 use configparser::ini::Ini;
+use std::collections::HashMap;
 
 fn main() {
   let mut config = Ini::new();
