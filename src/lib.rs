@@ -26,7 +26,7 @@ Future releases will add support for escaping, comments and modifying default se
 
 ## Syntax
 
-You can load a `HashMap` easily and parse it like:
+You can load a `ini`-file easily and parse it like:
 ```ignore,rust
 use configparser::ini::Ini;
 use std::collections::HashMap;

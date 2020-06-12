@@ -37,7 +37,7 @@ configparser = "0.3.0"
 ```
 
 ## Usage
-You can get a `HashMap` of type `HashMap<String, HashMap<String, String>>` with the `Ini` struct, like:
+You can load a `ini`-file easily and parse it like:
 ```rust
 use configparser::ini::Ini;
 use std::collections::HashMap;
@@ -54,13 +54,13 @@ fn main() {
   let map = match config.get_map() {
   	None => HashMap::new(), // or whatever you want to do if the map is empty
   	Some(map) => map
-  }; // or let map = config.get_map().unwrap() instead of match
+  }; // or let map = config.get_map()? instead of match
 
   for (key, value) in &map {
       println!("{:?}: {:?}", key, value);
   }
   // And safely fetch a value:
-  let val = config.get("section name", "key name").unwrap();
+  let val = config.get("section name", "key name")?; // or use .unwrap()
 }
 ```
 The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion and variable access.
