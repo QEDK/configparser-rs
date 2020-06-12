@@ -1,6 +1,6 @@
 [package]
 name = "configparser"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["QEDK <qedk.en@gmail.com>"]
 edition = "2018"
 description = "A simple configuration parsing utility with no dependencies. Works on a subset of ini configuration syntax."
