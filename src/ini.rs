@@ -120,7 +120,7 @@ impl Ini {
 	///Returns a clone of the stored value from the key stored in the defined section.
 	/// ## Example
 	///```ignore,rust
-	///let value = config.get("section", "key")?;
+	///let value = config.get("section", "key").unwrap();
 	///```
 	///Returns `Some(value)` of type `String` if value is found or else returns `None`.
 	pub fn get(&self, section: &str, key: &str) -> Option<String> {
@@ -136,7 +136,7 @@ impl Ini {
 	///Returns a clone of the `HashMap` stored in our struct.
 	///## Example
 	///```ignore,rust
-	///let map = config.get_map()?;
+	///let map = config.get_map().unwrap();
 	///```
 	///Returns `Some(map)` if map is non-empty or else returns `None`.
 	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, String>>> {
