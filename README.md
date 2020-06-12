@@ -108,6 +108,10 @@ additional terms or conditions.
 - 0.3.0
   - Added `get()` for getting values from the map directly. Docs expanded as well.
   - Mark `ini::load()` for deprecation.
+- 0.3.1
+  - Updated docs.
+  - All parameters now trimmed before insertion.
+  - Converted `ini::load()` into a wrapper around `Ini`.
 
 ### Future plans
 
