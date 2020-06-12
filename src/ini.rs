@@ -57,16 +57,26 @@ pub fn load(path: &str) -> HashMap<String, HashMap<String, String>> {
 	return map;
 }
 
-///The `Ini` struct simply contains a hashmap of the loaded configuration.
+///The `Ini` struct simply contains a nested hashmap of the loaded configuration.
+///## Example
+///```rust
+///use configparser::ini::Ini;
+///
+///let config = Ini::new();
+///```
 pub struct Ini {
 	map: HashMap<String, HashMap<String, String>>
 }
 
 impl Ini {
 	///Creates a new `HashMap` for the struct.
+	///All values in the HashMap are stored in `String` type.
+	///## Example
+	///```rust
+	///use configparser::ini::Ini;
 	///
-	///Example: `let config = Ini::new();`
-	///
+	///let config = Ini::new();
+	///```
 	///Returns the struct and stores it in the calling variable.
 	pub fn new() -> Ini {
 		let map: HashMap<String, HashMap<String, String>> = HashMap::new();
@@ -78,10 +88,15 @@ impl Ini {
 
 	///Loads a file from a defined path, parses it and puts the hashmap into our struct.
 	///At one time, it only stores one file's configuration, so every call to load() will clear the existing HashMap, if present.
-	///
-	///Example: `config.load("Path/to/file...")`
-	///
-	///Returns `Ok()` if no errors are thrown or else `Err(error_string)`.
+	///## Example
+	///```ignore,rust
+	///match config.load("Path/to/file...") {
+	/// Err(why) => panic!("{}", why),
+	/// Ok(_) => ()
+	///}
+	///```
+	///Returns `Ok()` if no errors are thrown or else `Err(error_string)`. Note that you cannot
+	///use `?` because the Ok is of `()` type.
 	pub fn load(&mut self, path: &str) -> Result<(), String> {
 		let path = Path::new(path);
 		let display = path.display();
@@ -111,7 +126,7 @@ impl Ini {
 			match trimmed.find('[') {
 				Some(start) => match trimmed.rfind(']') {
 					Some(end) => {
-						section = &trimmed[start+1..end];
+						section = &trimmed[start+1..end].trim();
 					},
 					None => return Err(format!("Found opening bracket at {} but no closing bracket", start))
 				}
@@ -119,11 +134,11 @@ impl Ini {
 					Some(delimiter) => {
 						match map.get_mut(section) {
 							Some(valmap) => {
-								valmap.insert(trimmed[..delimiter].to_string(), trimmed[delimiter+1..].to_string());
+								valmap.insert(trimmed[..delimiter].trim().to_string(), trimmed[delimiter+1..].trim().to_string());
 							}
 							None => {
 								let valmap: HashMap<String, String> =
-								[(trimmed[..delimiter].to_string(), trimmed[delimiter+1..].to_string())]
+								[(trimmed[..delimiter].trim().to_string(), trimmed[delimiter+1..].trim().to_string())]
 								.iter().cloned().collect();
 								map.insert(section.to_string(), valmap);
 							}
@@ -137,9 +152,10 @@ impl Ini {
 	}
 
 	///Returns a clone of the stored value from the key stored in the defined section.
-	///
-	///Example: `let value: String = config.get("section", "key");`
-	///
+	/// ## Example
+	///```ignore,rust
+	///let value = config.get("section", "key")?;
+	///```
 	///Returns `Some(value)` of type `String` if value is found or else returns `None`.
 	pub fn get(&self, section: &str, key: &str) -> Option<String> {
 		match self.map.get(section) {
@@ -152,9 +168,10 @@ impl Ini {
 	}
 
 	///Returns a clone of the `HashMap` stored in our struct.
-	///
-	///Example: `let map = config.get_map();`
-	///
+	///## Example
+	///```ignore,rust
+	///let map = config.get_map()?;
+	///```
 	///Returns `Some(map)` if map is non-empty or else returns `None`.
 	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, String>>> {
 		if self.map.is_empty() { None } else { Some(self.map.clone()) }
