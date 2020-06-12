@@ -34,12 +34,12 @@ use std::collections::HashMap;
 fn main() {
   let mut config = Ini::new();
 
-  match config.load("Path/to/file...") {
+  let a_map_clone = match config.load("Path/to/file...") {
   	Err(why) => panic!("{}", why),
-  	Ok(_) => println!("Yay!")
-  }
+  	Ok(map) => map
+  } // You can also safely not store the HashMap and access it later
 
-  // You can then access the map normally like:
+  // You can also then access the map normally like:
   let map = match config.get_map() {
   	None => HashMap::new(), // or whatever you want to do if the map is empty
   	Some(map) => map

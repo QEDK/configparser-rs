@@ -30,12 +30,13 @@ pub fn load(path: &str) -> HashMap<String, HashMap<String, String>> {
 ///
 ///let config = Ini::new();
 ///```
+#[derive(Debug, Clone)]
 pub struct Ini {
 	map: HashMap<String, HashMap<String, String>>
 }
 
 impl Ini {
-	///Creates a new `HashMap` for the struct.
+	///Creates a new `HashMap` of `HashMap<String, HashMap<String, String>>` type for the struct.
 	///All values in the HashMap are stored in `String` type.
 	///## Example
 	///```rust
@@ -53,17 +54,17 @@ impl Ini {
 	}
 
 	///Loads a file from a defined path, parses it and puts the hashmap into our struct.
-	///At one time, it only stores one file's configuration, so every call to load() will clear the existing HashMap, if present.
+	///At one time, it only stores one file's configuration, so every call to `load()` will clear the existing HashMap, if present.
 	///## Example
 	///```ignore,rust
-	///match config.load("Path/to/file...") {
+	///let map = match config.load("Path/to/file...") {
 	/// Err(why) => panic!("{}", why),
-	/// Ok(_) => ()
-	///}
+	/// Ok(inner) => inner
+	///};
 	///```
-	///Returns `Ok()` if no errors are thrown or else `Err(error_string)`. Note that you cannot
-	///use `?` because the Ok is of `()` type.
-	pub fn load(&mut self, path: &str) -> Result<(), String> {
+	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
+	///Similar to `get_map()` but returns a `Result` type and requires a path.
+	pub fn load(&mut self, path: &str) -> Result<HashMap<String, HashMap<String, String>>, String> {
 		let path = Path::new(path);
 		let display = path.display();
 
@@ -80,7 +81,7 @@ impl Ini {
 				Ok(map) => map
 			}
 		};
-		Ok(())
+		Ok(self.map.clone())
 	}
 
 	///Private function that parses ini-style syntax into a HashMap.
@@ -139,6 +140,7 @@ impl Ini {
 	///let map = config.get_map().unwrap();
 	///```
 	///Returns `Some(map)` if map is non-empty or else returns `None`.
+	///Similar to load() but returns an `Option` type with the currently stored `HashMap`.
 	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, String>>> {
 		if self.map.is_empty() { None } else { Some(self.map.clone()) }
 	}
