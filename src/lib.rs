@@ -37,15 +37,15 @@ fn main() {
   let a_map_clone = match config.load("Path/to/file...") {
   	Err(why) => panic!("{}", why),
   	Ok(map) => map
-  } // You can also safely not store the HashMap and access it later
+  }; // You can also safely not store the HashMap and access it later
 
   // You can also then access the map normally like:
-  let map = match config.get_map() {
+  let another_clone = match config.get_map() {
   	None => HashMap::new(), // or whatever you want to do if the map is empty
   	Some(map) => map
   }; // or let map = config.get_map().unwrap() instead of match
 
-  for (key, value) in &map {
+  for (key, value) in &another_clone {
       println!("{:?}: {:?}", key, value);
   }
   // And safely fetch a value:

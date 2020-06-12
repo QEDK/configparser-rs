@@ -48,15 +48,15 @@ fn main() {
   let a_map_clone = match config.load("Path/to/file...") {
   	Err(why) => panic!("{}", why),
   	Ok(map) => map
-  } // You can also safely not store the HashMap and access it later
+  }; // You can also safely not store the HashMap and access it later
 
   // You can also then access the map normally like:
-  let map = match config.get_map() {
+  let another_clone = match config.get_map() {
   	None => HashMap::new(), // or whatever you want to do if the map is empty
   	Some(map) => map
   }; // or let map = config.get_map().unwrap() instead of match
 
-  for (key, value) in &map {
+  for (key, value) in &another_clone {
       println!("{:?}: {:?}", key, value);
   }
   // And safely fetch a value:
@@ -64,21 +64,6 @@ fn main() {
 }
 ```
 The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion and variable access.
-
-As of now, there's also a public function, to load an ini-syntax file and parse it into a hashmap. Support for this will be dropped in the near future, and will be changed into a macro when it's dropped.
-```rust
-use configparser::ini;
-
-fn main() {
-  let map = ini::load("Path/to/file...");
-
-  // You can then access the map normally like:
-  for (key, value) in &map {
-      println!("{:?}: {:?}", key, value);
-  }
-  // ...and do what you want with it. :)
-}
-```
 
 ## License
 
