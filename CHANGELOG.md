@@ -18,4 +18,4 @@
 - 0.4.0
   - Changed `Ini::load()` to return an `Ok(map)` with a clone of the stored `HashMap`.
 
-Older changelogs are preserved one, current changelog is present in [README.md]
+Older changelogs are preserved here, current changelog is present in [README.md](README.md).

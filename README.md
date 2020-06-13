@@ -26,21 +26,47 @@ API_KEY = topsecret
 ```
 Essentially, the syntax consists of sections, each of can which contains keys with values. The `Ini` struct can read and write such values.
 
-## Datatypes
+## Supported datatypes
 `configparser` does not guess the datatype of values in configuration files and stores everything as strings. If you need other datatypes, you should
 parse them yourself. It's planned to implement getters for primitive datatypes in the future.
-
 ```rust
 let my_int = my_string.parse::<i32>().unwrap();
+let my_str = my_string.as_str();
 ```
+
+## Supported `ini` file structure
+A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. All leading and trailing whitespace is removed from stored keys, values and section names.
+Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
+explain it later). Key-value pairs or section headers cannot span multiple lines.
 Owing to how ini files usually are, this means that `[`, `]` and `=` are special symbols (this crate will allow you to use `]` sparingly).
 
-Key-value pairs or section headers cannot spread across multiple lines for obvious reasons because the parser cannot reliably parse it otherwise.
-A value on the next line could as well be a key for another.
+Let's take for example:
+```INI
+[Basic Values is the same thing]
+[   Basic Values is the same thing    ]
+key1=value1
+spaces in keys=allowed
+spaces in values=allowed as well
+spaces around the delimiter = also OK
 
-An important note is that key-value pairs not attached to any section are automatically put in a section called `DEFAULT`.
-Future releases will add support for escaping, comments and modifying default section naming.
+[All values are strings]
+values like this: 0000
+or this: 0.999
+are they treated as numbers? : no
+integers, floats and booleans are held as: strings
 
+[value-less?]
+a_valueless_key
+this key has an empty string value =
+
+    [indented sections]
+        can_values_be_as_well = True
+        purpose = formatting for readability
+        is_this_same     =        yes
+            is_this_same=yes
+```
+An important thing to note is that values with the same keys will get updated, this means that the last inserted value is the one that remains
+in the `HashMap`.
 
 ## Installation
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
@@ -95,14 +121,7 @@ additional terms or conditions.
 
 ## Changelog
 
-- 0.1.0 (yanked)
-  - First experimental version with only a public-facing load() function.
-- 0.1.1
-  - `configparser` module renamed to `ini`.
-- 0.2.1
-  - `Ini` struct is added along with file-loading, parsing and hashmap functions. Documentation is added.
-- 0.2.2
-  - Fixed docs.
+Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.3.0
   - Added `get()` for getting values from the map directly. Docs expanded as well.
   - Mark `ini::load()` for deprecation.
@@ -113,12 +132,21 @@ additional terms or conditions.
 - 0.4.0
   - Changed `Ini::load()` to return an `Ok(map)` with a clone of the stored `HashMap`.
 - 0.4.1
-  -
+  - Fixed and added docs.
+- 0.5.0 (**BETA**)
+  - Changelog added.
+  - Support for value-less keys.
+  - `HashMap` values are now `Option<String>` instead of `String` to denote empty values vs. no values.
+  - Documentation greatly improved.
+  - Syntax docs provided.
+  - `new()` and `get()` methods are simplified.
 
 ### Future plans
 
 - Support for `ini::load()` will be dropped in the next major releaser per SemVer (i.e. 1.0.0)
   - It will be replaced with a macro for a similar functionality.
   - It has been marked as deprecated.
-- More functions for `Ini` struct, such as reading from a string, insertion, deletion.
+- More functions for `Ini` struct, such as reading from a string, insertion and deletion.
+- Support for comments
+- Support for value-parsing
 - Index access
