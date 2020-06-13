@@ -1,24 +1,37 @@
 # configparser
 [![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2020)](https://github.com/QEDK/configparser-rs)
 
-A simple configuration parsing utility with no dependencies built on Rust.
 
-`configparser` works on a subset of ini configuration syntax (for now). It is inspired by Python's `configparser`.
+This crate provides the `Ini` struct which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
+
+This is a simple configuration parsing utility with no dependencies built on Rust. It is inspired by Python's `configparser`.
 
 The current release is experimental, this means that future releases will be swift until we reach `stable` (1.0.0).
 The codebase is thus subject to change for now.
 
-## ini-style configuration
+## Quick Start
 
-Most `ini` files look something like this (but they don't need to be `.ini` files obviously):
-```yaml
-[some-section]
+A basic `ini`-syntax (we say ini-syntax files because the files don't need to be necessarily `*.ini`) file looks like this:
+```INI
+[DEFAULT]
 key1 = value1
-key2 = value2
+pizzatime = yes
+cost = 9
 
-[some-other-section]
-key3 = value3
-maybekey1aswell = value1
+[github.com]
+User = QEDK
+
+[topsecrets]
+API_KEY = topsecret
+```
+Essentially, the syntax consists of sections, each of can which contains keys with values. The `Ini` struct can read and write such values.
+
+## Datatypes
+`configparser` does not guess the datatype of values in configuration files and stores everything as strings. If you need other datatypes, you should
+parse them yourself. It's planned to implement getters for primitive datatypes in the future.
+
+```rust
+let my_int = my_string.parse::<i32>().unwrap();
 ```
 Owing to how ini files usually are, this means that `[`, `]` and `=` are special symbols (this crate will allow you to use `]` sparingly).
 
@@ -99,6 +112,8 @@ additional terms or conditions.
   - Converted `ini::load()` into a wrapper around `Ini`.
 - 0.4.0
   - Changed `Ini::load()` to return an `Ok(map)` with a clone of the stored `HashMap`.
+- 0.4.1
+  -
 
 ### Future plans
 
@@ -106,3 +121,4 @@ additional terms or conditions.
   - It will be replaced with a macro for a similar functionality.
   - It has been marked as deprecated.
 - More functions for `Ini` struct, such as reading from a string, insertion, deletion.
+- Index access
