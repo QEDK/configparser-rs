@@ -71,7 +71,7 @@ or property key) is the one that remains in the `HashMap`.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.4.1"
+configparser = "0.5.0"
 ```
 
 ## Usage
