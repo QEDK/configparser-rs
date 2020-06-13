@@ -52,7 +52,7 @@ impl Ini {
 	}
 
 	///Loads a file from a defined path, parses it and puts the hashmap into our struct.
-	///At one time, it only stores one file's configuration, so every call to `load()` will clear the existing HashMap, if present.
+	///At one time, it only stores one file's configuration, so every call to `load()` will clear the existing `HashMap`, if present.
 	///## Example
 	///```ignore,rust
 	///let map = match config.load("Path/to/file...") {
@@ -146,7 +146,7 @@ impl Ini {
 	}
 
 	///Returns a clone of the stored value from the key stored in the defined section.
-	/// ## Example
+	///## Example
 	///```ignore,rust
 	///let value = config.get("section", "key").unwrap();
 	///```
@@ -161,7 +161,7 @@ impl Ini {
 	///let map = config.get_map().unwrap();
 	///```
 	///Returns `Some(map)` if map is non-empty or else returns `None`.
-	///Similar to load() but returns an `Option` type with the currently stored `HashMap`.
+	///Similar to `load()` but returns an `Option` type with the currently stored `HashMap`.
 	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, Option<String>>>> {
 		if self.map.is_empty() { None } else { Some(self.map.clone()) }
 	}

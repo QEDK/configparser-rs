@@ -1,33 +1,74 @@
-/*!A simple configuration parsing utility with no dependencies built on Rust.
-`configparser` works on a subset of ini configuration syntax. It is inspired by Python's `configparser`.
+/*!
+This crate provides the `Ini` struct which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
+
+This is a simple configuration parsing utility with no dependencies built on Rust. It is inspired by Python's `configparser`.
+
 The current release is experimental, this means that future releases will be swift until we reach `stable` (1.0.0).
 The codebase is thus subject to change for now.
 
-## ini-style configuration
+## Quick Start
 
-Most `ini` files look something like this (but they don't need to be `.ini` files obviously):
-```yaml
-[some-section]
+A basic `ini`-syntax file (we say ini-syntax files because the files don't need to be necessarily `*.ini`) looks like this:
+```INI
+[DEFAULT]
 key1 = value1
-key2 = value2
+pizzatime = yes
+cost = 9
 
-[some-other-section]
-key3 = value3
-maybekey1aswell = value1
+[topsecrets]
+nuclear launch codes = topsecret
+
+[github.com]
+User = QEDK
 ```
-Owing to how ini files usually are, this means that `[`, `]` and `=` are special symbols (this crate will allow you to use `]` sparingly). Duplicate
-values are not allowed, only the last key is stored and this applies to section headers and section keys alike.
+Essentially, the syntax consists of sections, each of which can which contains keys with values. The `Ini` struct can read and write such values.
 
-Key-value pairs or section headers cannot spread across multiple lines for obvious reasons because the parser cannot reliably parse it otherwise.
-A value on the next line could as well be a key for another.
+## Supported datatypes
+`configparser` does not guess the datatype of values in configuration files and stores everything as strings. If you need other datatypes, you should
+parse them yourself. It's planned to implement getters for primitive datatypes in the future.
+```rust
+let my_string = String::from("1984");
+let my_int = my_string.parse::<i32>().unwrap();
+let my_str = my_string.as_str();
+```
 
-An important note is that key-value pairs not attached to any section are automatically put in a section called `DEFAULT`.
-Future releases will add support for escaping, comments and modifying default section naming.
+## Supported `ini` file structure
+A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. All leading and trailing whitespace is removed from stored keys, values and section names.
+Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
+explain it later). Key-value pairs or section headers cannot span multiple lines.
+Owing to how ini files usually are, this means that `[`, `]` and `=` are special symbols (this crate will allow you to use `]` sparingly).
 
-## Syntax
+Let's take for example:
+```INI
+[Basic Values is the same thing]
+[   Basic Values is the same thing    ]
+key1=value1
+spaces in keys=allowed
+spaces in values=allowed as well
+spaces around the delimiter = also OK
 
+[All values are strings]
+values like this: 0000
+or this: 0.999
+are they treated as numbers? : no
+integers, floats and booleans are held as: strings
+
+[value-less?]
+a_valueless_key_has_None
+this key has an empty string value like Some("") =
+
+    [indented sections]
+        can_values_be_as_well = True
+        purpose = formatting for readability
+        is_this_same     =        yes
+            is_this_same=yes
+```
+An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
+or property key) is the one that remains in the `HashMap`.
+
+## Usage
 You can load an `ini`-file easily and parse it like:
-```ignore,rust
+```ignore, rust
 use configparser::ini::Ini;
 use std::collections::HashMap;
 
@@ -52,6 +93,7 @@ fn main() {
   let val = config.get("section name", "key name").unwrap();
 }
 ```
-The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion and variable access.
+The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion, index access
+as well as support for comments.
 */
 pub mod ini;

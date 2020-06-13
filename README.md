@@ -1,7 +1,6 @@
 # configparser
 [![Build Status](https://travis-ci.com/QEDK/configparser-rs.svg?branch=master)](https://travis-ci.com/QEDK/configparser-rs) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2020)](https://github.com/QEDK/configparser-rs)
 
-
 This crate provides the `Ini` struct which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
 
 This is a simple configuration parsing utility with no dependencies built on Rust. It is inspired by Python's `configparser`.
@@ -11,20 +10,20 @@ The codebase is thus subject to change for now.
 
 ## Quick Start
 
-A basic `ini`-syntax (we say ini-syntax files because the files don't need to be necessarily `*.ini`) file looks like this:
+A basic `ini`-syntax file (we say ini-syntax files because the files don't need to be necessarily `*.ini`) looks like this:
 ```INI
 [DEFAULT]
 key1 = value1
 pizzatime = yes
 cost = 9
 
+[topsecrets]
+nuclear launch codes = topsecret
+
 [github.com]
 User = QEDK
-
-[topsecrets]
-API_KEY = topsecret
 ```
-Essentially, the syntax consists of sections, each of can which contains keys with values. The `Ini` struct can read and write such values.
+Essentially, the syntax consists of sections, each of which can which contains keys with values. The `Ini` struct can read and write such values.
 
 ## Supported datatypes
 `configparser` does not guess the datatype of values in configuration files and stores everything as strings. If you need other datatypes, you should
@@ -56,8 +55,8 @@ are they treated as numbers? : no
 integers, floats and booleans are held as: strings
 
 [value-less?]
-a_valueless_key
-this key has an empty string value =
+a_valueless_key_has_None
+this key has an empty string value like Some("") =
 
     [indented sections]
         can_values_be_as_well = True
@@ -65,12 +64,12 @@ this key has an empty string value =
         is_this_same     =        yes
             is_this_same=yes
 ```
-An important thing to note is that values with the same keys will get updated, this means that the last inserted value is the one that remains
-in the `HashMap`.
+An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
+or property key) is the one that remains in the `HashMap`.
 
 ## Installation
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
-```yaml
+```TOML
 [dependencies]
 configparser = "0.4.1"
 ```
@@ -102,7 +101,8 @@ fn main() {
   let val = config.get("section name", "key name").unwrap();
 }
 ```
-The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion and variable access.
+The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion, index access
+as well as support for comments.
 
 ## License
 
