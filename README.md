@@ -140,6 +140,8 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Documentation greatly improved.
   - Syntax docs provided.
   - `new()` and `get()` methods are simplified.
+- 0.5.1
+  - Fixed erroneous docs.
 
 ### Future plans
 
