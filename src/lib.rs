@@ -49,14 +49,14 @@ spaces in values=allowed as well
 spaces around the delimiter = also OK
 
 [All values are strings]
-values like this: 0000
-or this: 0.999
-are they treated as numbers? : no
-integers, floats and booleans are held as: strings
+values like this= 0000
+or this= 0.999
+are they treated as numbers? = no
+integers, floats and booleans are held as= strings
 
 [value-less?]
 a_valueless_key_has_None
-this key has an empty string value like Some("") =
+this key has an empty string value has Some("") =
 
     [indented sections]
         can_values_be_as_well = True
