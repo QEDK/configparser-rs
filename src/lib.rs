@@ -69,32 +69,38 @@ or property key) is the one that remains in the `HashMap`.
 
 ## Usage
 You can load an `ini`-file easily and parse it like:
-```ignore, rust
+```rust
 use configparser::ini::Ini;
-use std::collections::HashMap;
+use std::error::Error;
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
   let mut config = Ini::new();
 
-  let a_map_clone = match config.load("Path/to/file...") {
-  	Err(why) => panic!("{}", why),
-  	Ok(map) => map
-  }; // You can also safely not store the HashMap and access it later
+  // You can easily load a file to get a clone of the map:
+  let map = config.load("../tests/test.ini")?;
+  println!("{:?}", map);
+  // You can also safely not store the reference and access it later with get_map_ref() or get a clone with get_map()
 
-  // You can also then access the map normally like:
-  let another_clone = match config.get_map() {
-  	None => HashMap::new(), // or whatever you want to do if the map is empty
-  	Some(map) => map
-  }; // or let map = config.get_map().unwrap() instead of match
+  // You can then access it like a normal hashmap:
+  let innermap = map["topsecret"].clone(); // Remember this is a hashmap!
 
-  for (key, value) in &another_clone {
-      println!("{:?}: {:?}", key, value);
-  }
-  // And safely fetch a value:
-  let val = config.get("section name", "key name").unwrap();
+  // If you want to access the value, then you can simply do:
+  let val = map["topsecret"]["KFC"].clone().unwrap();
+  // Remember that the .clone().unwrap() is required because it's an Option<String> type!
+
+  assert_eq!(val, "the secret herb called orega-"); // value accessible!
+
+  // What if you want to mutate the parser and remove KFC's secret recipe? Just use get_mut_map():
+  let mut_map = config.get_mut_map();
+  mut_map.get_mut("topsecret").unwrap().insert(String::from("KFC"), None);
+  // And the secret is back in safety, remember that these are normal HashMap functions chained for convenience.
+
+  // However very quickly see how that becomes cumbersome, so you can use the handy get() function from Ini
+  let val = config.get("topsecret", "KFC"); // unwrapping will be an error because we just emptied it!
+
+  assert_eq!(val, None); // as expected!
+  Ok(())
 }
 ```
-The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion, index access
-as well as support for comments.
 */
 pub mod ini;

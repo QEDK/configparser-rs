@@ -62,9 +62,9 @@ impl Ini {
 	///let location = map["tupac"];
 	///// map.insert("...") is not allowed because this reference it not mutable, use get_mut_map() instead.
 	///```
-	///Returns `Ok(map)` with an immutable reference to the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
-	///Use `get_map()` if you want a modifiable clone.
-	pub fn load(&mut self, path: &str) -> Result<&HashMap<String, HashMap<String, Option<String>>>, String> {
+	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
+	///Use `get_mut_map()` if you want a mutable reference.
+	pub fn load(&mut self, path: &str) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
 		let path = Path::new(path);
 		let display = path.display();
 
@@ -81,7 +81,7 @@ impl Ini {
 				Ok(map) => map
 			}
 		};
-		Ok(&self.map)
+		Ok(self.map.clone())
 	}
 
 	///Private function that parses ini-style syntax into a HashMap.
