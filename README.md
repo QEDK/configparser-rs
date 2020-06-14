@@ -71,7 +71,7 @@ or property key) is the one that remains in the `HashMap`.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.5.1"
+configparser = "0.6.0"
 ```
 
 ## Usage
@@ -83,22 +83,29 @@ use std::collections::HashMap;
 fn main() {
   let mut config = Ini::new();
 
-  let a_map_clone = match config.load("Path/to/file...") {
+  // You can easily load a file to get a clone of the map:
+  let map = match config.load("tests/test.ini") {
   	Err(why) => panic!("{}", why),
   	Ok(map) => map
-  }; // You can also safely not store the HashMap and access it later
+  }; // You can also safely not store the reference and access it later with get_map_ref()
+  // or get a clone with get_map()
 
-  // You can also then access the map normally like:
-  let another_clone = match config.get_map() {
-  	None => HashMap::new(), // or whatever you want to do if the map is empty
-  	Some(map) => map
-  }; // or let map = config.get_map().unwrap() instead of match
+  // You can then access it like a normal hashmap:
+  let innermap = map["topsecret"]; // Remember this is a hashmap!
 
-  for (key, value) in &another_clone {
-      println!("{:?}: {:?}", key, value);
-  }
-  // And safely fetch a value:
-  let val = config.get("section name", "key name").unwrap();
+  // If you want to access the value, then you can simply do:
+  let val = map["topsecret"]["KFC"].clone().unwrap();
+  // Remember that the .clone().unwrap() is required because it's an Option<String> type!
+
+  // What if you want to mutate the parser and remove KFC's secret recipe? Just use get_mut_map()
+  let mut_map = config.get_mut_map();
+  mut_map.get_mut("topsecret").unwrap().insert(String::from("KFC"), None);
+  // And the secret is back in safety, remember that these are normal HashMap functions chained for convenience.
+
+  // However very quickly see how that becomes cumbersome, so you can use the handy get() function from Ini
+  let val = config.get("topsecret", "KFC"); // unwrapping will be an error because we just emptied it!
+
+  assert_eq!(val, None);
 }
 ```
 The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion, index access
@@ -133,7 +140,7 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Changed `Ini::load()` to return an `Ok(map)` with a clone of the stored `HashMap`.
 - 0.4.1
   - Fixed and added docs.
-- 0.5.0 (**BETA**)
+- 0.5.0 (**BETA**) (yanked)
   - Changelog added.
   - Support for value-less keys.
   - `HashMap` values are now `Option<String>` instead of `String` to denote empty values vs. no values.
@@ -142,6 +149,9 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - `new()` and `get()` methods are simplified.
 - 0.5.1
   - Fixed erroneous docs.
+- 0.6.0 (**BETA 2**)
+  - `Ini::load` now gives an immutable reference to the map.
+  - `get_map_ref()` and `get_mut_map()` are now added to allow direct `HashMap` index access making things greatly easier.
 
 ### Future plans
 
@@ -151,4 +161,3 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - More functions for `Ini` struct, such as reading from a string, insertion and deletion.
 - Support for comments
 - Support for value-parsing
-- Index access
