@@ -59,8 +59,7 @@ impl Ini {
 	/// Err(why) => panic!("{}", why),
 	/// Ok(inner) => inner
 	///};
-	///let location = map["tupac"];
-	///// map.insert("...") is not allowed because this reference it not mutable, use get_mut_map() instead.
+	///let location = map["tupac's"]["crib"].unwrap();
 	///```
 	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
 	///Use `get_mut_map()` if you want a mutable reference.
@@ -172,7 +171,7 @@ impl Ini {
 	///##Example
 	///```ignore,rust
 	///let map = config.get_map_ref();
-	///let val = map.get("username", "password");
+	///let sectionmap = map["section name"];
 	///```
 	///If you just need to definitely mutate the map, use `get_mut_map()` instead.
 	pub fn get_map_ref(&self) -> &HashMap<String, HashMap<String, Option<String>>> {
@@ -183,7 +182,7 @@ impl Ini {
 	///##Example
 	///```ignore,rust
 	///let map = config.get_mut_map();
-	///map.insert("nuclear launch codes", "topsecret");
+	///map.get_mut("topsecrets").unwrap().insert(String::from("nuclear launch codes"), None);
 	///```
 	///If you just need to access the map without mutating, use `get_map_ref()` instead.
 	pub fn get_mut_map(&mut self) -> &mut HashMap<String, HashMap<String, Option<String>>> {

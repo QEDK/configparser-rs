@@ -66,10 +66,11 @@ this key has an empty string value has Some("") =
 ```
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
+The only bit of magic the API does is the section-less properties are put in a section called "DEFAULT". It is planned to allow configuring this variable.
 
 ## Usage
 You can load an `ini`-file easily and parse it like:
-```rust
+```ignore,rust
 use configparser::ini::Ini;
 use std::error::Error;
 
@@ -77,7 +78,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   let mut config = Ini::new();
 
   // You can easily load a file to get a clone of the map:
-  let map = config.load("../tests/test.ini")?;
+  let map = config.load("tests/test.ini")?;
   println!("{:?}", map);
   // You can also safely not store the reference and access it later with get_map_ref() or get a clone with get_map()
 

@@ -29,6 +29,7 @@ Essentially, the syntax consists of sections, each of which can which contains k
 `configparser` does not guess the datatype of values in configuration files and stores everything as strings. If you need other datatypes, you should
 parse them yourself. It's planned to implement getters for primitive datatypes in the future.
 ```rust
+let my_string = String::from("1984");
 let my_int = my_string.parse::<i32>().unwrap();
 let my_str = my_string.as_str();
 ```
@@ -66,6 +67,7 @@ this key has an empty string value has Some("") =
 ```
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
+The only bit of magic the API does is the section-less properties are put in a section called "DEFAULT". It is planned to allow configuring this variable.
 
 ## Installation
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
@@ -150,7 +152,7 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.5.1
   - Fixed erroneous docs.
 - 0.6.0 (**BETA 2**)
-  - `Ini::load` now gives an immutable reference to the map.
+  - Tests added.
   - `get_map_ref()` and `get_mut_map()` are now added to allow direct `HashMap` index access making things greatly easier.
 
 ### Future plans
