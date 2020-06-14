@@ -59,10 +59,12 @@ impl Ini {
 	/// Err(why) => panic!("{}", why),
 	/// Ok(inner) => inner
 	///};
+	///let location = map["tupac"];
+	///// map.insert("...") is not allowed because this reference it not mutable, use get_mut_map() instead.
 	///```
-	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
-	///Similar to `get_map()` but returns a `Result` type and requires a path.
-	pub fn load(&mut self, path: &str) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
+	///Returns `Ok(map)` with an immutable reference to the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
+	///Use `get_map()` if you want a modifiable clone.
+	pub fn load(&mut self, path: &str) -> Result<&HashMap<String, HashMap<String, Option<String>>>, String> {
 		let path = Path::new(path);
 		let display = path.display();
 
@@ -79,7 +81,7 @@ impl Ini {
 				Ok(map) => map
 			}
 		};
-		Ok(self.map.clone())
+		Ok(&self.map)
 	}
 
 	///Private function that parses ini-style syntax into a HashMap.
@@ -164,5 +166,27 @@ impl Ini {
 	///Similar to `load()` but returns an `Option` type with the currently stored `HashMap`.
 	pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, Option<String>>>> {
 		if self.map.is_empty() { None } else { Some(self.map.clone()) }
+	}
+
+	///Returns an immutable reference to the `HashMap` stored in our struct.
+	///##Example
+	///```ignore,rust
+	///let map = config.get_map_ref();
+	///let val = map.get("username", "password");
+	///```
+	///If you just need to definitely mutate the map, use `get_mut_map()` instead.
+	pub fn get_map_ref(&self) -> &HashMap<String, HashMap<String, Option<String>>> {
+		&self.map
+	}
+
+	///Returns a mutable reference to the `HashMap` stored in our struct.
+	///##Example
+	///```ignore,rust
+	///let map = config.get_mut_map();
+	///map.insert("nuclear launch codes", "topsecret");
+	///```
+	///If you just need to access the map without mutating, use `get_map_ref()` instead.
+	pub fn get_mut_map(&mut self) -> &mut HashMap<String, HashMap<String, Option<String>>> {
+		&mut self.map
 	}
 }
