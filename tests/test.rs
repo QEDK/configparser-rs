@@ -10,12 +10,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 	assert_eq!(config.get("topsecret", "None string"), None);
 	assert_eq!(config.get("spacing", "indented").unwrap(), "indented");
 	assert_eq!(config.get("spacing", "not indented").unwrap(), "not indented");
-	assert_eq!(map["DEFAULT"]["defaultvalues"].clone().unwrap(), "defaultvalues");
-	assert_eq!(map["topsecret"]["KFC"].clone().unwrap(), "the secret herb is orega-");
-	assert_eq!(map["topsecret"]["Empty string"].clone().unwrap(), "");
+	assert_eq!(map["DEFAULT"]["defaultvalues"].unwrap(), "defaultvalues");
+	assert_eq!(map["topsecret"]["KFC"].unwrap(), "the secret herb is orega-");
+	assert_eq!(map["topsecret"]["Empty string"].unwrap(), "");
 	assert_eq!(map["topsecret"]["None string"], None);
-	assert_eq!(map["spacing"]["indented"].clone().unwrap(), "indented");
-	assert_eq!(map["spacing"]["not indented"].clone().unwrap(), "not indented");
+	assert_eq!(map["spacing"]["indented"].unwrap(), "indented");
+	assert_eq!(map["spacing"]["not indented"].unwrap(), "not indented");
 	let mut_map = config.get_mut_map();
 	mut_map.get_mut("topsecret").unwrap().insert(String::from("None string"), Some(String::from("None string")));
 	assert_eq!(map["topsecret"]["None string"].clone().unwrap(), "None string");
