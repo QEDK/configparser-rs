@@ -73,7 +73,7 @@ The only bit of magic the API does is the section-less properties are put in a s
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.6.1"
+configparser = "0.6.2"
 ```
 
 ## Usage
