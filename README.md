@@ -73,7 +73,7 @@ The only bit of magic the API does is the section-less properties are put in a s
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.6.0"
+configparser = "0.6.1"
 ```
 
 ## Usage
@@ -131,13 +131,6 @@ additional terms or conditions.
 ## Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.3.0
-  - Added `get()` for getting values from the map directly. Docs expanded as well.
-  - Mark `ini::load()` for deprecation.
-- 0.3.1
-  - Updated docs.
-  - All parameters now trimmed before insertion.
-  - Converted `ini::load()` into a wrapper around `Ini`.
 - 0.4.0
   - Changed `Ini::load()` to return an `Ok(map)` with a clone of the stored `HashMap`.
 - 0.4.1
@@ -150,10 +143,12 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Syntax docs provided.
   - `new()` and `get()` methods are simplified.
 - 0.5.1
-  - Fixed erroneous docs.
+  - Fixed erroneous docs
 - 0.6.0 (**BETA 2**)
-  - Tests added.
+  - Tests added
   - `get_map_ref()` and `get_mut_map()` are now added to allow direct `HashMap` index access making things greatly easier.
+- 0.6.1
+  - Fixed tests
 
 ### Future plans
 
