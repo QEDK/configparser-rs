@@ -75,7 +75,17 @@ or property key) is the one that remains in the `HashMap`.
 The only bit of magic the API does is the section-less properties are put in a section called "default". It is planned to allow configuring this variable.
 
 ## Usage
-You can load an `ini`-file easily and parse it like:
+Let's take another simple `ini` file and talk about working with it:
+```INI
+[topsecret]
+KFC = the secret herb is orega-
+
+[values]
+Int = -31415
+```
+If you read the above sections carefully, you'll know that 1) all the keys are stored in lowercase, 2) `get()` can make access in a case-insensitive
+manner and 3) we can use `getint()` to parse the `Int` value into an `i64`. Let's see that in action.
+
 ```rust
 use configparser::ini::Ini;
 use std::error::Error;

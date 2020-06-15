@@ -30,7 +30,7 @@ pub fn load(path: &str) -> HashMap<String, HashMap<String, Option<String>>> {
 ///
 ///let config = Ini::new();
 ///```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Ini {
 	map: HashMap<String, HashMap<String, Option<String>>>
 }

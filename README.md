@@ -82,7 +82,17 @@ configparser = "0.7.0"
 ```
 
 ## Usage
-You can load an `ini`-file easily and parse it like:
+Let's take another simple `ini` file and talk about working with it:
+```INI
+[topsecret]
+KFC = the secret herb is orega-
+
+[values]
+Int = -31415
+```
+If you read the above sections carefully, you'll know that 1) all the keys are stored in lowercase, 2) `get()` can make access in a case-insensitive
+manner and 3) we can use `getint()` to parse the `Int` value into an `i64`. Let's see that in action.
+
 ```rust
 use configparser::ini::Ini;
 use std::error::Error;
@@ -164,6 +174,9 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Handy getter functions introduced such as `getint()`, `getuint()`, `getfloat()`, `getbool()`
   - Fixed docs
   - Fixed tests
+- 0.7.1
+  - Enable `Eq` and `PartialEq` traits
+  - Improve docs
 
 ### Future plans
 
