@@ -147,8 +147,9 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Fixed tests
 - 0.6.2
   - Fixed accidental binary delivery increasing crate size by ~20x
-- 0.7.0
-  - Handy getter functions introduced such as `getint()`, `getfloat()`, `getbool()`
+- 0.7.0 (**BETA 3**)
+  - Handy getter functions introduced such as `getint()`, `getuint()`, `getfloat()`, `getbool()`
+  - Fixed docs
 
 ### Future plans
 

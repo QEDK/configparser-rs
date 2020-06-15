@@ -41,12 +41,15 @@ Owing to how ini files usually are, this means that `[`, `]` and `=` are special
 
 Let's take for example:
 ```INI
-[Basic Values is the same thing]
-[   Basic Values is the same thing    ]
-key1=value1
+[section headers are case-insensitive]
+[   section headers are case-insensitive    ]
+are the section headers above same? = yes
+sectionheaders_and_keysarestored_in_lowercase? = yes
+keys_are_also_case_insensitive = Values are case sensitive
 spaces in keys=allowed
 spaces in values=allowed as well
 spaces around the delimiter = also OK
+
 
 [All values are strings]
 values like this= 0000
@@ -66,7 +69,7 @@ this key has an empty string value has Some("") =
 ```
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
-The only bit of magic the API does is the section-less properties are put in a section called "DEFAULT". It is planned to allow configuring this variable.
+The only bit of magic the API does is the section-less properties are put in a section called "default". It is planned to allow configuring this variable.
 
 ## Usage
 You can load an `ini`-file easily and parse it like:
