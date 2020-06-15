@@ -254,7 +254,7 @@ impl Ini {
 	///## Example
 	///```ignore,rust
 	///let map = config.get_map_ref();
-	///let sectionmap = map["section name"];
+	///let sectionmap = map["section name"].clone();
 	///```
 	///If you just need to definitely mutate the map, use `get_mut_map()` instead.
 	pub fn get_map_ref(&self) -> &HashMap<String, HashMap<String, Option<String>>> {
@@ -267,7 +267,7 @@ impl Ini {
 	///let map = config.get_mut_map();
 	///map.get_mut("topsecrets").unwrap().insert(String::from("nuclear launch codes"), None);
 	///```
-	///If you just need to access the map without mutating, use `get_map_ref()` instead.
+	///If you just need to access the map without mutating, use `get_map_ref()` or make a clone with `get_map()` instead.
 	pub fn get_mut_map(&mut self) -> &mut HashMap<String, HashMap<String, Option<String>>> {
 		&mut self.map
 	}

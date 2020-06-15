@@ -26,12 +26,14 @@ User = QEDK
 Essentially, the syntax consists of sections, each of which can which contains keys with values. The `Ini` struct can read and write such values.
 
 ## Supported datatypes
-`configparser` does not guess the datatype of values in configuration files and stores everything as strings. If you need other datatypes, you should
-parse them yourself. It's planned to implement getters for primitive datatypes in the future.
-```rust
+`configparser` does not guess the datatype of values in configuration files and stores everything as strings. However, some datatypes are so common
+that it's a safe bet that some values need to be parsed in other types. For this, the `Ini` struct provides easy functions like `getint()`, `getuint()`,
+`getfloat()` and `getbool()`. The only bit of extra magic involved is that the `getbool()` function will treat boolean values case-insensitively (so
+`true` is the same as `True` just like `TRUE`). You can ofcourse just choose to parse the string values yourself.
+```ignore,rust
 let my_string = String::from("1984");
 let my_int = my_string.parse::<i32>().unwrap();
-let my_str = my_string.as_str();
+let my_value = config.getint("somesection", "someintvalue")?.unwrap();
 ```
 
 ## Supported `ini` file structure
@@ -42,12 +44,15 @@ Owing to how ini files usually are, this means that `[`, `]` and `=` are special
 
 Let's take for example:
 ```INI
-[Basic Values is the same thing]
-[   Basic Values is the same thing    ]
-key1=value1
+[section headers are case-insensitive]
+[   section headers are case-insensitive    ]
+are the section headers above same? = yes
+sectionheaders_and_keysarestored_in_lowercase? = yes
+keys_are_also_case_insensitive = Values are case sensitive
 spaces in keys=allowed
 spaces in values=allowed as well
 spaces around the delimiter = also OK
+
 
 [All values are strings]
 values like this= 0000
@@ -67,7 +72,7 @@ this key has an empty string value has Some("") =
 ```
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
-The only bit of magic the API does is the section-less properties are put in a section called "DEFAULT". It is planned to allow configuring this variable.
+The only bit of magic the API does is the section-less properties are put in a section called "default". It is planned to allow configuring this variable.
 
 ## Installation
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:

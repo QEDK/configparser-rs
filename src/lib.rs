@@ -25,13 +25,16 @@ User = QEDK
 Essentially, the syntax consists of sections, each of which can which contains keys with values. The `Ini` struct can read and write such values.
 
 ## Supported datatypes
-`configparser` does not guess the datatype of values in configuration files and stores everything as strings. If you need other datatypes, you should
-parse them yourself. It's planned to implement getters for primitive datatypes in the future.
-```rust
+`configparser` does not guess the datatype of values in configuration files and stores everything as strings. However, some datatypes are so common
+that it's a safe bet that some values need to be parsed in other types. For this, the `Ini` struct provides easy functions like `getint()`, `getuint()`,
+`getfloat()` and `getbool()`. The only bit of extra magic involved is that the `getbool()` function will treat boolean values case-insensitively (so
+`true` is the same as `True` just like `TRUE`). You can ofcourse just choose to parse the string values yourself.
+```ignore,rust
 let my_string = String::from("1984");
 let my_int = my_string.parse::<i32>().unwrap();
-let my_str = my_string.as_str();
+let my_value = config.getint("somesection", "someintvalue")?.unwrap();
 ```
+
 
 ## Supported `ini` file structure
 A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. All leading and trailing whitespace is removed from stored keys, values and section names.
