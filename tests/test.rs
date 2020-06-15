@@ -51,12 +51,17 @@ fn doc() -> Result<(), Box<dyn Error>> {
   // What if you want to mutate the parser and remove KFC's secret recipe? Just use get_mut_map():
   let mut_map = config.get_mut_map();
   mut_map.get_mut("topsecret").unwrap().insert(String::from("kfc"), None);
-  println!("{:?}", mut_map);
   // And the secret is back in safety, remember that these are normal HashMap functions chained for convenience.
 
   // However very quickly see how that becomes cumbersome, so you can use the handy get() function from Ini
+  // The get() function accesses the map case-insensitively, so you can use uppercase as well:
   let val = config.get("topsecret", "KFC"); // unwrapping will be an error because we just emptied it!
-
   assert_eq!(val, None); // as expected!
+
+  // What if you want to get a number?
+  let my_number = config.getint("values", "Int")?.unwrap();
+  assert_eq!(my_number, -31415); // and we got it!
+  // The Ini struct provides more getters for primitive datatypes.
+
   Ok(())
 }
