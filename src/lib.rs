@@ -73,7 +73,7 @@ The only bit of magic the API does is the section-less properties are put in a s
 
 ## Usage
 You can load an `ini`-file easily and parse it like:
-```ignore,rust
+```rust
 use configparser::ini::Ini;
 use std::error::Error;
 
@@ -89,20 +89,27 @@ fn main() -> Result<(), Box<dyn Error>> {
   let innermap = map["topsecret"].clone(); // Remember this is a hashmap!
 
   // If you want to access the value, then you can simply do:
-  let val = map["topsecret"]["KFC"].clone().unwrap();
-  // Remember that the .clone().unwrap() is required because it's an Option<String> type!
+  let val = map["topsecret"]["kfc"].clone().unwrap();
+  // Lowercasing when accessing map directly is important because all keys are stored in lower-case!
+  // Note: The .clone().unwrap() is required because it's an Option<String> type.
 
-  assert_eq!(val, "the secret herb called orega-"); // value accessible!
+  assert_eq!(val, "the secret herb is orega-"); // value accessible!
 
   // What if you want to mutate the parser and remove KFC's secret recipe? Just use get_mut_map():
   let mut_map = config.get_mut_map();
-  mut_map.get_mut("topsecret").unwrap().insert(String::from("KFC"), None);
+  mut_map.get_mut("topsecret").unwrap().insert(String::from("kfc"), None);
   // And the secret is back in safety, remember that these are normal HashMap functions chained for convenience.
 
   // However very quickly see how that becomes cumbersome, so you can use the handy get() function from Ini
+  // The get() function accesses the map case-insensitively, so you can use uppercase as well:
   let val = config.get("topsecret", "KFC"); // unwrapping will be an error because we just emptied it!
-
   assert_eq!(val, None); // as expected!
+
+  // What if you want to get a number?
+  let my_number = config.getint("values", "Int")?.unwrap();
+  assert_eq!(my_number, -31415); // and we got it!
+  // The Ini struct provides more getters for primitive datatypes.
+
   Ok(())
 }
 ```

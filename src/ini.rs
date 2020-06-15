@@ -148,7 +148,7 @@ impl Ini {
 
 	///Returns a clone of the stored value from the key stored in the defined section.
 	///Unlike accessing the map directly, `get()` processes your input to make case-insensitive access.
-	///All `get` functions do this for you.
+	///All `get` functions will do this automatically.
 	///## Example
 	///```ignore,rust
 	///let value = config.get("section", "key").unwrap();
@@ -158,6 +158,14 @@ impl Ini {
 		self.map.get(&section.to_lowercase())?.get(&key.to_lowercase())?.clone()
 	}
 
+	///Parses the stored value from the key stored in the defined section to a `bool`.
+	///For ease of use, the function converts the type case-insensitively (`true` == `True`).
+	///## Example
+	///```ignore,rust
+	///let value = config.getbool("section", "key")?.unwrap();
+	///```
+	///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
+	///If the parsing fails, it returns an `Err(string)`.
 	pub fn getbool(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
@@ -171,6 +179,13 @@ impl Ini {
 		}
 	}
 
+	///Parses the stored value from the key stored in the defined section to an `i64`.
+	///## Example
+	///```ignore,rust
+	///let value = config.getint("section", "key")?.unwrap();
+	///```
+	///Returns `Ok(Some(value))` of type `i64` if value is found or else returns `Ok(None)`.
+	///If the parsing fails, it returns an `Err(string)`.
 	pub fn getint(&self, section: &str, key: &str) -> Result<Option<i64>, String> {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
@@ -184,6 +199,13 @@ impl Ini {
 		}
 	}
 
+	///Parses the stored value from the key stored in the defined section to a `u64`.
+	///## Example
+	///```ignore,rust
+	///let value = config.getuint("section", "key")?.unwrap();
+	///```
+	///Returns `Ok(Some(value))` of type `u64` if value is found or else returns `Ok(None)`.
+	///If the parsing fails, it returns an `Err(string)`.
 	pub fn getuint(&self, section: &str, key: &str) -> Result<Option<u64>, String> {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
@@ -197,6 +219,13 @@ impl Ini {
 		}
 	}
 
+	///Parses the stored value from the key stored in the defined section to a `f64`.
+	///## Example
+	///```ignore,rust
+	///let value = config.getfloat("section", "key")?.unwrap();
+	///```
+	///Returns `Ok(Some(value))` of type `f64` if value is found or else returns `Ok(None)`.
+	///If the parsing fails, it returns an `Err(string)`.
 	pub fn getfloat(&self, section: &str, key: &str) -> Result<Option<f64>, String> {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
