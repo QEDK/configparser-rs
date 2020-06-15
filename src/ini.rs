@@ -59,7 +59,7 @@ impl Ini {
 	/// Err(why) => panic!("{}", why),
 	/// Ok(inner) => inner
 	///};
-	///let location = map["tupac's"]["crib"].unwrap();
+	///let location = map["tupac's"]["crib"].clone().unwrap();
 	///```
 	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
 	///Use `get_mut_map()` if you want a mutable reference.
@@ -168,7 +168,7 @@ impl Ini {
 	}
 
 	///Returns an immutable reference to the `HashMap` stored in our struct.
-	///##Example
+	///## Example
 	///```ignore,rust
 	///let map = config.get_map_ref();
 	///let sectionmap = map["section name"];
