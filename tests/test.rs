@@ -11,6 +11,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 	assert_eq!(config.get("topsecret", "None string"), None);
 	assert_eq!(config.get("spacing", "indented").unwrap(), "indented");
 	assert_eq!(config.get("spacing", "not indented").unwrap(), "not indented");
+	assert_eq!(config.getbool("values", "Bool")?.unwrap(), true);
+	assert_eq!(config.getint("values", "Int")?.unwrap(), -31415);
+	assert_eq!(config.getuint("values", "Uint")?.unwrap(), 31415);
+	assert_eq!(config.getfloat("values", "Float")?.unwrap(), 3.1415);
 	assert_eq!(map["default"]["defaultvalues"].clone().unwrap(), "defaultvalues");
 	assert_eq!(map["topsecret"]["kfc"].clone().unwrap(), "the secret herb is orega-");
 	assert_eq!(map["topsecret"]["empty string"].clone().unwrap(), "");
