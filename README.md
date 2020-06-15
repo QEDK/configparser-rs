@@ -78,7 +78,7 @@ The only bit of magic the API does is the section-less properties are put in a s
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.6.2"
+configparser = "0.7.0"
 ```
 
 ## Usage
@@ -163,6 +163,7 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.7.0 (**BETA 3**)
   - Handy getter functions introduced such as `getint()`, `getuint()`, `getfloat()`, `getbool()`
   - Fixed docs
+  - Fixed tests
 
 ### Future plans
 
@@ -171,4 +172,3 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - It has been marked as deprecated.
 - More functions for `Ini` struct, such as reading from a string, insertion and deletion.
 - Support for comments
-- Support for value-parsing
