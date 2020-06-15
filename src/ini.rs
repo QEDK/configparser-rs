@@ -86,7 +86,7 @@ impl Ini {
 	///Private function that parses ini-style syntax into a HashMap.
 	fn parse(&self, input: String) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
 		let mut map: HashMap<String, HashMap<String, Option<String>>> = HashMap::new();
-		let mut section = String::from("DEFAULT");
+		let mut section = String::from("default");
 		for (num, lines) in input.lines().enumerate() {
 			let trimmed = lines.trim();
 			if trimmed.len() == 0 {
@@ -147,13 +147,67 @@ impl Ini {
 	}
 
 	///Returns a clone of the stored value from the key stored in the defined section.
+	///Unlike accessing the map directly, `get()` processes your input to make case-insensitive access.
+	///All `get` functions do this for you.
 	///## Example
 	///```ignore,rust
 	///let value = config.get("section", "key").unwrap();
 	///```
 	///Returns `Some(value)` of type `String` if value is found or else returns `None`.
 	pub fn get(&self, section: &str, key: &str) -> Option<String> {
-		self.map.get(section)?.get(key)?.clone()
+		self.map.get(&section.to_lowercase())?.get(&key.to_lowercase())?.clone()
+	}
+
+	pub fn getbool(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
+		match self.map.get(&section.to_lowercase()) {
+			Some(secmap) => match secmap.get(&key.to_lowercase()) {
+				Some(val) => match val.clone().unwrap().to_lowercase().parse::<bool>() {
+					Err(why) => Err(why.to_string()),
+					Ok(boolean) => Ok(Some(boolean))
+				},
+				None => Ok(None)
+			},
+			None => Ok(None)
+		}
+	}
+
+	pub fn getint(&self, section: &str, key: &str) -> Result<Option<i64>, String> {
+		match self.map.get(&section.to_lowercase()) {
+			Some(secmap) => match secmap.get(&key.to_lowercase()) {
+				Some(val) => match val.clone().unwrap().parse::<i64>() {
+					Err(why) => Err(why.to_string()),
+					Ok(int) => Ok(Some(int))
+				},
+				None => Ok(None)
+			},
+			None => Ok(None)
+		}
+	}
+
+	pub fn getuint(&self, section: &str, key: &str) -> Result<Option<u64>, String> {
+		match self.map.get(&section.to_lowercase()) {
+			Some(secmap) => match secmap.get(&key.to_lowercase()) {
+				Some(val) => match val.clone().unwrap().parse::<u64>() {
+					Err(why) => Err(why.to_string()),
+					Ok(uint) => Ok(Some(uint))
+				},
+				None => Ok(None)
+			},
+			None => Ok(None)
+		}
+	}
+
+	pub fn getfloat(&self, section: &str, key: &str) -> Result<Option<f64>, String> {
+		match self.map.get(&section.to_lowercase()) {
+			Some(secmap) => match secmap.get(&key.to_lowercase()) {
+				Some(val) => match val.clone().unwrap().parse::<f64>() {
+					Err(why) => Err(why.to_string()),
+					Ok(float) => Ok(Some(float))
+				},
+				None => Ok(None)
+			},
+			None => Ok(None)
+		}
 	}
 
 	///Returns a clone of the `HashMap` stored in our struct.
