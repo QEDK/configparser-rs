@@ -17,5 +17,7 @@
   - Converted `ini::load()` into a wrapper around `Ini`.
 - 0.4.0
   - Changed `Ini::load()` to return an `Ok(map)` with a clone of the stored `HashMap`.
+- 0.4.1
+  - Fixed and added docs.
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).

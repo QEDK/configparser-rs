@@ -131,10 +131,6 @@ additional terms or conditions.
 ## Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.4.0
-  - Changed `Ini::load()` to return an `Ok(map)` with a clone of the stored `HashMap`.
-- 0.4.1
-  - Fixed and added docs.
 - 0.5.0 (**BETA**) (yanked)
   - Changelog added.
   - Support for value-less keys.
@@ -147,8 +143,12 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.6.0 (**BETA 2**)
   - Tests added
   - `get_map_ref()` and `get_mut_map()` are now added to allow direct `HashMap` index access making things greatly easier.
-- 0.6.1
+- 0.6.1 (yanked)
   - Fixed tests
+- 0.6.2
+  - Fixed accidental binary delivery increasing crate size by ~20x
+- 0.7.0
+  - Handy getter functions introduced such as `getint()`, `getfloat()`, `getbool()`
 
 ### Future plans
 
