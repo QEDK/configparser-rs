@@ -1,8 +1,8 @@
 //!The ini module provides all the things necessary to load and parse ini-syntax files.
 //!The most important of which is the `Ini` struct.
 use std::fs::File;
-use std::io::prelude::*;
 use std::path::Path;
+use std::io::prelude::*;
 use std::collections::HashMap;
 
 ///A public function of the module to load and parse files into a hashmap.
@@ -23,7 +23,7 @@ pub fn load(path: &str) -> HashMap<String, HashMap<String, Option<String>>> {
 	}
 }
 
-///The `Ini` struct simply contains a nested hashmap of the loaded configuration.
+///The `Ini` struct simply contains a nested hashmap of the loaded configuration, and the default section header.
 ///## Example
 ///```rust
 ///use configparser::ini::Ini;
@@ -32,7 +32,8 @@ pub fn load(path: &str) -> HashMap<String, HashMap<String, Option<String>>> {
 ///```
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Ini {
-	map: HashMap<String, HashMap<String, Option<String>>>
+	map: HashMap<String, HashMap<String, Option<String>>>,
+	default_section: std::string::String
 }
 
 impl Ini {
@@ -47,12 +48,29 @@ impl Ini {
 	///Returns the struct and stores it in the calling variable.
 	pub fn new() -> Ini {
 		Ini {
-			map: HashMap::new()
+			map: HashMap::new(),
+			default_section: String::from("default")
 		}
 	}
 
+	///Sets the default section header to something else (the default is "default").
+	///It must be set before `load()` is called in order to take effect.
+	///## Example
+	///```ignore,rust
+	///let config = Ini::new();
+	///config.set_default_section("topsecret");
+	///let map = match config.load("Path/to/file...") {
+	/// Err(why) => panic!("{}", why),
+	/// Ok(inner) => inner
+	///};
+	///```
+	///Returns nothing.
+	pub fn set_default_section(&mut self, section: &str) {
+		self.default_section = section.to_string();
+	}
+
 	///Loads a file from a defined path, parses it and puts the hashmap into our struct.
-	///At one time, it only stores one file's configuration, so every call to `load()` will clear the existing `HashMap`, if present.
+	///At one time, it only stores one file's configuration, so every call to `load()` or `read()` will clear the existing `HashMap`, if present.
 	///## Example
 	///```ignore,rust
 	///let map = match config.load("Path/to/file...") {
@@ -83,10 +101,30 @@ impl Ini {
 		Ok(self.map.clone())
 	}
 
+	///Reads an input string, parses it and puts the hashmap into our struct.
+	///At one time, it only stores one file's configuration, so every call to `load()` or `read()` will clear the existing `HashMap`, if present.
+	///## Example
+	///```ignore,rust
+	///let map = match config.read(config_string) {
+	/// Err(why) => panic!("{}", why),
+	/// Ok(inner) => inner
+	///};
+	///let location = map["2000s"]["2020"].clone().unwrap();
+	///```
+	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
+	///Use `get_mut_map()` if you want a mutable reference.
+	pub fn read(&mut self, input: String) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
+		self.map = match self.parse(input) {
+			Err(why) => return Err(why),
+			Ok(map) => map
+		};
+		Ok(self.map.clone())
+	}
+
 	///Private function that parses ini-style syntax into a HashMap.
 	fn parse(&self, input: String) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
 		let mut map: HashMap<String, HashMap<String, Option<String>>> = HashMap::new();
-		let mut section = String::from("default");
+		let mut section = self.default_section.clone();
 		for (num, lines) in input.lines().enumerate() {
 			let trimmed = lines.trim();
 			if trimmed.len() == 0 {
