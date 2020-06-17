@@ -177,6 +177,9 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.7.1
   - Enable `Eq` and `PartialEq` traits
   - Improve docs
+- 0.8.0 (**BETA 4**)
+  - Added feature to set default headers.
+  - Added feature to parse from a `String`.
 
 ### Future plans
 
