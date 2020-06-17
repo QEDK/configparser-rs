@@ -70,7 +70,7 @@ impl Ini {
 	}
 
 	///Loads a file from a defined path, parses it and puts the hashmap into our struct.
-	///At one time, it only stores one file's configuration, so every call to `load()` or `read()` will clear the existing `HashMap`, if present.
+	///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `HashMap`, if present.
 	///## Example
 	///```ignore,rust
 	///let map = match config.load("Path/to/file...") {
@@ -102,7 +102,7 @@ impl Ini {
 	}
 
 	///Reads an input string, parses it and puts the hashmap into our struct.
-	///At one time, it only stores one file's configuration, so every call to `load()` or `read()` will clear the existing `HashMap`, if present.
+	///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `HashMap`, if present.
 	///## Example
 	///```ignore,rust
 	///let map = match config.read(config_string) {
