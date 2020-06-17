@@ -79,7 +79,7 @@ this key has an empty string value has Some("") =
 ```
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
-The only bit of magic the API does is the section-less properties are put in a section called "default". It is planned to allow configuring this variable.
+The only bit of magic the API does is the section-less properties are put in a section called "default". You can configure this variable via the API.
 
 ## Usage
 Let's take another simple `ini` file and talk about working with it:
@@ -186,5 +186,5 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - Support for `ini::load()` will be dropped in the next major releaser per SemVer (i.e. 1.0.0)
   - It will be replaced with a macro for a similar functionality.
   - It has been marked as deprecated.
-- More functions for `Ini` struct, such as reading from a string, insertion and deletion.
+- More functions for the `Ini` struct, such as insertion and deletion.
 - Support for comments

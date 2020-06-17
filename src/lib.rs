@@ -72,7 +72,7 @@ this key has an empty string value has Some("") =
 ```
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
-The only bit of magic the API does is the section-less properties are put in a section called "default". It is planned to allow configuring this variable.
+The only bit of magic the API does is the section-less properties are put in a section called "default". You can configure this variable via the API.
 
 ## Usage
 Let's take another simple `ini` file and talk about working with it:
