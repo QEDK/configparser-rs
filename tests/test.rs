@@ -5,6 +5,22 @@ use std::error::Error;
 fn main() -> Result<(), Box<dyn Error>> {
 	let mut config = Ini::new();
 	let map = config.load("tests/test.ini")?;
+	let inpstring = config.read(String::from
+		("defaultvalues=defaultvalues
+		[topsecret]
+		KFC = the secret herb is orega-
+		Empty string =
+		None string
+		[ spacing ]
+			indented=indented
+		not indented = not indented
+
+		[values]
+		Bool = True
+		Int = -31415
+		Uint = 31415
+		Float = 3.1415"))?;
+	assert_eq!(map, inpstring);
 	assert_eq!(config.get("DEFAULT", "defaultvalues").unwrap(), "defaultvalues");
 	assert_eq!(config.get("topsecret", "KFC").unwrap(), "the secret herb is orega-");
 	assert_eq!(config.get("topsecret", "Empty string").unwrap(), "");
