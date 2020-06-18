@@ -46,8 +46,9 @@ let my_value = config.getint("somesection", "someintvalue")?.unwrap();
 ## Supported `ini` file structure
 A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. All leading and trailing whitespace is removed from stored keys, values and section names.
 Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
-explain it later). Key-value pairs or section headers cannot span multiple lines.
-Owing to how ini files usually are, this means that `[`, `]` and `=` are special symbols (this crate will allow you to use `]` sparingly).
+explain it later). You can use comment symbols (`;` to denote comments). It is planned to allow configuring this via the API in the future.
+Keep in mind that key-value pairs or section headers cannot span multiple lines.
+Owing to how ini files usually are, this means that `[`, `]`, `=`, ';' are special symbols (this crate will allow you to use `]` sparingly).
 
 Let's take for example:
 ```INI
@@ -56,7 +57,8 @@ Let's take for example:
 are the section headers above same? = yes
 sectionheaders_and_keysarestored_in_lowercase? = yes
 keys_are_also_case_insensitive = Values are case sensitive
-spaces in keys=allowed
+;anything after a comment symbol is ignored
+spaces in keys=allowed ;everything before this is still valid!
 spaces in values=allowed as well
 spaces around the delimiter = also OK
 
@@ -154,15 +156,6 @@ additional terms or conditions.
 ## Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.5.0 (**BETA**) (yanked)
-  - Changelog added.
-  - Support for value-less keys.
-  - `HashMap` values are now `Option<String>` instead of `String` to denote empty values vs. no values.
-  - Documentation greatly improved.
-  - Syntax docs provided.
-  - `new()` and `get()` methods are simplified.
-- 0.5.1
-  - Fixed erroneous docs
 - 0.6.0 (**BETA 2**)
   - Tests added
   - `get_map_ref()` and `get_mut_map()` are now added to allow direct `HashMap` index access making things greatly easier.
@@ -180,6 +173,9 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.8.0 (**BETA 4**)
   - Added feature to set default headers.
   - Added feature to parse from a `String`.
+- 0.8.1
+  - Added support for comments
+  - Improved docs
 
 ### Future plans
 
@@ -187,4 +183,3 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - It will be replaced with a macro for a similar functionality.
   - It has been marked as deprecated.
 - More functions for the `Ini` struct, such as insertion and deletion.
-- Support for comments

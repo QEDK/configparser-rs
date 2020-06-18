@@ -19,5 +19,14 @@
   - Changed `Ini::load()` to return an `Ok(map)` with a clone of the stored `HashMap`.
 - 0.4.1
   - Fixed and added docs.
+- 0.5.0 (**BETA**) (yanked)
+  - Changelog added.
+  - Support for value-less keys.
+  - `HashMap` values are now `Option<String>` instead of `String` to denote empty values vs. no values.
+  - Documentation greatly improved.
+  - Syntax docs provided.
+  - `new()` and `get()` methods are simplified.
+- 0.5.1
+  - Fixed erroneous docs
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).
