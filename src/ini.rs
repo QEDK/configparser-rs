@@ -104,12 +104,19 @@ impl Ini {
 	///Reads an input string, parses it and puts the hashmap into our struct.
 	///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `HashMap`, if present.
 	///## Example
-	///```ignore,rust
-	///let map = match config.read(config_string) {
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///let map = match config.read(String::from(
+	///	"[2000s]
+	///	2020 = bad"
+	///	)) {
 	/// Err(why) => panic!("{}", why),
 	/// Ok(inner) => inner
 	///};
-	///let location = map["2000s"]["2020"].clone().unwrap();
+	///let this_year = map["2000s"]["2020"].clone().unwrap();
+	///assert_eq!(this_year, "bad"); // value accessible!
 	///```
 	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
 	///Use `get_mut_map()` if you want a mutable reference.
@@ -126,7 +133,10 @@ impl Ini {
 		let mut map: HashMap<String, HashMap<String, Option<String>>> = HashMap::new();
 		let mut section = self.default_section.clone();
 		for (num, lines) in input.lines().enumerate() {
-			let trimmed = lines.trim();
+			let trimmed = match lines.find(';') {
+				Some(idx) => lines[..idx].trim(),
+				None => lines.trim()
+			};
 			if trimmed.len() == 0 {
 				continue;
 			}

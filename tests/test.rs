@@ -13,8 +13,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 		None string
 		[ spacing ]
 			indented=indented
-		not indented = not indented
-
+		not indented = not indented				;testcomment
+		;testcomment
 		[values]
 		Bool = True
 		Int = -31415
