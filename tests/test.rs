@@ -5,6 +5,7 @@ use std::error::Error;
 fn main() -> Result<(), Box<dyn Error>> {
 	let mut config = Ini::new();
 	let map = config.load("tests/test.ini")?;
+	config.set_comment_symbols(&[';', '#', '!']);
 	let inpstring = config.read(String::from
 		("defaultvalues=defaultvalues
 		[topsecret]
@@ -14,8 +15,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 		[ spacing ]
 			indented=indented
 		not indented = not indented				;testcomment
-		;testcomment
-		[values]
+		!modified comment
+		[values]#another comment
 		Bool = True
 		Int = -31415
 		Uint = 31415
