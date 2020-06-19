@@ -1,5 +1,5 @@
-//!The ini module provides all the things necessary to load and parse ini-syntax files.
-//!The most important of which is the `Ini` struct.
+//!The ini module provides all the things necessary to load and parse ini-syntax files. The most important of which is the `Ini` struct.
+//!See the [implementation](https://docs.rs/configparser/*/configparser/ini/struct.Ini.html) documentation for more details.
 use std::fs::File;
 use std::path::Path;
 use std::io::prelude::*;
@@ -23,7 +23,7 @@ pub fn load(path: &str) -> HashMap<String, HashMap<String, Option<String>>> {
 	}
 }
 
-///The `Ini` struct simply contains a nested hashmap of the loaded configuration, and the default section header.
+///The `Ini` struct simply contains a nested hashmap of the loaded configuration, the default section header and comment symbols.
 ///## Example
 ///```rust
 ///use configparser::ini::Ini;
@@ -55,7 +55,7 @@ impl Ini {
 		}
 	}
 
-	///Sets the default section header to something else (the default is "default").
+	///Sets the default section header to the defined string (the default is `default`).
 	///It must be set before `load()` or `read()` is called in order to take effect.
 	///## Example
 	///```ignore,rust
@@ -71,7 +71,7 @@ impl Ini {
 		self.default_section = section.to_string();
 	}
 
-	///Sets the default comment symbols to something else (the default is ";" and "#"). Keep in mind this will remove the default symbols.
+	///Sets the default comment symbols to something else (the defaults are `;` and `#`). Keep in mind that this will remove the default symbols.
 	///It must be set before `load()` or `read()` is called in order to take effect.
 	///## Example
 	///```ignore,rust
