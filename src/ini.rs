@@ -124,8 +124,7 @@ impl Ini {
 	///let mut config = Ini::new();
 	///let map = match config.read(String::from(
 	///	"[2000s]
-	///	2020 = bad"
-	///	)) {
+	///	2020 = bad")) {
 	/// Err(why) => panic!("{}", why),
 	/// Ok(inner) => inner
 	///};

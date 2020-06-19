@@ -58,7 +58,8 @@ are the section headers above same? = yes
 sectionheaders_and_keysarestored_in_lowercase? = yes
 keys_are_also_case_insensitive = Values are case sensitive
 ;anything after a comment symbol is ignored
-spaces in keys=allowed ;everything before this is still valid!
+#this is also a comment
+spaces in keys=allowed ;and everything before this is still valid!
 spaces in values=allowed as well
 spaces around the delimiter = also OK
 
