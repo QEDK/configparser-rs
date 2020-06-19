@@ -28,7 +28,7 @@ pub fn load(path: &str) -> HashMap<String, HashMap<String, Option<String>>> {
 ///```rust
 ///use configparser::ini::Ini;
 ///
-///let config = Ini::new();
+///let mut config = Ini::new();
 ///```
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Ini {
@@ -44,7 +44,7 @@ impl Ini {
 	///```rust
 	///use configparser::ini::Ini;
 	///
-	///let config = Ini::new();
+	///let mut config = Ini::new();
 	///```
 	///Returns the struct and stores it in the calling variable.
 	pub fn new() -> Ini {
@@ -58,29 +58,28 @@ impl Ini {
 	///Sets the default section header to the defined string (the default is `default`).
 	///It must be set before `load()` or `read()` is called in order to take effect.
 	///## Example
-	///```ignore,rust
-	///let config = Ini::new();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///
 	///config.set_default_section("topsecret");
-	///let map = match config.load("Path/to/file...") {
-	/// Err(why) => panic!("{}", why),
-	/// Ok(inner) => inner
-	///};
+	///let map = config.load("tests/test.ini").unwrap();
 	///```
 	///Returns nothing.
 	pub fn set_default_section(&mut self, section: &str) {
 		self.default_section = section.to_string();
 	}
 
-	///Sets the default comment symbols to something else (the defaults are `;` and `#`). Keep in mind that this will remove the default symbols.
-	///It must be set before `load()` or `read()` is called in order to take effect.
+	///Sets the default comment symbols to the defined character slice (the defaults are `;` and `#`).
+	///Keep in mind that this will remove the default symbols. It must be set before `load()` or `read()` is called in order to take effect.
 	///## Example
-	///```ignore,rust
-	///let config = Ini::new();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
 	///config.set_comment_symbols(&['!', '#']);
-	///let map = match config.load("Path/to/file...") {
-	/// Err(why) => panic!("{}", why),
-	/// Ok(inner) => inner
-	///};
+	///let map = config.load("tests/test.ini").unwrap();
 	///```
 	///Returns nothing.
 	pub fn set_comment_symbols(&mut self, symlist: &[char]) {
@@ -91,10 +90,7 @@ impl Ini {
 	///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `HashMap`, if present.
 	///## Example
 	///```ignore,rust
-	///let map = match config.load("Path/to/file...") {
-	/// Err(why) => panic!("{}", why),
-	/// Ok(inner) => inner
-	///};
+	///let map = match config.load("Path/to/file...").unwrap();
 	///let location = map["tupac's"]["crib"].clone().unwrap();
 	///```
 	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
