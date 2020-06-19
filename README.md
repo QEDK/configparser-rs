@@ -157,13 +157,6 @@ additional terms or conditions.
 ## Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.6.0 (**BETA 2**)
-  - Tests added
-  - `get_map_ref()` and `get_mut_map()` are now added to allow direct `HashMap` index access making things greatly easier.
-- 0.6.1 (yanked)
-  - Fixed tests
-- 0.6.2
-  - Fixed accidental binary delivery increasing crate size by ~20x
 - 0.7.0 (**BETA 3**)
   - Handy getter functions introduced such as `getint()`, `getuint()`, `getfloat()`, `getbool()`
   - Fixed docs
@@ -177,6 +170,10 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.8.1
   - Added support for comments
   - Improved docs
+- 0.9.0
+  - Comment customization is here! (defaults are now changed to `#` and `;`)
+  - Fixed some docs
+  - Make more docs pass tests
 
 ### Future plans
 

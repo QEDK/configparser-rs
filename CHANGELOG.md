@@ -28,5 +28,12 @@
   - `new()` and `get()` methods are simplified.
 - 0.5.1
   - Fixed erroneous docs
+- 0.6.0 (**BETA 2**)
+  - Tests added
+  - `get_map_ref()` and `get_mut_map()` are now added to allow direct `HashMap` index access making things greatly easier.
+- 0.6.1 (yanked)
+  - Fixed tests
+- 0.6.2
+  - Fixed accidental binary delivery increasing crate size by ~20x
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).
