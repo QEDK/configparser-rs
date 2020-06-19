@@ -170,8 +170,8 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.8.1
   - Added support for comments
   - Improved docs
-- 0.9.0
-  - Comment customization is here! (defaults are now changed to `#` and `;`)
+- 0.9.0 (**BETA 5**)
+  - Comment customization is here! (**note:** defaults are now changed to `#` and `;`)
   - Fixed some docs
   - Make more docs pass tests
 
