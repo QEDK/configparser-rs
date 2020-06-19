@@ -33,7 +33,8 @@ pub fn load(path: &str) -> HashMap<String, HashMap<String, Option<String>>> {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Ini {
 	map: HashMap<String, HashMap<String, Option<String>>>,
-	default_section: std::string::String
+	default_section: std::string::String,
+	comment_symbols: Vec<char>
 }
 
 impl Ini {
@@ -49,12 +50,13 @@ impl Ini {
 	pub fn new() -> Ini {
 		Ini {
 			map: HashMap::new(),
-			default_section: String::from("default")
+			default_section: String::from("default"),
+			comment_symbols: vec![';', '#']
 		}
 	}
 
 	///Sets the default section header to something else (the default is "default").
-	///It must be set before `load()` is called in order to take effect.
+	///It must be set before `load()` or `read()` is called in order to take effect.
 	///## Example
 	///```ignore,rust
 	///let config = Ini::new();
@@ -67,6 +69,22 @@ impl Ini {
 	///Returns nothing.
 	pub fn set_default_section(&mut self, section: &str) {
 		self.default_section = section.to_string();
+	}
+
+	///Sets the default comment symbols to something else (the default is ";" and "#"). Keep in mind this will remove the default symbols.
+	///It must be set before `load()` or `read()` is called in order to take effect.
+	///## Example
+	///```ignore,rust
+	///let config = Ini::new();
+	///config.set_comment_symbols(&['!', '#']);
+	///let map = match config.load("Path/to/file...") {
+	/// Err(why) => panic!("{}", why),
+	/// Ok(inner) => inner
+	///};
+	///```
+	///Returns nothing.
+	pub fn set_comment_symbols(&mut self, symlist: &[char]) {
+		self.comment_symbols = symlist.to_vec();
 	}
 
 	///Loads a file from a defined path, parses it and puts the hashmap into our struct.
@@ -133,7 +151,7 @@ impl Ini {
 		let mut map: HashMap<String, HashMap<String, Option<String>>> = HashMap::new();
 		let mut section = self.default_section.clone();
 		for (num, lines) in input.lines().enumerate() {
-			let trimmed = match lines.find(';') {
+			let trimmed = match lines.find(|c: char| self.comment_symbols.contains(&c)) {
 				Some(idx) => lines[..idx].trim(),
 				None => lines.trim()
 			};
