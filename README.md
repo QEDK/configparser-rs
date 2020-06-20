@@ -46,9 +46,9 @@ let my_value = config.getint("somesection", "someintvalue")?.unwrap();
 ## Supported `ini` file structure
 A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. All leading and trailing whitespace is removed from stored keys, values and section names.
 Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
-explain it later). You can use comment symbols (`;` to denote comments). It is planned to allow configuring this via the API in the future.
-Keep in mind that key-value pairs or section headers cannot span multiple lines.
-Owing to how ini files usually are, this means that `[`, `]`, `=`, ';' are special symbols (this crate will allow you to use `]` sparingly).
+explain it later). You can use comment symbols (`;` and `#` to denote comments). This can be configured with the `set_comment_symbols()` method in the
+API. Keep in mind that key-value pairs or section headers cannot span multiple lines.
+Owing to how ini files usually are, this means that `[`, `]`, `=`, ';' and `#` are special symbols (this crate will allow you to use `]` sparingly).
 
 Let's take for example:
 ```INI
