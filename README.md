@@ -29,7 +29,7 @@ Essentially, the syntax consists of sections, each of which can which contains k
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.9.0"
+configparser = "0.9.1"
 ```
 
 ## Supported datatypes
