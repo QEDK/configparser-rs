@@ -174,6 +174,8 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Comment customization is here! (**note:** defaults are now changed to `#` and `;`)
   - Fixed some docs
   - Make more docs pass tests
+- 0.9.1
+  - Hotfix to change getters to return `Ok(None)` instead of failing parsing for `None` values
 
 ### Future plans
 
