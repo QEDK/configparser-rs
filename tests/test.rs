@@ -32,6 +32,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 	assert_eq!(config.getint("values", "Int")?.unwrap(), -31415);
 	assert_eq!(config.getuint("values", "Uint")?.unwrap(), 31415);
 	assert_eq!(config.getfloat("values", "Float")?.unwrap(), 3.1415);
+	assert_eq!(config.getfloat("topsecret", "None string"), Ok(None));
 	assert_eq!(map["default"]["defaultvalues"].clone().unwrap(), "defaultvalues");
 	assert_eq!(map["topsecret"]["kfc"].clone().unwrap(), "the secret herb is orega-");
 	assert_eq!(map["topsecret"]["empty string"].clone().unwrap(), "");
