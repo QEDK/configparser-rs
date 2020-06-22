@@ -230,9 +230,12 @@ impl Ini {
 	pub fn getbool(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
-				Some(val) => match val.clone().unwrap().to_lowercase().parse::<bool>() {
-					Err(why) => Err(why.to_string()),
-					Ok(boolean) => Ok(Some(boolean))
+				Some(val) => match val {
+					Some(inner) => match inner.clone().to_lowercase().parse::<bool>() {
+						Err(why) => Err(why.to_string()),
+						Ok(boolean) => Ok(Some(boolean))
+					},
+					None => Ok(None)
 				},
 				None => Ok(None)
 			},
@@ -250,9 +253,12 @@ impl Ini {
 	pub fn getint(&self, section: &str, key: &str) -> Result<Option<i64>, String> {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
-				Some(val) => match val.clone().unwrap().parse::<i64>() {
-					Err(why) => Err(why.to_string()),
-					Ok(int) => Ok(Some(int))
+				Some(val) => match val {
+					Some(inner) => match inner.clone().parse::<i64>() {
+						Err(why) => Err(why.to_string()),
+						Ok(int) => Ok(Some(int))
+					},
+					None => Ok(None)
 				},
 				None => Ok(None)
 			},
@@ -270,9 +276,12 @@ impl Ini {
 	pub fn getuint(&self, section: &str, key: &str) -> Result<Option<u64>, String> {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
-				Some(val) => match val.clone().unwrap().parse::<u64>() {
-					Err(why) => Err(why.to_string()),
-					Ok(uint) => Ok(Some(uint))
+				Some(val) => match val {
+					Some(inner) => match inner.clone().parse::<u64>() {
+						Err(why) => Err(why.to_string()),
+						Ok(uint) => Ok(Some(uint))
+					},
+					None => Ok(None)
 				},
 				None => Ok(None)
 			},
@@ -290,9 +299,12 @@ impl Ini {
 	pub fn getfloat(&self, section: &str, key: &str) -> Result<Option<f64>, String> {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
-				Some(val) => match val.clone().unwrap().parse::<f64>() {
-					Err(why) => Err(why.to_string()),
-					Ok(float) => Ok(Some(float))
+				Some(val) => match val {
+					Some(inner) => match inner.clone().parse::<f64>() {
+						Err(why) => Err(why.to_string()),
+						Ok(float) => Ok(Some(float))
+					},
+					None => Ok(None)
 				},
 				None => Ok(None)
 			},
