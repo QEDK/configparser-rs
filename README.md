@@ -29,7 +29,7 @@ Essentially, the syntax consists of sections, each of which can which contains k
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.9.1"
+configparser = "0.9.2"
 ```
 
 ## Supported datatypes
@@ -185,6 +185,9 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Make more docs pass tests
 - 0.9.1
   - Hotfix to change getters to return `Ok(None)` instead of failing parsing for `None` values
+- 0.9.2
+  - Added `getboolcoerce()` function to parse more `bool`-like values.
+  - Convert some snippets to doctests.
 
 ### Future plans
 
