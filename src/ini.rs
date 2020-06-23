@@ -231,9 +231,39 @@ impl Ini {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
 				Some(val) => match val {
-					Some(inner) => match inner.clone().to_lowercase().parse::<bool>() {
+					Some(inner) => match inner.to_lowercase().parse::<bool>() {
 						Err(why) => Err(why.to_string()),
 						Ok(boolean) => Ok(Some(boolean))
+					},
+					None => Ok(None)
+				},
+				None => Ok(None)
+			},
+			None => Ok(None)
+		}
+	}
+
+	///Parses the stored value from the key stored in the defined section to a `bool`. For ease of use, the function converts the type coerces a match.
+	///It attempts to case-insenstively find `true`, `yes`, `t`, `y` and `1` to parse it as `True`.
+	///Similarly it attempts to case-insensitvely find `false`, `no`, `f`, `n` and `0` to parse it as `False`.
+	///```ignore,rust
+	///let value = config.getboolcoerce("section", "key")?.unwrap();
+	///```
+	///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
+	///If the parsing fails, it returns an `Err(string)`.
+	pub fn getboolcoerce(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
+		match self.map.get(&section.to_lowercase()) {
+			Some(secmap) => match secmap.get(&key.to_lowercase()) {
+				Some(val) => match val {
+					Some(inner) => {
+						let boolval = &inner.to_lowercase().clone()[..];
+						if ["true", "yes", "t", "y", "1"].contains(&&boolval) {
+							return Ok(Some(true));
+						} else if ["false", "no", "f", "n", "0"].contains(&&boolval) {
+							return Ok(Some(false));
+						} else {
+							return Err(format!("Unable to parse value into bool at {}:{}", section, key));
+						}
 					},
 					None => Ok(None)
 				},
@@ -254,7 +284,7 @@ impl Ini {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
 				Some(val) => match val {
-					Some(inner) => match inner.clone().parse::<i64>() {
+					Some(inner) => match inner.parse::<i64>() {
 						Err(why) => Err(why.to_string()),
 						Ok(int) => Ok(Some(int))
 					},
@@ -277,7 +307,7 @@ impl Ini {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
 				Some(val) => match val {
-					Some(inner) => match inner.clone().parse::<u64>() {
+					Some(inner) => match inner.parse::<u64>() {
 						Err(why) => Err(why.to_string()),
 						Ok(uint) => Ok(Some(uint))
 					},
@@ -300,7 +330,7 @@ impl Ini {
 		match self.map.get(&section.to_lowercase()) {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
 				Some(val) => match val {
-					Some(inner) => match inner.clone().parse::<f64>() {
+					Some(inner) => match inner.parse::<f64>() {
 						Err(why) => Err(why.to_string()),
 						Ok(float) => Ok(Some(float))
 					},
