@@ -28,11 +28,20 @@ Essentially, the syntax consists of sections, each of which can which contains k
 `configparser` does not guess the datatype of values in configuration files and stores everything as strings. However, some datatypes are so common
 that it's a safe bet that some values need to be parsed in other types. For this, the `Ini` struct provides easy functions like `getint()`, `getuint()`,
 `getfloat()` and `getbool()`. The only bit of extra magic involved is that the `getbool()` function will treat boolean values case-insensitively (so
-`true` is the same as `True` just like `TRUE`). You can ofcourse just choose to parse the string values yourself.
-```ignore,rust
+`true` is the same as `True` just like `TRUE`). The crate also provides a stronger `getboolcoerce()` function that parses more values (such as `T`, `yes` and `0`, all case-insensitively), the function's documentation will give you the exact details.
+```rust
+use configparser::ini::Ini;
+
+let mut config = Ini::new();
+config.read(String::from(
+  "[somesection]
+  someintvalue = 5"));
+let my_value = config.getint("somesection", "someintvalue").unwrap().unwrap();
+assert_eq!(my_value, 5); // value accessible!
+
+//You can ofcourse just choose to parse the values yourself:
 let my_string = String::from("1984");
 let my_int = my_string.parse::<i32>().unwrap();
-let my_value = config.getint("somesection", "someintvalue")?.unwrap();
 ```
 
 
@@ -84,7 +93,7 @@ Let's take another simple `ini` file and talk about working with it:
 KFC = the secret herb is orega-
 
 [values]
-Int = -31415
+Uint = 31415
 ```
 If you read the above sections carefully, you'll know that 1) all the keys are stored in lowercase, 2) `get()` can make access in a case-insensitive
 manner and 3) we can use `getint()` to parse the `Int` value into an `i64`. Let's see that in action.
@@ -121,9 +130,9 @@ fn main() -> Result<(), Box<dyn Error>> {
   let val = config.get("topsecret", "KFC"); // unwrapping will be an error because we just emptied it!
   assert_eq!(val, None); // as expected!
 
-  // What if you want to get a number?
-  let my_number = config.getint("values", "Int")?.unwrap();
-  assert_eq!(my_number, -31415); // and we got it!
+  // What if you want to get an unsigned integer?
+  let my_number = config.getuint("values", "Uint")?.unwrap();
+  assert_eq!(my_number, 31415); // and we got it!
   // The Ini struct provides more getters for primitive datatypes.
 
   Ok(())
