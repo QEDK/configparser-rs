@@ -246,6 +246,7 @@ impl Ini {
 	///Parses the stored value from the key stored in the defined section to a `bool`. For ease of use, the function converts the type coerces a match.
 	///It attempts to case-insenstively find `true`, `yes`, `t`, `y` and `1` to parse it as `True`.
 	///Similarly it attempts to case-insensitvely find `false`, `no`, `f`, `n` and `0` to parse it as `False`.
+	///## Example
 	///```ignore,rust
 	///let value = config.getboolcoerce("section", "key")?.unwrap();
 	///```

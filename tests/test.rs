@@ -18,6 +18,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 		!modified comment
 		[values]#another comment
 		Bool = True
+		Boolcoerce = 0
 		Int = -31415
 		Uint = 31415
 		Float = 3.1415"))?;
@@ -29,6 +30,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 	assert_eq!(config.get("spacing", "indented").unwrap(), "indented");
 	assert_eq!(config.get("spacing", "not indented").unwrap(), "not indented");
 	assert_eq!(config.getbool("values", "Bool")?.unwrap(), true);
+	assert_eq!(config.getboolcoerce("values", "Boolcoerce")?.unwrap(), false);
 	assert_eq!(config.getint("values", "Int")?.unwrap(), -31415);
 	assert_eq!(config.getuint("values", "Uint")?.unwrap(), 31415);
 	assert_eq!(config.getfloat("values", "Float")?.unwrap(), 3.1415);
