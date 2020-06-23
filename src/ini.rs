@@ -211,8 +211,13 @@ impl Ini {
 	///Unlike accessing the map directly, `get()` processes your input to make case-insensitive access.
 	///All `get` functions will do this automatically.
 	///## Example
-	///```ignore,rust
-	///let value = config.get("section", "key").unwrap();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.load("tests/test.ini");
+	///let value = config.get("default", "defaultvalues").unwrap();
+	///assert_eq!(value, String::from("defaultvalues"));
 	///```
 	///Returns `Some(value)` of type `String` if value is found or else returns `None`.
 	pub fn get(&self, section: &str, key: &str) -> Option<String> {
@@ -222,8 +227,13 @@ impl Ini {
 	///Parses the stored value from the key stored in the defined section to a `bool`.
 	///For ease of use, the function converts the type case-insensitively (`true` == `True`).
 	///## Example
-	///```ignore,rust
-	///let value = config.getbool("section", "key")?.unwrap();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.load("tests/test.ini");
+	///let value = config.getbool("values", "bool").unwrap().unwrap();
+	///assert!(value);  // value accessible!
 	///```
 	///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
 	///If the parsing fails, it returns an `Err(string)`.
@@ -247,8 +257,13 @@ impl Ini {
 	///It attempts to case-insenstively find `true`, `yes`, `t`, `y` and `1` to parse it as `True`.
 	///Similarly it attempts to case-insensitvely find `false`, `no`, `f`, `n` and `0` to parse it as `False`.
 	///## Example
-	///```ignore,rust
-	///let value = config.getboolcoerce("section", "key")?.unwrap();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.load("tests/test.ini");
+	///let value = config.getboolcoerce("values", "boolcoerce").unwrap().unwrap();
+	///assert!(!value);  // value accessible!
 	///```
 	///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
 	///If the parsing fails, it returns an `Err(string)`.
