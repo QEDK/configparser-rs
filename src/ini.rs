@@ -392,13 +392,14 @@ impl Ini {
 	}
 
 	///Sets an `Option<String>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
-	///If an existing value is there in the map, it will be overwritten. You can insert `None` safely.
+	///An existing value in the map  will be overwritten. You can also set `None` safely.
 	///## Example
 	///```ignore,rust
 	///let key_value = String::from("value")
 	///config.set("section", "key", Option(key_value);
+	///config.set("section", "key", None);  // also valid!
 	///```
-	///Returns `None` if there is not existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
+	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
 	///If you want to insert using a string literal, use `setstr()` instead.
 	pub fn set(&mut self, section: &str, key: &str, value:Option<String>) -> Option<Option<String>> {
 		match self.map.get_mut(&section.to_lowercase()) {
@@ -413,7 +414,7 @@ impl Ini {
 	}
 
 	///Sets an `<Option<&str>>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
-	///If an existing value is there in the map, it will be overwritten. You can insert `None` safely.
+	///An existing value in the map  will be overwritten. You can also set `None` safely.
 	///## Example
 	///```ignore,rust
 	///config.setstr("section", "key", Option("value");
