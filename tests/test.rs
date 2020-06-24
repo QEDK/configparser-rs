@@ -23,7 +23,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 		Uint = 31415
 		Float = 3.1415"))?;
 	assert_eq!(map, inpstring);
+	config.set("DEFAULT", "defaultvalues", Some(String::from("notdefault")));
+	assert_eq!(config.get("DEFAULT", "defaultvalues").unwrap(), "notdefault");
+	config.setstr("DEFAULT", "defaultvalues", Some("defaultvalues"));
 	assert_eq!(config.get("DEFAULT", "defaultvalues").unwrap(), "defaultvalues");
+	config.setstr("DEFAULT", "defaultvalues", None);
+	assert_eq!(config.get("DEFAULT", "defaultvalues"), None);
 	assert_eq!(config.get("topsecret", "KFC").unwrap(), "the secret herb is orega-");
 	assert_eq!(config.get("topsecret", "Empty string").unwrap(), "");
 	assert_eq!(config.get("topsecret", "None string"), None);
