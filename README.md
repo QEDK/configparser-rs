@@ -188,6 +188,9 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.9.2
   - Added `getboolcoerce()` function to parse more `bool`-like values.
   - Convert some snippets to doctests.
+- 0.10.0 (**BETA 6**)
+  - Added `set()` and `setstr()` methods to add section, key, values to the configuration.
+  - Added more test, minor doc fixes.
 
 ### Future plans
 
