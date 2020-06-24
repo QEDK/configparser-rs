@@ -396,7 +396,7 @@ impl Ini {
 	///## Example
 	///```ignore,rust
 	///let key_value = String::from("value")
-	///config.set("section", "key", Option(key_value);
+	///config.set("section", "key", Some(key_value);
 	///config.set("section", "key", None);  // also valid!
 	///```
 	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
@@ -417,7 +417,7 @@ impl Ini {
 	///An existing value in the map  will be overwritten. You can also set `None` safely.
 	///## Example
 	///```ignore,rust
-	///config.setstr("section", "key", Option("value");
+	///config.setstr("section", "key", Some("value");
 	///```
 	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
 	///If you want to insert using a `String`, use `set()` instead.
