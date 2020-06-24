@@ -110,30 +110,30 @@ fn main() -> Result<(), Box<dyn Error>> {
   println!("{:?}", map);
   // You can also safely not store the reference and access it later with get_map_ref() or get a clone with get_map()
 
-  // You can then access it like a normal hashmap:
-  let innermap = map["topsecret"].clone(); // Remember this is a hashmap!
 
   // If you want to access the value, then you can simply do:
-  let val = map["topsecret"]["kfc"].clone().unwrap();
-  // Lowercasing when accessing map directly is important because all keys are stored in lower-case!
-  // Note: The .clone().unwrap() is required because it's an Option<String> type.
+  let val = config.get("TOPSECRET", "KFC").unwrap();
+  // Notice how get() can access indexes case-insensitively.
 
   assert_eq!(val, "the secret herb is orega-"); // value accessible!
 
-  // What if you want to mutate the parser and remove KFC's secret recipe? Just use get_mut_map():
-  let mut_map = config.get_mut_map();
-  mut_map.get_mut("topsecret").unwrap().insert(String::from("kfc"), None);
-  // And the secret is back in safety, remember that these are normal HashMap functions chained for convenience.
+  // What if you want remove KFC's secret recipe? Just use set():
+  config.set("topsecret", "kfc", None);
 
-  // However very quickly see how that becomes cumbersome, so you can use the handy get() function from Ini
-  // The get() function accesses the map case-insensitively, so you can use uppercase as well:
-  let val = config.get("topsecret", "KFC"); // unwrapping will be an error because we just emptied it!
-  assert_eq!(val, None); // as expected!
+  assert_eq!(config.get("TOPSECRET", "KFC"), None); // as expected!
 
   // What if you want to get an unsigned integer?
   let my_number = config.getuint("values", "Uint")?.unwrap();
   assert_eq!(my_number, 31415); // and we got it!
   // The Ini struct provides more getters for primitive datatypes.
+
+  // You can also access it like a normal hashmap:
+  let innermap = map["topsecret"].clone();
+  // Remember that all indexes are stored in lowercase!
+
+  // If you want to simply mutate the stored hashmap, you can use get_mut_map()
+  let map = config.get_mut_map();
+  // You can then use normal HashMap functions on this map at your convenience.
 
   Ok(())
 }
