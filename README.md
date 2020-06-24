@@ -57,7 +57,7 @@ A configuration file can consist of sections, each led by a `[section-name]` hea
 Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
 explain it later). You can use comment symbols (`;` and `#` to denote comments). This can be configured with the `set_comment_symbols()` method in the
 API. Keep in mind that key-value pairs or section headers cannot span multiple lines.
-Owing to how ini files usually are, this means that `[`, `]`, `=`, ';' and `#` are special symbols (this crate will allow you to use `]` sparingly).
+Owing to how ini files usually are, this means that `[`, `]`, `=`, `;` and `#` are special symbols (this crate will allow you to use `]` sparingly).
 
 Let's take for example:
 ```INI
@@ -103,7 +103,7 @@ KFC = the secret herb is orega-
 Uint = 31415
 ```
 If you read the above sections carefully, you'll know that 1) all the keys are stored in lowercase, 2) `get()` can make access in a case-insensitive
-manner and 3) we can use `getint()` to parse the `Int` value into an `i64`. Let's see that in action.
+manner and 3) we can use `getuint()` to parse the `Uint` value into an `u64`. Let's see that in action.
 
 ```rust
 use configparser::ini::Ini;
