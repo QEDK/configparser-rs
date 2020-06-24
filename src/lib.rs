@@ -110,7 +110,6 @@ fn main() -> Result<(), Box<dyn Error>> {
   println!("{:?}", map);
   // You can also safely not store the reference and access it later with get_map_ref() or get a clone with get_map()
 
-
   // If you want to access the value, then you can simply do:
   let val = config.get("TOPSECRET", "KFC").unwrap();
   // Notice how get() can access indexes case-insensitively.
