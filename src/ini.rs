@@ -381,7 +381,7 @@ impl Ini {
 	}
 
 	///Returns a mutable reference to the `HashMap` stored in our struct.
-	///##Example
+	///## Example
 	///```ignore,rust
 	///let map = config.get_mut_map();
 	///map.get_mut("topsecrets").unwrap().insert(String::from("nuclear launch codes"), None);
@@ -389,5 +389,46 @@ impl Ini {
 	///If you just need to access the map without mutating, use `get_map_ref()` or make a clone with `get_map()` instead.
 	pub fn get_mut_map(&mut self) -> &mut HashMap<String, HashMap<String, Option<String>>> {
 		&mut self.map
+	}
+
+	///Sets an `Option<String>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
+	///If an existing value is there in the map, it will be overwritten. You can insert `None` safely.
+	///## Example
+	///```ignore,rust
+	///let key_value = String::from("value")
+	///config.set("section", "key", Option(key_value);
+	///```
+	///Returns `None` if there is not existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
+	///If you want to insert using a string literal, use `setstr()` instead.
+	pub fn set(&mut self, section: &str, key: &str, value:Option<String>) -> Option<Option<String>> {
+		match self.map.get_mut(&section.to_lowercase()) {
+			Some(secmap) => secmap.insert(key.to_lowercase(), value),
+			None => {
+				let mut valmap: HashMap<String, Option<String>> = HashMap::new();
+				valmap.insert(key.to_lowercase(), value);
+				self.map.insert(section.to_lowercase(), valmap);
+				None
+			}
+		}
+	}
+
+	///Sets an `<Option<&str>>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
+	///If an existing value is there in the map, it will be overwritten. You can insert `None` safely.
+	///## Example
+	///```ignore,rust
+	///config.setstr("section", "key", Option("value");
+	///```
+	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
+	///If you want to insert using a `String`, use `set()` instead.
+	pub fn setstr(&mut self, section: &str, key: &str, value:Option<&str>) -> Option<Option<String>> {
+		match self.map.get_mut(&section.to_lowercase()) {
+			Some(secmap) => secmap.insert(key.to_lowercase(), value.map(String::from)),
+			None => {
+				let mut valmap: HashMap<String, Option<String>> = HashMap::new();
+				valmap.insert(key.to_lowercase(), value.map(String::from));
+				self.map.insert(section.to_lowercase(), valmap);
+				None
+			}
+		}
 	}
 }
