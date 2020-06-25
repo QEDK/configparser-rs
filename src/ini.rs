@@ -159,10 +159,10 @@ impl Ini {
 	///use configparser::ini::Ini;
 	///
 	///fn main() -> std::io::Result<()> {
-	///let mut config = Ini::new();
+	///  let mut config = Ini::new();
 	///  config.read(String::from(
-	///	  "[2000s]
-	///	  2020 = bad"));
+	///    "[2000s]
+	///    2020 = bad"));
 	///  config.write("output.ini")
 	///}
 	///```
