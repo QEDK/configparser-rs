@@ -145,7 +145,7 @@ impl Ini {
 	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
 	///Use `get_mut_map()` if you want a mutable reference.
 	pub fn read(&mut self, input: String) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
-		self.map = match self.parse(input.to_string()) {
+		self.map = match self.parse(input) {
 			Err(why) => return Err(why),
 			Ok(map) => map
 		};
@@ -449,10 +449,17 @@ impl Ini {
 	///Sets an `Option<String>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
 	///An existing value in the map  will be overwritten. You can also set `None` safely.
 	///## Example
-	///```ignore,rust
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.read(String::from(
+	///  "[section]
+	///  key=value"));
 	///let key_value = String::from("value");
 	///config.set("section", "key", Some(key_value));
 	///config.set("section", "key", None);  // also valid!
+	///assert_eq!(config.get("section", "key"), None);  // correct!
 	///```
 	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
 	///If you want to insert using a string literal, use `setstr()` instead.
@@ -471,8 +478,16 @@ impl Ini {
 	///Sets an `<Option<&str>>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
 	///An existing value in the map  will be overwritten. You can also set `None` safely.
 	///## Example
-	///```ignore,rust
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.read(String::from(
+	///  "[section]
+	///  key=notvalue"));
 	///config.setstr("section", "key", Some("value"));
+	///config.setstr("section", "key", None);  // also valid!
+	///assert_eq!(config.get("section", "key"), None);  // correct!
 	///```
 	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
 	///If you want to insert using a `String`, use `set()` instead.
