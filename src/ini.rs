@@ -155,7 +155,7 @@ impl Ini {
 	///Writes the current configuation to the specfied path. If a file is not present, it is automatically created for you, if a file already
 	///exists, it is truncated and the configuration is written to it.
 	///## Example
-	///```norun, rust
+	///```rust
 	///use configparser::ini::Ini;
 	///
 	///fn main() -> std::io::Result<()> {
