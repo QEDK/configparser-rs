@@ -160,10 +160,10 @@ impl Ini {
 	///
 	///fn main() -> std::io::Result<()> {
 	///let mut config = Ini::new();
-	///config.read(String::from(
-	///	"[2000s]
-	///	2020 = bad"));
-	///config.write("output.ini")
+	///  config.read(String::from(
+	///	  "[2000s]
+	///	  2020 = bad"));
+	///  config.write("output.ini")
 	///}
 	///```
 	///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
