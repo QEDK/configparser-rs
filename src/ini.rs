@@ -1,5 +1,6 @@
 //!The ini module provides all the things necessary to load and parse ini-syntax files. The most important of which is the `Ini` struct.
 //!See the [implementation](https://docs.rs/configparser/*/configparser/ini/struct.Ini.html) documentation for more details.
+use std::fs;
 use std::fs::File;
 use std::path::Path;
 use std::io::prelude::*;
@@ -54,6 +55,16 @@ impl Ini {
 			comment_symbols: vec![';', '#']
 		}
 	}
+
+	///Creates a new `HashMap` of `HashMap<String, HashMap<String, Option<String>>>` type for the struct.
+	///All values in the HashMap are stored in `String` type.
+	///## Example
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///```
+	///Returns the struct and stores it in the calling variable.
 
 	///Sets the default section header to the defined string (the default is `default`).
 	///It must be set before `load()` or `read()` is called in order to take effect.
@@ -134,11 +145,55 @@ impl Ini {
 	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
 	///Use `get_mut_map()` if you want a mutable reference.
 	pub fn read(&mut self, input: String) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
-		self.map = match self.parse(input) {
+		self.map = match self.parse(input.to_string()) {
 			Err(why) => return Err(why),
 			Ok(map) => map
 		};
 		Ok(self.map.clone())
+	}
+
+	///Writes the current configuation to the specfied path. If a file is not present, it is automatically created for you, if a file already
+	///exists, it is truncated and the configuration is written to it.
+	///## Example
+	///```norun, rust
+	///use configparser::ini::Ini;
+	///
+	///fn main() -> std::io::Result<()> {
+	///let mut config = Ini::new();
+	///config.read(String::from(
+	///	"[2000s]
+	///	2020 = bad"));
+	///config.write("output.ini")
+	///}
+	///```
+	///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
+	pub fn write(&self, path: &str) -> std::io::Result<()> {
+		let mut out = String::new();
+		let mut cloned = self.map.clone();
+		if let Some(defaultmap) = cloned.get("default") {
+			for (key, val) in defaultmap.iter() {
+				out.push_str(&key);
+				if let Some(value) = val {
+					out.push_str("=");
+					out.push_str(&value);
+				}
+				out.push_str("\n");
+			}
+			cloned.remove("default");
+		}
+		for (section, secmap) in cloned.iter() {
+			out.push_str(&format!("[{}]", section));
+			out.push_str("\n");
+			for (key, val) in secmap.iter() {
+				out.push_str(&key);
+				if let Some(value) = val {
+					out.push_str("=");
+					out.push_str(&value);
+				}
+				out.push_str("\n");
+			}
+		}
+		fs::write(path, out)
 	}
 
 	///Private function that parses ini-style syntax into a HashMap.
@@ -395,8 +450,8 @@ impl Ini {
 	///An existing value in the map  will be overwritten. You can also set `None` safely.
 	///## Example
 	///```ignore,rust
-	///let key_value = String::from("value")
-	///config.set("section", "key", Some(key_value);
+	///let key_value = String::from("value");
+	///config.set("section", "key", Some(key_value));
 	///config.set("section", "key", None);  // also valid!
 	///```
 	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
@@ -417,19 +472,11 @@ impl Ini {
 	///An existing value in the map  will be overwritten. You can also set `None` safely.
 	///## Example
 	///```ignore,rust
-	///config.setstr("section", "key", Some("value");
+	///config.setstr("section", "key", Some("value"));
 	///```
 	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
 	///If you want to insert using a `String`, use `set()` instead.
 	pub fn setstr(&mut self, section: &str, key: &str, value:Option<&str>) -> Option<Option<String>> {
-		match self.map.get_mut(&section.to_lowercase()) {
-			Some(secmap) => secmap.insert(key.to_lowercase(), value.map(String::from)),
-			None => {
-				let mut valmap: HashMap<String, Option<String>> = HashMap::new();
-				valmap.insert(key.to_lowercase(), value.map(String::from));
-				self.map.insert(section.to_lowercase(), valmap);
-				None
-			}
-		}
+		self.set(section, key, value.map(String::from))
 	}
 }
