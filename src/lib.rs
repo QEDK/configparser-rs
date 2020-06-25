@@ -22,7 +22,8 @@ nuclear launch codes = topsecret
 [github.com]
 User = QEDK
 ```
-Essentially, the syntax consists of sections, each of which can which contains keys with values. The `Ini` struct can read and write such values.
+Essentially, the syntax consists of sections, each of which can which contains keys with values. The `Ini` struct can read and write such values to
+strings as well as files.
 
 ## Supported datatypes
 `configparser` does not guess the datatype of values in configuration files and stores everything as strings. However, some datatypes are so common
@@ -85,6 +86,7 @@ this key has an empty string value has Some("") =
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
 The only bit of magic the API does is the section-less properties are put in a section called "default". You can configure this variable via the API.
+Keep in mind that a section named "default" is also treated as sectionless so the output files remains consistent with no section header.
 
 ## Usage
 Let's take another simple `ini` file and talk about working with it:
@@ -130,9 +132,14 @@ fn main() -> Result<(), Box<dyn Error>> {
   let innermap = map["topsecret"].clone();
   // Remember that all indexes are stored in lowercase!
 
+  // You can easily write the currently stored configuration to a file like:
+  config.write("output.ini");
+
   // If you want to simply mutate the stored hashmap, you can use get_mut_map()
   let map = config.get_mut_map();
   // You can then use normal HashMap functions on this map at your convenience.
+  // Remember that functions which rely on standard formatting might stop working
+  // if it's mutated differently.
 
   Ok(())
 }
