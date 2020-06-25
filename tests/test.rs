@@ -28,8 +28,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 	config.setstr("DEFAULT", "defaultvalues", Some("defaultvalues"));
 	assert_eq!(config.get("DEFAULT", "defaultvalues").unwrap(), "defaultvalues");
 	config.setstr("DEFAULT", "defaultvalues", None);
-	config.write("tests/test2.ini")?;
-	let map2 = config.clone().load("tests/test2.ini")?;
+	config.write("output.ini")?;
+	let map2 = config.clone().load("output.ini")?;
 	assert_eq!(map2, *config.get_map_ref());
 	assert_eq!(config.get("DEFAULT", "defaultvalues"), None);
 	assert_eq!(config.get("topsecret", "KFC").unwrap(), "the secret herb is orega-");
