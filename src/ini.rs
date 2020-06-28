@@ -86,6 +86,16 @@ impl Ini {
 		self.comment_symbols = symlist.to_vec();
 	}
 
+	///Gets all the sections of the currently-stored `HashMap` in a vector.
+	///## Example
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.load("tests/test.ini");
+	///let sections = config.sections();
+	///```
+	///Returns `Vec<String>`.
 	pub fn sections(&self) -> Vec<String> {
 		self.map.keys().cloned().collect()
 	}
