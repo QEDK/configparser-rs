@@ -35,5 +35,18 @@
   - Fixed tests
 - 0.6.2
   - Fixed accidental binary delivery increasing crate size by ~20x
+- 0.7.0 (**BETA 3**)
+  - Handy getter functions introduced such as `getint()`, `getuint()`, `getfloat()`, `getbool()`
+  - Fixed docs
+  - Fixed tests
+- 0.7.1
+  - Enable `Eq` and `PartialEq` traits
+  - Improve docs
+- 0.8.0 (**BETA 4**)
+  - Added feature to set default headers.
+  - Added feature to parse from a `String`.
+- 0.8.1
+  - Added support for comments
+  - Improved docs
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).

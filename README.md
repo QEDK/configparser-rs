@@ -171,19 +171,6 @@ additional terms or conditions.
 ## Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.7.0 (**BETA 3**)
-  - Handy getter functions introduced such as `getint()`, `getuint()`, `getfloat()`, `getbool()`
-  - Fixed docs
-  - Fixed tests
-- 0.7.1
-  - Enable `Eq` and `PartialEq` traits
-  - Improve docs
-- 0.8.0 (**BETA 4**)
-  - Added feature to set default headers.
-  - Added feature to parse from a `String`.
-- 0.8.1
-  - Added support for comments
-  - Improved docs
 - 0.9.0 (**BETA 5**)
   - Comment customization is here! (**note:** defaults are now changed to `#` and `;`)
   - Fixed some docs
@@ -199,6 +186,10 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.11.0 (**BETA 7**)
   - Writing to file is here! (`write()`).
   - More doctests and docs fixed, next release is planned to be stable.
+- 0.11.1
+  - Hotfix to remove hardcoded default section and use set default section.
+  - Enabled auto-trait implementation of `Default` for empty inits.
+  - Added the `sections()` method to get a vector of sections.
 
 ### Future plans
 
