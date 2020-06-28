@@ -14,9 +14,8 @@ use std::collections::HashMap;
 	)]
 pub fn load(path: &str) -> HashMap<String, HashMap<String, Option<String>>> {
 	let mut config = Ini::new();
-	match config.load(path) {
-		Err(why) => panic!("{}", why),
-		Ok(_) => ()
+	if let Err(why) = config.load(path) {
+		panic!("{}", why)
 	}
 	match config.get_map() {
 		Some(map) => map,
@@ -31,7 +30,7 @@ pub fn load(path: &str) -> HashMap<String, HashMap<String, Option<String>>> {
 ///
 ///let mut config = Ini::new();
 ///```
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Default)]
 pub struct Ini {
 	map: HashMap<String, HashMap<String, Option<String>>>,
 	default_section: std::string::String,
@@ -55,16 +54,6 @@ impl Ini {
 			comment_symbols: vec![';', '#']
 		}
 	}
-
-	///Creates a new `HashMap` of `HashMap<String, HashMap<String, Option<String>>>` type for the struct.
-	///All values in the HashMap are stored in `String` type.
-	///## Example
-	///```rust
-	///use configparser::ini::Ini;
-	///
-	///let mut config = Ini::new();
-	///```
-	///Returns the struct and stores it in the calling variable.
 
 	///Sets the default section header to the defined string (the default is `default`).
 	///It must be set before `load()` or `read()` is called in order to take effect.
@@ -95,6 +84,10 @@ impl Ini {
 	///Returns nothing.
 	pub fn set_comment_symbols(&mut self, symlist: &[char]) {
 		self.comment_symbols = symlist.to_vec();
+	}
+
+	pub fn sections(&self) -> Vec<String> {
+		self.map.keys().cloned().collect()
 	}
 
 	///Loads a file from a defined path, parses it and puts the hashmap into our struct.
@@ -134,10 +127,10 @@ impl Ini {
 	///
 	///let mut config = Ini::new();
 	///let map = match config.read(String::from(
-	///	"[2000s]
-	///	2020 = bad")) {
-	/// Err(why) => panic!("{}", why),
-	/// Ok(inner) => inner
+	///    "[2000s]
+	///    2020 = bad")) {
+	///    Err(why) => panic!("{}", why),
+	///    Ok(inner) => inner
 	///};
 	///let this_year = map["2000s"]["2020"].clone().unwrap();
 	///assert_eq!(this_year, "bad"); // value accessible!
@@ -170,7 +163,7 @@ impl Ini {
 	pub fn write(&self, path: &str) -> std::io::Result<()> {
 		let mut out = String::new();
 		let mut cloned = self.map.clone();
-		if let Some(defaultmap) = cloned.get("default") {
+		if let Some(defaultmap) = cloned.get(&self.default_section) {
 			for (key, val) in defaultmap.iter() {
 				out.push_str(&key);
 				if let Some(value) = val {
@@ -179,7 +172,7 @@ impl Ini {
 				}
 				out.push_str("\n");
 			}
-			cloned.remove("default");
+			cloned.remove(&self.default_section);
 		}
 		for (section, secmap) in cloned.iter() {
 			out.push_str(&format!("[{}]", section));
@@ -205,7 +198,7 @@ impl Ini {
 				Some(idx) => lines[..idx].trim(),
 				None => lines.trim()
 			};
-			if trimmed.len() == 0 {
+			if trimmed.is_empty() {
 				continue;
 			}
 			match trimmed.find('[') {
@@ -222,8 +215,8 @@ impl Ini {
 						match map.get_mut(&section) {
 							Some(valmap) => {
 								let key = trimmed[..delimiter].trim().to_lowercase();
-								let value = trimmed[delimiter+1..].trim().to_string();
-								if key.len() == 0 {
+								let value = trimmed[delimiter+1..].trim().to_owned();
+								if key.is_empty() {
 									return Err(format!("line {}:{}: Key cannot be empty", num, delimiter));
 								}
 								else {
@@ -233,8 +226,8 @@ impl Ini {
 							None => {
 								let mut valmap: HashMap<String, Option<String>> = HashMap::new();
 								let key = trimmed[..delimiter].trim().to_lowercase();
-								let value = trimmed[delimiter+1..].trim().to_string();
-								if key.len() == 0 {
+								let value = trimmed[delimiter+1..].trim().to_owned();
+								if key.is_empty() {
 									return Err(format!("line {}:{}: Key cannot be empty", num, delimiter));
 								}
 								else {
@@ -327,13 +320,13 @@ impl Ini {
 			Some(secmap) => match secmap.get(&key.to_lowercase()) {
 				Some(val) => match val {
 					Some(inner) => {
-						let boolval = &inner.to_lowercase().clone()[..];
-						if ["true", "yes", "t", "y", "1"].contains(&&boolval) {
-							return Ok(Some(true));
-						} else if ["false", "no", "f", "n", "0"].contains(&&boolval) {
-							return Ok(Some(false));
+						let boolval = &inner.to_lowercase()[..];
+						if ["true", "yes", "t", "y", "1"].contains(&boolval) {
+							Ok(Some(true))
+						} else if ["false", "no", "f", "n", "0"].contains(&boolval) {
+							Ok(Some(false))
 						} else {
-							return Err(format!("Unable to parse value into bool at {}:{}", section, key));
+							Err(format!("Unable to parse value into bool at {}:{}", section, key))
 						}
 					},
 					None => Ok(None)
