@@ -155,7 +155,7 @@ impl Ini {
 		Ok(self.map.clone())
 	}
 
-	///Writes the current configuation to the specfied path. If a file is not present, it is automatically created for you, if a file already
+	///Writes the current configuation to the specified path. If a file is not present, it is automatically created for you, if a file already
 	///exists, it is truncated and the configuration is written to it.
 	///## Example
 	///```rust
@@ -349,8 +349,13 @@ impl Ini {
 
 	///Parses the stored value from the key stored in the defined section to an `i64`.
 	///## Example
-	///```ignore,rust
-	///let value = config.getint("section", "key")?.unwrap();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.load("tests/test.ini");
+	///let value = config.getint("values", "int").unwrap().unwrap();
+	///assert_eq!(value, -31415);  // value accessible!
 	///```
 	///Returns `Ok(Some(value))` of type `i64` if value is found or else returns `Ok(None)`.
 	///If the parsing fails, it returns an `Err(string)`.
@@ -372,8 +377,13 @@ impl Ini {
 
 	///Parses the stored value from the key stored in the defined section to a `u64`.
 	///## Example
-	///```ignore,rust
-	///let value = config.getuint("section", "key")?.unwrap();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.load("tests/test.ini");
+	///let value = config.getint("values", "Uint").unwrap().unwrap();
+	///assert_eq!(value, 31415);  // value accessible!
 	///```
 	///Returns `Ok(Some(value))` of type `u64` if value is found or else returns `Ok(None)`.
 	///If the parsing fails, it returns an `Err(string)`.
