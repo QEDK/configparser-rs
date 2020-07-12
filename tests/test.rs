@@ -31,6 +31,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 	config.write("output.ini")?;
 	let map2 = config.clone().load("output.ini")?;
 	assert_eq!(map2, *config.get_map_ref());
+	let map3 = config.clone().read(config.writes())?;
+	assert_eq!(map2, map3);
 	assert_eq!(config.sections().len(), 4);
 	assert_eq!(config.get("DEFAULT", "defaultvalues"), None);
 	assert_eq!(config.get("topsecret", "KFC").unwrap(), "the secret herb is orega-");
