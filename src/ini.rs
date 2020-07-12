@@ -463,11 +463,18 @@ impl Ini {
 
 	///Returns an immutable reference to the `HashMap` stored in our struct.
 	///## Example
-	///```ignore,rust
-	///let map = config.get_map_ref();
-	///let sectionmap = map["section name"].clone();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///let mapclone = config.read(String::from
+	///  ("[topsecrets]
+	///  Valueless key")).unwrap();
+	/////Think of the clone as being a snapshot at a point of time while the reference always points to the current configuration.
+	///assert_eq!(*config.get_map_ref(), mapclone);  // same as expected.
 	///```
-	///If you just need to definitely mutate the map, use `get_mut_map()` instead.
+	///If you just need to definitely mutate the map, use `get_mut_map()` instead. Alternatively, you can generate a snapshot by getting a clone
+	///with `get_map()` and work with that.
 	pub fn get_map_ref(&self) -> &HashMap<String, HashMap<String, Option<String>>> {
 		&self.map
 	}
