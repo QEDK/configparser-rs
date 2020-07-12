@@ -174,7 +174,8 @@ impl Ini {
 		fs::write(path, self.unparse())
 	}
 
-	///Returns a string with the current configuation formatted with valid ini-syntax.
+	///Returns a string with the current configuration formatted with valid ini-syntax. This is always safe since the configuration is validated during
+	///parsing.
 	///## Example
 	///```rust
 	///use configparser::ini::Ini;
