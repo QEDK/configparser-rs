@@ -171,6 +171,29 @@ impl Ini {
 	///```
 	///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
 	pub fn write(&self, path: &str) -> std::io::Result<()> {
+		fs::write(path, self.unparse())
+	}
+
+	///Returns a string with the current configuation formatted with valid ini-syntax.
+	///## Example
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///fn main() {
+	///  let mut config = Ini::new();
+	///  config.read(String::from(
+	///    "[2000s]
+	///    2020 = bad"));
+	///  let outstring = config.writes();
+	///}
+	///```
+	///Returns a `String` type contatining the ini-syntax file.
+	pub fn writes(&self) -> String {
+		self.unparse()
+	}
+
+	///Private function that converts the currently stored configuration into a valid ini-syntax string.
+	fn unparse(&self) -> String {
 		let mut out = String::new();
 		let mut cloned = self.map.clone();
 		if let Some(defaultmap) = cloned.get(&self.default_section) {
@@ -196,7 +219,7 @@ impl Ini {
 				out.push_str("\n");
 			}
 		}
-		fs::write(path, out)
+		out
 	}
 
 	///Private function that parses ini-style syntax into a HashMap.
