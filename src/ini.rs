@@ -474,9 +474,16 @@ impl Ini {
 
 	///Returns a mutable reference to the `HashMap` stored in our struct.
 	///## Example
-	///```ignore,rust
-	///let map = config.get_mut_map();
-	///map.get_mut("topsecrets").unwrap().insert(String::from("nuclear launch codes"), None);
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.read(String::from
+	///  ("[topsecrets]
+	///  Valueless key"));
+	/////We can then get the mutable map and insert a value like:
+	///config.get_mut_map().get_mut("topsecrets").unwrap().insert(String::from("nuclear launch codes"), None);
+	///assert_eq!(config.get("topsecrets", "nuclear launch codes"), None);  // inserted successfully!
 	///```
 	///If you just need to access the map without mutating, use `get_map_ref()` or make a clone with `get_map()` instead.
 	pub fn get_mut_map(&mut self) -> &mut HashMap<String, HashMap<String, Option<String>>> {
