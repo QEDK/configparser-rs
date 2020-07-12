@@ -30,7 +30,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.11.1"
+configparser = "0.12.0"
 ```
 
 ## Supported datatypes
@@ -190,6 +190,9 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Hotfix to remove hardcoded default section and use set default section.
   - Enabled auto-trait implementation of `Default` for empty inits.
   - Added the `sections()` method to get a vector of sections.
+- 0.12.0
+  - New function added, `writes()` to support writing configuration to a string.
+  - More doctests passed.
 
 ### Future plans
 
