@@ -576,6 +576,6 @@ impl Ini {
 	///```
 	///Returns `Some(section_map)` if the section exists or else, `None`.
 	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
-		self.map.remove(section)
+		self.map.remove(&section.to_lowercase())
 	}
 }
