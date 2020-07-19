@@ -50,7 +50,7 @@ impl Ini {
 	pub fn new() -> Ini {
 		Ini {
 			map: HashMap::new(),
-			default_section: String::from("default"),
+			default_section: "default".to_owned(),
 			comment_symbols: vec![';', '#']
 		}
 	}
@@ -68,7 +68,7 @@ impl Ini {
 	///```
 	///Returns nothing.
 	pub fn set_default_section(&mut self, section: &str) {
-		self.default_section = section.to_string();
+		self.default_section = section.to_owned();
 	}
 
 	///Sets the default comment symbols to the defined character slice (the defaults are `;` and `#`).
@@ -564,6 +564,7 @@ impl Ini {
 	}
 
 	///Removes a section from the hashmap, returning the properties stored in the section if the section was previously in the map.
+	///Note that this function does not return a reference but a clone since the section will
 	///```rust
 	///use configparser::ini::Ini;
 	///
@@ -571,11 +572,11 @@ impl Ini {
 	///config.read(String::from(
 	///  "[section]
 	///  updog=whatsupdog"));
-	///config.remove_section("section");  // this will return an hashmap of the stored property
-	///assert!(config.get_map_ref.is_empty());  // our map is empty!
+	///config.remove_section("section");  // this will return a cloned hashmap of the stored property
+	///assert!(config.get_map_ref.is_empty());  // our map is now empty!
 	///```
 	///Returns nothing.
 	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
-		self.map.remove(&section)
+		self.map.remove(&section.to_owned()).clone()
 	}
 }
