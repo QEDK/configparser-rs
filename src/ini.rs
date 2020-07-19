@@ -512,7 +512,7 @@ impl Ini {
 	///config.set("section", "key", None);  // also valid!
 	///assert_eq!(config.get("section", "key"), None);  // correct!
 	///```
-	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
+	///Returns `None` if there is no existing value, else returns `Some(Option<String>)`, with the existing value being the wrapped `Option<String>`.
 	///If you want to insert using a string literal, use `setstr()` instead.
 	pub fn set(&mut self, section: &str, key: &str, value:Option<String>) -> Option<Option<String>> {
 		match self.map.get_mut(&section.to_lowercase()) {
@@ -526,7 +526,7 @@ impl Ini {
 		}
 	}
 
-	///Sets an `<Option<&str>>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
+	///Sets an `Option<&str>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
 	///An existing value in the map  will be overwritten. You can also set `None` safely.
 	///## Example
 	///```rust
@@ -540,7 +540,7 @@ impl Ini {
 	///config.setstr("section", "key", None);  // also valid!
 	///assert_eq!(config.get("section", "key"), None);  // correct!
 	///```
-	///Returns `None` if there is no existing value, else returns `Option<Option<String>`, with the existing value being the wrapped `Option<String>`.
+	///Returns `None` if there is no existing value, else returns `Some(Option<String>)`, with the existing value being the wrapped `Option<String>`.
 	///If you want to insert using a `String`, use `set()` instead.
 	pub fn setstr(&mut self, section: &str, key: &str, value:Option<&str>) -> Option<Option<String>> {
 		self.set(section, key, value.map(String::from))
@@ -574,7 +574,7 @@ impl Ini {
 	///config.remove_section("section");  // this will return a cloned hashmap of the stored property
 	///assert!(config.get_map_ref().is_empty());  // with the last section removed, our map is now empty!
 	///```
-	///Returns nothing.
+	///Returns `Some(section_map)` if the section exists or else, `None`.
 	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
 		self.map.remove(section)
 	}
