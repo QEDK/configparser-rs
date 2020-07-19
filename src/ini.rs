@@ -555,13 +555,14 @@ impl Ini {
 	///config.read(String::from(
 	///  "[section]
 	///  key=somevalue"));
-	///key
+	///config.clear();
+	///assert!(config.get_map_ref.is_empty());  // our map is empty!
 	///```
 	pub fn clear(&mut self) {
 		self.map.clear();
 	}
 
-	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>> {
+	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
 		self.map.remove(&section)
 	}
 }
