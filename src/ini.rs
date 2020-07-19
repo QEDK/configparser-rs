@@ -558,10 +558,23 @@ impl Ini {
 	///config.clear();
 	///assert!(config.get_map_ref.is_empty());  // our map is empty!
 	///```
+	///Returns nothing.
 	pub fn clear(&mut self) {
 		self.map.clear();
 	}
 
+	///Removes a section from the hashmap, returning the properties stored in the section if the section was previously in the map.
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.read(String::from(
+	///  "[section]
+	///  updog=whatsupdog"));
+	///config.remove_section("section");  // this will return an hashmap of the stored property
+	///assert!(config.get_map_ref.is_empty());  // our map is empty!
+	///```
+	///Returns nothing.
 	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
 		self.map.remove(&section)
 	}
