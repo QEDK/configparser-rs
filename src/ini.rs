@@ -564,7 +564,6 @@ impl Ini {
 	}
 
 	///Removes a section from the hashmap, returning the properties stored in the section if the section was previously in the map.
-	///Note that this function does not return a reference but a clone since the section will
 	///```rust
 	///use configparser::ini::Ini;
 	///
@@ -577,6 +576,6 @@ impl Ini {
 	///```
 	///Returns nothing.
 	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
-		self.map.remove(&section.to_owned()).clone()
+		self.map.remove(section)
 	}
 }
