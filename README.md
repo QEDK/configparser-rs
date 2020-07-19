@@ -30,7 +30,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.12.0"
+configparser = "0.13.0"
 ```
 
 ## Supported datatypes
@@ -190,13 +190,15 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Hotfix to remove hardcoded default section and use set default section.
   - Enabled auto-trait implementation of `Default` for empty inits.
   - Added the `sections()` method to get a vector of sections.
-- 0.12.0
+- 0.12.0 (**BETA 8**)
   - New function added, `writes()` to support writing configuration to a string.
   - More doctests passed.
+- 0.13.0 (**BETA 9**)
+  - New functions added, `clear()` and `remove_section()` to make handling similar to hashmaps.
+  - Docs fixed. On track to stable.
 
 ### Future plans
 
 - Support for `ini::load()` will be dropped in the next major releaser per SemVer (i.e. 1.0.0)
   - It will be replaced with a macro for a similar functionality.
   - It has been marked as deprecated.
-- More functions for the `Ini` struct, such as insertion and deletion.
