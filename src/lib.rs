@@ -133,7 +133,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   // Remember that all indexes are stored in lowercase!
 
   // You can easily write the currently stored configuration to a file like:
-  config.write("output.ini");
+  config.write("output.ini")?;
 
   // If you want to simply mutate the stored hashmap, you can use get_mut_map()
   let map = config.get_mut_map();
