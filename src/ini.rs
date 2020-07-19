@@ -545,4 +545,23 @@ impl Ini {
 	pub fn setstr(&mut self, section: &str, key: &str, value:Option<&str>) -> Option<Option<String>> {
 		self.set(section, key, value.map(String::from))
 	}
+
+	///Clears the map, removing all sections and properties from the hashmap. It keeps the allocated memory for reuse.
+	///## Example
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.read(String::from(
+	///  "[section]
+	///  key=somevalue"));
+	///key
+	///```
+	pub fn clear(&mut self) {
+		self.map.clear();
+	}
+
+	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>> {
+		self.map.remove(&section)
+	}
 }
