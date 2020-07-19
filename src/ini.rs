@@ -556,7 +556,7 @@ impl Ini {
 	///  "[section]
 	///  key=somevalue"));
 	///config.clear();
-	///assert!(config.get_map_ref.is_empty());  // our map is empty!
+	///assert!(config.get_map_ref().is_empty());  // our map is empty!
 	///```
 	///Returns nothing.
 	pub fn clear(&mut self) {
@@ -572,7 +572,7 @@ impl Ini {
 	///  "[section]
 	///  updog=whatsupdog"));
 	///config.remove_section("section");  // this will return a cloned hashmap of the stored property
-	///assert!(config.get_map_ref.is_empty());  // our map is now empty!
+	///assert!(config.get_map_ref().is_empty());  // with the last section removed, our map is now empty!
 	///```
 	///Returns nothing.
 	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
