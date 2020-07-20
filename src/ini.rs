@@ -578,4 +578,8 @@ impl Ini {
 	pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
 		self.map.remove(&section.to_lowercase())
 	}
+
+	pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Option<String>> {
+		self.map.get_mut(&section.to_lowercase())?.remove(&key.to_lowercase())
+	}
 }
