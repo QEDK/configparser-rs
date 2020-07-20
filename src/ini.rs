@@ -579,6 +579,20 @@ impl Ini {
 		self.map.remove(&section.to_lowercase())
 	}
 
+	///Removes a key from a section in the hashmap, returning the value attached to the key if it was previously in the map.
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.read(String::from(
+	///  "[section]
+	///  updog=whatsupdog
+	///  [anothersection]
+	///  updog=differentdog"));
+	///let val = config.remove_key("anothersection", "updog").unwrap().unwrap();
+	///assert_eq!(val, String::from("differentdog"));  // with the last section removed, our map is now empty!
+	///```
+	///Returns `Some(section_map)` if the section exists or else, `None`.
 	pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Option<String>> {
 		self.map.get_mut(&section.to_lowercase())?.remove(&key.to_lowercase())
 	}
