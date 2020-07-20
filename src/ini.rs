@@ -608,7 +608,7 @@ impl Ini {
 	///let val = config.remove_key("anothersection", "updog").unwrap().unwrap();
 	///assert_eq!(val, String::from("differentdog"));  // with the last section removed, our map is now empty!
 	///```
-	///Returns `Some(section_map)` if the section exists or else, `None`.
+	///Returns `Some(Option<String>)` if the value exists or else, `None`.
 	pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Option<String>> {
 		self.map.get_mut(&section.to_lowercase())?.remove(&key.to_lowercase())
 	}
