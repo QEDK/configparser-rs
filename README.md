@@ -30,7 +30,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "0.13.1"
+configparser = "0.13.2"
 ```
 
 ## Supported datatypes
@@ -196,9 +196,12 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.13.0 (**BETA 9**)
   - New functions added, `clear()` and `remove_section()` to make handling similar to hashmaps.
   - Docs fixed. On track to stable.
-- 0.13.1
+- 0.13.1 (yanked)
   - New function added, `remove_key()` to remove a key from a section
   - All doctests passing!
+- 0.13.2 (**FINAL BETA**)
+  - Erroneous docs fixed.
+  - Final release before stable.
 
 ### Future plans
 
