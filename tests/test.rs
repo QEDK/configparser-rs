@@ -53,6 +53,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 	assert_eq!(map["spacing"]["indented"].clone().unwrap(), "indented");
 	assert_eq!(map["spacing"]["not indented"].clone().unwrap(), "not indented");
 	let mut config2 = config.clone();
+	let val = config2.remove_key("default", "defaultvalues");
+	assert_eq!(val, Some(None));
+	assert_eq!(config2.get("default", "defaultvalues"), None);
 	config2.remove_section("default");
 	assert_eq!(config2.get("default", "nope"), None);
 	let mut_map = config.get_mut_map();
