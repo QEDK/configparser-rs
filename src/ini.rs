@@ -103,9 +103,13 @@ impl Ini {
 	///Loads a file from a defined path, parses it and puts the hashmap into our struct.
 	///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `HashMap`, if present.
 	///## Example
-	///```ignore,rust
-	///let map = match config.load("Path/to/file...").unwrap();
-	///let location = map["tupac's"]["crib"].clone().unwrap();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///let map = config.load("tests/test.ini").unwrap();  // we can get a clone like this, or just store it
+	/////Then, we can use standard hashmap functions like:
+	///let values = map.get("values").unwrap();
 	///```
 	///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
 	///Use `get_mut_map()` if you want a mutable reference.
