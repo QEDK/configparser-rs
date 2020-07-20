@@ -429,8 +429,13 @@ impl Ini {
 
 	///Parses the stored value from the key stored in the defined section to a `f64`.
 	///## Example
-	///```ignore,rust
-	///let value = config.getfloat("section", "key")?.unwrap();
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.load("tests/test.ini");
+	///let value = config.getfloat("values", "float").unwrap().unwrap();
+	///assert_eq!(value, 3.1415);  // value accessible!
 	///```
 	///Returns `Ok(Some(value))` of type `f64` if value is found or else returns `Ok(None)`.
 	///If the parsing fails, it returns an `Err(string)`.
@@ -452,8 +457,15 @@ impl Ini {
 
 	///Returns a clone of the `HashMap` stored in our struct.
 	///## Example
-	///```ignore,rust
+	///```rust
+	///use configparser::ini::Ini;
+	///
+	///let mut config = Ini::new();
+	///config.read(String::from(
+	///  "[section]
+	///  key=values"));
 	///let map = config.get_map().unwrap();
+	///assert_eq!(map, *config.get_map_ref());  // the cloned map is basically a snapshot that you own
 	///```
 	///Returns `Some(map)` if map is non-empty or else returns `None`.
 	///Similar to `load()` but returns an `Option` type with the currently stored `HashMap`.
