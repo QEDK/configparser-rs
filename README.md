@@ -5,8 +5,7 @@ This crate provides the `Ini` struct which implements a basic configuration lang
 
 This is a simple configuration parsing utility with no dependencies built on Rust. It is inspired by Python's `configparser`.
 
-The current release is experimental, this means that future releases will be swift until we reach `stable` (1.0.0).
-The codebase is thus subject to change for now.
+The current release is stable and changes will take place at a slower pace. We'll be keeping semver in mind for future releases as well.
 
 ## Quick Start
 
@@ -171,25 +170,6 @@ additional terms or conditions.
 ## Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.9.0 (**BETA 5**)
-  - Comment customization is here! (**note:** defaults are now changed to `#` and `;`)
-  - Fixed some docs
-  - Make more docs pass tests
-- 0.9.1
-  - Hotfix to change getters to return `Ok(None)` instead of failing parsing for `None` values
-- 0.9.2
-  - Added `getboolcoerce()` function to parse more `bool`-like values.
-  - Convert some snippets to doctests.
-- 0.10.0 (**BETA 6**)
-  - Added `set()` and `setstr()` methods to add section, key, values to the configuration.
-  - Added more test, minor doc fixes.
-- 0.11.0 (**BETA 7**)
-  - Writing to file is here! (`write()`).
-  - More doctests and docs fixed, next release is planned to be stable.
-- 0.11.1
-  - Hotfix to remove hardcoded default section and use set default section.
-  - Enabled auto-trait implementation of `Default` for empty inits.
-  - Added the `sections()` method to get a vector of sections.
 - 0.12.0 (**BETA 8**)
   - New function added, `writes()` to support writing configuration to a string.
   - More doctests passed.
@@ -202,9 +182,10 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.13.2 (**FINAL BETA**)
   - Erroneous docs fixed.
   - Final release before stable.
+- 1.0.0 (**STABLE**)
+  - Dropped support for `ini::load()`
+  - Updated tests
 
 ### Future plans
 
-- Support for `ini::load()` will be dropped in the next major releaser per SemVer (i.e. 1.0.0)
-  - It will be replaced with a macro for a similar functionality.
-  - It has been marked as deprecated.
+- TBA

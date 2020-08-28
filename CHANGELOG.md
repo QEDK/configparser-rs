@@ -48,5 +48,24 @@
 - 0.8.1
   - Added support for comments
   - Improved docs
+  - 0.9.0 (**BETA 5**)
+  - Comment customization is here! (**note:** defaults are now changed to `#` and `;`)
+  - Fixed some docs
+  - Make more docs pass tests
+- 0.9.1
+  - Hotfix to change getters to return `Ok(None)` instead of failing parsing for `None` values
+- 0.9.2
+  - Added `getboolcoerce()` function to parse more `bool`-like values.
+  - Convert some snippets to doctests.
+- 0.10.0 (**BETA 6**)
+  - Added `set()` and `setstr()` methods to add section, key, values to the configuration.
+  - Added more test, minor doc fixes.
+- 0.11.0 (**BETA 7**)
+  - Writing to file is here! (`write()`).
+  - More doctests and docs fixed, next release is planned to be stable.
+- 0.11.1
+  - Hotfix to remove hardcoded default section and use set default section.
+  - Enabled auto-trait implementation of `Default` for empty inits.
+  - Added the `sections()` method to get a vector of sections.
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).
