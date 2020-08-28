@@ -6,23 +6,6 @@ use std::path::Path;
 use std::io::prelude::*;
 use std::collections::HashMap;
 
-///A public function of the module to load and parse files into a hashmap.
-///Support for this function will be dropped in the near future and replaced with a macro.
-#[deprecated(
-	since = "0.3.0",
-	note = "Please use the Ini struct instead."
-	)]
-pub fn load(path: &str) -> HashMap<String, HashMap<String, Option<String>>> {
-	let mut config = Ini::new();
-	if let Err(why) = config.load(path) {
-		panic!("{}", why)
-	}
-	match config.get_map() {
-		Some(map) => map,
-		None => HashMap::new()
-	}
-}
-
 ///The `Ini` struct simply contains a nested hashmap of the loaded configuration, the default section header and comment symbols.
 ///## Example
 ///```rust
@@ -184,13 +167,11 @@ impl Ini {
 	///```rust
 	///use configparser::ini::Ini;
 	///
-	///fn main() {
-	///  let mut config = Ini::new();
-	///  config.read(String::from(
-	///    "[2000s]
-	///    2020 = bad"));
-	///  let outstring = config.writes();
-	///}
+	///let mut config = Ini::new();
+	///config.read(String::from(
+	///  "[2000s]
+	///  2020 = bad"));
+	///let outstring = config.writes();
 	///```
 	///Returns a `String` type contatining the ini-syntax file.
 	pub fn writes(&self) -> String {
