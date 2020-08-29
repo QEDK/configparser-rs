@@ -188,4 +188,4 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 
 ### Future plans
 
-- TBA
+- Support for appending sections, coercing them as well.
