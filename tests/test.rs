@@ -10,6 +10,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "defaultvalues=defaultvalues
 		[topsecret]
 		KFC = the secret herb is orega-
+                colon:value after colon
 		Empty string =
 		None string
 		[ spacing ]
@@ -53,6 +54,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     assert_eq!(
         config.get("spacing", "not indented").unwrap(),
         "not indented"
+    );
+    assert_eq!(
+        config.get("topsecret", "colon").unwrap(),
+        "value after colon"
     );
     assert_eq!(config.getbool("values", "Bool")?.unwrap(), true);
     assert_eq!(
