@@ -18,6 +18,7 @@ pub struct Ini {
     map: HashMap<String, HashMap<String, Option<String>>>,
     default_section: std::string::String,
     comment_symbols: Vec<char>,
+    delimiters: Vec<char>,
 }
 
 impl Ini {
@@ -35,6 +36,7 @@ impl Ini {
             map: HashMap::new(),
             default_section: "default".to_owned(),
             comment_symbols: vec![';', '#'],
+            delimiters: vec!['=', ':'],
         }
     }
 
@@ -241,7 +243,7 @@ impl Ini {
                         ));
                     }
                 },
-                None => match trimmed.find('=') {
+                None => match trimmed.find(&self.delimiters[..]) {
                     Some(delimiter) => match map.get_mut(&section) {
                         Some(valmap) => {
                             let key = trimmed[..delimiter].trim().to_lowercase();
