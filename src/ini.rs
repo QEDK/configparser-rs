@@ -19,6 +19,7 @@ pub struct Ini {
     default_section: std::string::String,
     comment_symbols: Vec<char>,
     delimiters: Vec<char>,
+    case_sensitive: bool,
 }
 
 impl Ini {
@@ -37,6 +38,26 @@ impl Ini {
             default_section: "default".to_owned(),
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
+            case_sensitive: false,
+        }
+    }
+
+    ///Creates a new **case-sensitive** `HashMap` of `HashMap<String, HashMap<String, Option<String>>>` type for the struct.
+    ///All values in the HashMap are stored in `String` type.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///```
+    ///Returns the struct and stores it in the calling variable.
+    pub fn new_cs() -> Ini {
+        Ini {
+            map: HashMap::new(),
+            default_section: "default".to_owned(),
+            comment_symbols: vec![';', '#'],
+            delimiters: vec!['=', ':'],
+            case_sensitive: true,
         }
     }
 
