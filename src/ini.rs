@@ -259,7 +259,7 @@ impl Ini {
                     }
                     None => {
                         return Err(format!(
-                            "line {}:{}: Found opening bracket but no closing bracket",
+                            "line {}:{}: Found opening bracket for section name but no closing bracket",
                             num, start
                         ));
                     }
@@ -311,9 +311,19 @@ impl Ini {
         Ok(map)
     }
 
+    ///Private function that cases things automatically depending on the set variable.
+    fn autocase(&self, section: &str, key: &str) -> (String, String) {
+        if self.case_sensitive {
+            (section.to_owned(), key.to_owned())
+        } else {
+            (section.to_lowercase(), key.to_lowercase())
+        }
+    }
+
     ///Returns a clone of the stored value from the key stored in the defined section.
-    ///Unlike accessing the map directly, `get()` processes your input to make case-insensitive access.
-    ///All `get` functions will do this automatically.
+    ///Unlike accessing the map directly, `get()` can process your input to make case-insensitive access when the
+    ///default constructor is used.
+    ///All `get` functions will do this automatically under the hood.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -325,9 +335,10 @@ impl Ini {
     ///```
     ///Returns `Some(value)` of type `String` if value is found or else returns `None`.
     pub fn get(&self, section: &str, key: &str) -> Option<String> {
+        let (section, key) = self.autocase(section, key);
         self.map
-            .get(&section.to_lowercase())?
-            .get(&key.to_lowercase())?
+            .get(&section)?
+            .get(&key)?
             .clone()
     }
 
@@ -345,8 +356,9 @@ impl Ini {
     ///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getbool(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
-        match self.map.get(&section.to_lowercase()) {
-            Some(secmap) => match secmap.get(&key.to_lowercase()) {
+        let (section, key) = self.autocase(section, key);
+        match self.map.get(&section) {
+            Some(secmap) => match secmap.get(&key) {
                 Some(val) => match val {
                     Some(inner) => match inner.to_lowercase().parse::<bool>() {
                         Err(why) => Err(why.to_string()),
