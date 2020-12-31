@@ -48,7 +48,7 @@ impl Ini {
     ///```rust
     ///use configparser::ini::Ini;
     ///
-    ///let mut config = Ini::new();
+    ///let mut config = Ini::new_cs();
     ///```
     ///Returns the struct and stores it in the calling variable.
     pub fn new_cs() -> Ini {
