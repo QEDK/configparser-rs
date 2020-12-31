@@ -53,7 +53,7 @@ let my_int = my_string.parse::<i32>().unwrap();
 ```
 
 ## Supported `ini` file structure
-A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. All leading and trailing whitespace is removed from stored keys, values and section names.
+A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. Case-sensitivity can be enabled using the `Ini::new_cs()` constructor. All leading and trailing whitespace is removed from stored keys, values and section names.
 Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
 explain it later). You can use comment symbols (`;` and `#` to denote comments). This can be configured with the `set_comment_symbols()` method in the
 API. Keep in mind that key-value pairs or section headers cannot span multiple lines.
@@ -61,11 +61,12 @@ Owing to how ini files usually are, this means that `[`, `]`, `=`, `;` and `#` a
 
 Let's take for example:
 ```INI
-[section headers are case-insensitive]
-[   section headers are case-insensitive    ]
+[section headers are case-insensitive by default]
+[   section headers are case-insensitive by default   ]
 are the section headers above same? = yes
 sectionheaders_and_keysarestored_in_lowercase? = yes
 keys_are_also_case_insensitive = Values are case sensitive
+Case-sensitive_keys_and_sections = using a special constructor
 ;anything after a comment symbol is ignored
 #this is also a comment
 spaces in keys=allowed ;and everything before this is still valid!
@@ -88,6 +89,7 @@ this key has an empty string value has Some("") =
         purpose = formatting for readability
         is_this_same     =        yes
             is_this_same=yes
+
 ```
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
@@ -147,6 +149,9 @@ fn main() -> Result<(), Box<dyn Error>> {
   // Remember that functions which rely on standard formatting might stop working
   // if it's mutated differently.
 
+  // If you want a case-sensitive map, just do:
+  let mut config = Ini::new_cs();
+  // This automatically changes the behaviour of every function and parses the file as case-sensitive.
 
   Ok(())
 }
