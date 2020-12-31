@@ -677,7 +677,7 @@ impl Ini {
     pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Option<String>> {
         let (section, key) = self.autocase(section, key);
         self.map
-            .get_mut(&section.to_lowercase())?
-            .remove(&key.to_lowercase())
+            .get_mut(&section)?
+            .remove(&key)
     }
 }
