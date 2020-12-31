@@ -8,5 +8,9 @@ jobs:
   allow_failures:
     - rust: nightly
   fast_finish: true
-after_script:
+before_script:
+  - rustup component add rustfmt
+script:
+  - cargo build --verbose
+  - cargo test --verbose
   - cargo fmt -- --check

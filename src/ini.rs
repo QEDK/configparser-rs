@@ -676,8 +676,6 @@ impl Ini {
     ///Returns `Some(Option<String>)` if the value exists or else, `None`.
     pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Option<String>> {
         let (section, key) = self.autocase(section, key);
-        self.map
-            .get_mut(&section)?
-            .remove(&key)
+        self.map.get_mut(&section)?.remove(&key)
     }
 }
