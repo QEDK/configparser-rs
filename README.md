@@ -1,5 +1,5 @@
 # configparser
-[![Build Status](https://travis-ci.com/mexili/configparser-rs.svg?branch=master)](https://travis-ci.com/mexili/configparser-rs) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2020)](https://github.com/QEDK/configparser-rs)
+[![Build Status](https://travis-ci.com/mexili/configparser-rs.svg?branch=master)](https://travis-ci.com/mexili/configparser-rs) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2021)](https://github.com/QEDK/configparser-rs)
 
 This crate provides the `Ini` struct which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
 
@@ -147,6 +147,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   // Remember that functions which rely on standard formatting might stop working
   // if it's mutated differently.
 
+
   Ok(())
 }
 ```
@@ -170,9 +171,6 @@ additional terms or conditions.
 ## Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.12.0 (**BETA 8**)
-  - New function added, `writes()` to support writing configuration to a string.
-  - More doctests passed.
 - 0.13.0 (**BETA 9**)
   - New functions added, `clear()` and `remove_section()` to make handling similar to hashmaps.
   - Docs fixed. On track to stable.
@@ -185,6 +183,10 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 1.0.0 (**STABLE**)
   - Dropped support for `ini::load()`
   - Updated tests
+- 2.0.0
+  - **BREAKING** Added Python-esque support for `:` as a delimiter.
+  - :new: Add support for case-sensitive maps with automatic handling under the hood.
+  - :hammer: Fixed buggy setters which went uncaught, to preserve case-insensitive nature.
 
 ### Future plans
 

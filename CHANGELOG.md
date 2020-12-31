@@ -67,5 +67,8 @@
   - Hotfix to remove hardcoded default section and use set default section.
   - Enabled auto-trait implementation of `Default` for empty inits.
   - Added the `sections()` method to get a vector of sections.
+- 0.12.0 (**BETA 8**)
+  - New function added, `writes()` to support writing configuration to a string.
+  - More doctests passed.
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).
