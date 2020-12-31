@@ -7,7 +7,7 @@ This is a simple configuration parsing utility with no dependencies built on Rus
 
 The current release is stable and changes will take place at a slower pace. We'll be keeping semver in mind for future releases as well.
 
-## Quick Start
+## 🚀 Quick Start
 
 A basic `ini`-syntax file (we say ini-syntax files because the files don't need to be necessarily `*.ini`) looks like this:
 ```INI
@@ -25,14 +25,14 @@ User = QEDK
 Essentially, the syntax consists of sections, each of which can which contains keys with values. The `Ini` struct can read and write such values to
 strings as well as files.
 
-### Installation
+### 🧰 Installation
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
 configparser = "2.0.0"
 ```
 
-## Supported datatypes
+## ➕ Supported datatypes
 `configparser` does not guess the datatype of values in configuration files and stores everything as strings. However, some datatypes are so common
 that it's a safe bet that some values need to be parsed in other types. For this, the `Ini` struct provides easy functions like `getint()`, `getuint()`,
 `getfloat()` and `getbool()`. The only bit of extra magic involved is that the `getbool()` function will treat boolean values case-insensitively (so
@@ -52,12 +52,13 @@ let my_string = String::from("1984");
 let my_int = my_string.parse::<i32>().unwrap();
 ```
 
-## Supported `ini` file structure
-A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. Case-sensitivity can be enabled using the `Ini::new_cs()` constructor. All leading and trailing whitespace is removed from stored keys, values and section names.
-Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
+## 📝 Supported `ini` file structure
+A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a delimiter (`=` and `:`). By default, section names and key names are case-insensitive. Case-sensitivity can be enabled using the `Ini::new_cs()` constructor. All leading and trailing whitespace is removed from stored keys, values and section names.
+Key values can be omitted, in which case the key-value delimiter
+may also be left out (but this is different from putting a delimiter, we'll
 explain it later). You can use comment symbols (`;` and `#` to denote comments). This can be configured with the `set_comment_symbols()` method in the
 API. Keep in mind that key-value pairs or section headers cannot span multiple lines.
-Owing to how ini files usually are, this means that `[`, `]`, `=`, `;` and `#` are special symbols (this crate will allow you to use `]` sparingly).
+Owing to how ini files usually are, this means that `[`, `]`, `=`, `:`, `;` and `#` are special symbols by default (this crate will allow you to use `]` sparingly).
 
 Let's take for example:
 ```INI
@@ -97,7 +98,7 @@ or property key) is the one that remains in the `HashMap`.
 The only bit of magic the API does is the section-less properties are put in a section called "default". You can configure this variable via the API.
 Keep in mind that a section named "default" is also treated as sectionless so the output files remains consistent with no section header.
 
-## Usage
+## 🛠 Usage
 Let's take another simple `ini` file and talk about working with it:
 ```INI
 [topsecret]
@@ -159,7 +160,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 ```
 The `Ini` struct offers great support for type conversion and type setting safely, as well as map accesses. See the API for more verbose documentation.
 
-## License
+## 📜 License
 
 Licensed under either of
 
@@ -168,13 +169,13 @@ Licensed under either of
 
 at your option.
 
-### Contribution
+### ✏ Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the LGPL-3.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
 
-## Changelog
+## 🆕 Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.13.0 (**BETA 9**)
@@ -194,6 +195,6 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - :new: Add support for case-sensitive maps with automatic handling under the hood.
   - :hammer: Fixed buggy setters which went uncaught, to preserve case-insensitive nature.
 
-### Future plans
+### 🔜 Future plans
 
 - Support for appending sections, coercing them as well.
