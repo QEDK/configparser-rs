@@ -244,7 +244,13 @@ impl Ini {
     ) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
         let mut map: HashMap<String, HashMap<String, Option<String>>> = HashMap::new();
         let mut section = self.default_section.clone();
-        let caser = |val: &str| { if self.case_sensitive { val.to_owned() } else { val.to_lowercase() } };
+        let caser = |val: &str| {
+            if self.case_sensitive {
+                val.to_owned()
+            } else {
+                val.to_lowercase()
+            }
+        };
         for (num, lines) in input.lines().enumerate() {
             let trimmed = match lines.find(|c: char| self.comment_symbols.contains(&c)) {
                 Some(idx) => lines[..idx].trim(),
