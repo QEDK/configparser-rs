@@ -60,6 +60,7 @@ are the section headers above same? = yes
 sectionheaders_and_keysarestored_in_lowercase? = yes
 keys_are_also_case_insensitive = Values are case sensitive
 Case-sensitive_keys_and_sections = using a special constructor
+you can also use colons : instead of the equal symbol
 ;anything after a comment symbol is ignored
 #this is also a comment
 spaces in keys=allowed ;and everything before this is still valid!
