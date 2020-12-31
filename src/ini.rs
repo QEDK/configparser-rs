@@ -244,6 +244,7 @@ impl Ini {
     ) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
         let mut map: HashMap<String, HashMap<String, Option<String>>> = HashMap::new();
         let mut section = self.default_section.clone();
+        let caser = |val: &str| { if self.case_sensitive { val.to_owned() } else { val.to_lowercase() } };
         for (num, lines) in input.lines().enumerate() {
             let trimmed = match lines.find(|c: char| self.comment_symbols.contains(&c)) {
                 Some(idx) => lines[..idx].trim(),
@@ -255,7 +256,7 @@ impl Ini {
             match trimmed.find('[') {
                 Some(start) => match trimmed.rfind(']') {
                     Some(end) => {
-                        section = trimmed[start + 1..end].trim().to_lowercase();
+                        section = caser(trimmed[start + 1..end].trim());
                     }
                     None => {
                         return Err(format!(
@@ -267,7 +268,7 @@ impl Ini {
                 None => match trimmed.find(&self.delimiters[..]) {
                     Some(delimiter) => match map.get_mut(&section) {
                         Some(valmap) => {
-                            let key = trimmed[..delimiter].trim().to_lowercase();
+                            let key = caser(trimmed[..delimiter].trim());
                             let value = trimmed[delimiter + 1..].trim().to_owned();
                             if key.is_empty() {
                                 return Err(format!(
@@ -280,7 +281,7 @@ impl Ini {
                         }
                         None => {
                             let mut valmap: HashMap<String, Option<String>> = HashMap::new();
-                            let key = trimmed[..delimiter].trim().to_lowercase();
+                            let key = caser(trimmed[..delimiter].trim());
                             let value = trimmed[delimiter + 1..].trim().to_owned();
                             if key.is_empty() {
                                 return Err(format!(
@@ -295,12 +296,12 @@ impl Ini {
                     },
                     None => match map.get_mut(&section) {
                         Some(valmap) => {
-                            let key = trimmed.to_lowercase();
+                            let key = caser(trimmed);
                             valmap.insert(key, None);
                         }
                         None => {
                             let mut valmap: HashMap<String, Option<String>> = HashMap::new();
-                            let key = trimmed.to_lowercase();
+                            let key = caser(trimmed);
                             valmap.insert(key, None);
                             map.insert(section.clone(), valmap);
                         }
