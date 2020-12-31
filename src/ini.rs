@@ -321,7 +321,7 @@ impl Ini {
     }
 
     ///Returns a clone of the stored value from the key stored in the defined section.
-    ///Unlike accessing the map directly, `get()` can process your input to make case-insensitive access when the
+    ///Unlike accessing the map directly, `get()` can process your input to make case-insensitive access *if* the
     ///default constructor is used.
     ///All `get` functions will do this automatically under the hood.
     ///## Example
@@ -336,10 +336,7 @@ impl Ini {
     ///Returns `Some(value)` of type `String` if value is found or else returns `None`.
     pub fn get(&self, section: &str, key: &str) -> Option<String> {
         let (section, key) = self.autocase(section, key);
-        self.map
-            .get(&section)?
-            .get(&key)?
-            .clone()
+        self.map.get(&section)?.get(&key)?.clone()
     }
 
     ///Parses the stored value from the key stored in the defined section to a `bool`.
@@ -387,8 +384,9 @@ impl Ini {
     ///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getboolcoerce(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
-        match self.map.get(&section.to_lowercase()) {
-            Some(secmap) => match secmap.get(&key.to_lowercase()) {
+        let (section, key) = self.autocase(section, key);
+        match self.map.get(&section) {
+            Some(secmap) => match secmap.get(&key) {
                 Some(val) => match val {
                     Some(inner) => {
                         let boolval = &inner.to_lowercase()[..];
@@ -424,8 +422,9 @@ impl Ini {
     ///Returns `Ok(Some(value))` of type `i64` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getint(&self, section: &str, key: &str) -> Result<Option<i64>, String> {
-        match self.map.get(&section.to_lowercase()) {
-            Some(secmap) => match secmap.get(&key.to_lowercase()) {
+        let (section, key) = self.autocase(section, key);
+        match self.map.get(&section) {
+            Some(secmap) => match secmap.get(&key) {
                 Some(val) => match val {
                     Some(inner) => match inner.parse::<i64>() {
                         Err(why) => Err(why.to_string()),
@@ -452,8 +451,9 @@ impl Ini {
     ///Returns `Ok(Some(value))` of type `u64` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getuint(&self, section: &str, key: &str) -> Result<Option<u64>, String> {
-        match self.map.get(&section.to_lowercase()) {
-            Some(secmap) => match secmap.get(&key.to_lowercase()) {
+        let (section, key) = self.autocase(section, key);
+        match self.map.get(&section) {
+            Some(secmap) => match secmap.get(&key) {
                 Some(val) => match val {
                     Some(inner) => match inner.parse::<u64>() {
                         Err(why) => Err(why.to_string()),
@@ -480,8 +480,9 @@ impl Ini {
     ///Returns `Ok(Some(value))` of type `f64` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getfloat(&self, section: &str, key: &str) -> Result<Option<f64>, String> {
-        match self.map.get(&section.to_lowercase()) {
-            Some(secmap) => match secmap.get(&key.to_lowercase()) {
+        let (section, key) = self.autocase(section, key);
+        match self.map.get(&section) {
+            Some(secmap) => match secmap.get(&key) {
                 Some(val) => match val {
                     Some(inner) => match inner.parse::<f64>() {
                         Err(why) => Err(why.to_string()),
@@ -576,12 +577,13 @@ impl Ini {
         key: &str,
         value: Option<String>,
     ) -> Option<Option<String>> {
-        match self.map.get_mut(&section.to_lowercase()) {
-            Some(secmap) => secmap.insert(key.to_lowercase(), value),
+        let (section, key) = self.autocase(section, key);
+        match self.map.get_mut(&section) {
+            Some(secmap) => secmap.insert(key, value),
             None => {
                 let mut valmap: HashMap<String, Option<String>> = HashMap::new();
-                valmap.insert(key.to_lowercase(), value);
-                self.map.insert(section.to_lowercase(), valmap);
+                valmap.insert(key, value);
+                self.map.insert(section, valmap);
                 None
             }
         }
@@ -609,7 +611,8 @@ impl Ini {
         key: &str,
         value: Option<&str>,
     ) -> Option<Option<String>> {
-        self.set(section, key, value.map(String::from))
+        let (section, key) = self.autocase(section, key);
+        self.set(&section, &key, value.map(String::from))
     }
 
     ///Clears the map, removing all sections and properties from the hashmap. It keeps the allocated memory for reuse.
@@ -642,7 +645,12 @@ impl Ini {
     ///```
     ///Returns `Some(section_map)` if the section exists or else, `None`.
     pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
-        self.map.remove(&section.to_lowercase())
+        let section = if self.case_sensitive {
+            section.to_owned()
+        } else {
+            section.to_lowercase()
+        };
+        self.map.remove(&section)
     }
 
     ///Removes a key from a section in the hashmap, returning the value attached to the key if it was previously in the map.
@@ -660,6 +668,7 @@ impl Ini {
     ///```
     ///Returns `Some(Option<String>)` if the value exists or else, `None`.
     pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Option<String>> {
+        let (section, key) = self.autocase(section, key);
         self.map
             .get_mut(&section.to_lowercase())?
             .remove(&key.to_lowercase())
