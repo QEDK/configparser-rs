@@ -1,18 +1,13 @@
 use configparser::ini::Ini;
 use std::error::Error;
-use std::f64::consts::PI;
 
-macro_rules! assert_approx {
-    ($x:expr, $y:expr, $d:expr) => {
-        let diff = ($x - $y).abs();
-        if !(diff < $d) {
-            panic!(format!("difference {} is greater than {}.", diff, $d));
-        }
-    };
-}
-
-const INI_STR: &'static str = "
-        defaultvalues=defaultvalues
+#[test]
+fn non_cs() -> Result<(), Box<dyn Error>> {
+    let mut config = Ini::new();
+    let map = config.load("tests/test.ini")?;
+    config.set_comment_symbols(&[';', '#', '!']);
+    let inpstring = config.read(
+        "defaultvalues=defaultvalues
 		[topsecret]
 		KFC = the secret herb is orega-
                 colon:value after colon
@@ -27,17 +22,9 @@ const INI_STR: &'static str = "
 		Boolcoerce = 0
 		Int = -31415
 		Uint = 31415
-		Float = 3.1415
-        [*Factory.[java,class]] ;inner brackets
-        Σ = 1
-";
-
-#[test]
-fn non_cs() -> Result<(), Box<dyn Error>> {
-    let mut config = Ini::new();
-    let map = config.load("tests/test.ini")?;
-    config.set_comment_symbols(&[';', '#', '!']);
-    let inpstring = config.read(INI_STR.to_owned())?;
+		Float = 3.1415"
+            .to_owned(),
+    )?;
     assert_eq!(map, inpstring);
     config.set("DEFAULT", "defaultvalues", Some("notdefault".to_owned()));
     assert_eq!(
@@ -55,14 +42,10 @@ fn non_cs() -> Result<(), Box<dyn Error>> {
     assert_eq!(map2, *config.get_map_ref());
     let map3 = config.clone().read(config.writes())?;
     assert_eq!(map2, map3);
-    assert_eq!(config.sections().len(), 5);
+    assert_eq!(config.sections().len(), 4);
     assert_eq!(config.get("DEFAULT", "defaultvalues"), None);
     assert_eq!(
         config.get("topsecret", "KFC").unwrap(),
-        "the secret herb is orega-"
-    );
-    assert_eq!(
-        config.get("topsecret", "kfc").unwrap(),
         "the secret herb is orega-"
     );
     assert_eq!(config.get("topsecret", "Empty string").unwrap(), "");
@@ -83,7 +66,7 @@ fn non_cs() -> Result<(), Box<dyn Error>> {
     );
     assert_eq!(config.getint("values", "Int")?.unwrap(), -31415);
     assert_eq!(config.getuint("values", "Uint")?.unwrap(), 31415);
-    assert_approx!(config.getfloat("values", "Float")?.unwrap(), PI, 0.0001);
+    assert_eq!(config.getfloat("values", "Float")?.unwrap(), 3.1415);
     assert_eq!(config.getfloat("topsecret", "None string"), Ok(None));
     assert_eq!(
         map["default"]["defaultvalues"].clone().unwrap(),
@@ -100,14 +83,6 @@ fn non_cs() -> Result<(), Box<dyn Error>> {
         map["spacing"]["not indented"].clone().unwrap(),
         "not indented"
     );
-
-    assert_eq!(map.keys().any(|key| key == "*Factory.[java,class]"), false);
-    assert_eq!(map.keys().any(|key| key == "*factory.[java,class]"), true);
-    assert_eq!(map["*factory.[java,class]"]["σ"].clone().unwrap(), "1");
-    assert_eq!(map["*factory.[java,class]"].get("Σ"), None);
-    assert_eq!(config.getuint("*factory.[java,class]", "σ")?.unwrap(), 1);
-    assert_eq!(config.getuint("*Factory.[java,class]", "Σ")?.unwrap(), 1);
-
     let mut config2 = config.clone();
     let val = config2.remove_key("default", "defaultvalues");
     assert_eq!(val, Some(None));
@@ -134,7 +109,25 @@ fn cs() -> Result<(), Box<dyn Error>> {
     let mut config = Ini::new_cs();
     let map = config.load("tests/test.ini")?;
     config.set_comment_symbols(&[';', '#', '!']);
-    let inpstring = config.read(INI_STR.to_owned())?;
+    let inpstring = config.read(
+        "defaultvalues=defaultvalues
+        [topsecret]
+        KFC = the secret herb is orega-
+                colon:value after colon
+        Empty string =
+        None string
+        [ spacing ]
+            indented=indented
+        not indented = not indented             ;testcomment
+        !modified comment
+        [values]#another comment
+        Bool = True
+        Boolcoerce = 0
+        Int = -31415
+        Uint = 31415
+        Float = 3.1415"
+            .to_owned(),
+    )?;
     assert_eq!(map, inpstring);
     config.set("default", "defaultvalues", Some("notdefault".to_owned()));
     assert_eq!(
@@ -152,13 +145,12 @@ fn cs() -> Result<(), Box<dyn Error>> {
     assert_eq!(map2, *config.get_map_ref());
     let map3 = config.clone().read(config.writes())?;
     assert_eq!(map2, map3);
-    assert_eq!(config.sections().len(), 5);
+    assert_eq!(config.sections().len(), 4);
     assert_eq!(config.get("default", "defaultvalues"), None);
     assert_eq!(
         config.get("topsecret", "KFC").unwrap(),
         "the secret herb is orega-"
     );
-    assert_eq!(config.get("topsecret", "kfc"), None);
     assert_eq!(config.get("topsecret", "Empty string").unwrap(), "");
     assert_eq!(config.get("topsecret", "None string"), None);
     assert_eq!(config.get("spacing", "indented").unwrap(), "indented");
@@ -177,7 +169,7 @@ fn cs() -> Result<(), Box<dyn Error>> {
     );
     assert_eq!(config.getint("values", "Int")?.unwrap(), -31415);
     assert_eq!(config.getuint("values", "Uint")?.unwrap(), 31415);
-    assert_approx!(config.getfloat("values", "Float")?.unwrap(), PI, 0.0001);
+    assert_eq!(config.getfloat("values", "Float")?.unwrap(), 3.1415);
     assert_eq!(config.getfloat("topsecret", "None string"), Ok(None));
     assert_eq!(
         map["default"]["defaultvalues"].clone().unwrap(),
@@ -194,14 +186,6 @@ fn cs() -> Result<(), Box<dyn Error>> {
         map["spacing"]["not indented"].clone().unwrap(),
         "not indented"
     );
-    assert_eq!(map.keys().any(|key| key == "*Factory.[java,class]"), true);
-    assert_eq!(map.keys().any(|key| key == "*factory.[java,class]"), false);
-    assert_eq!(
-        map["*Factory.[java,class]"]["Σ"].clone().unwrap(),
-        "1".to_owned()
-    );
-    assert_eq!(config.getuint("*Factory.[java,class]", "σ")?, None);
-    assert_eq!(config.getuint("*Factory.[java,class]", "Σ")?.unwrap(), 1);
     let mut config2 = config.clone();
     let val = config2.remove_key("default", "defaultvalues");
     assert_eq!(val, Some(None));
