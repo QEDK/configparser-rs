@@ -212,29 +212,26 @@ impl Ini {
         let mut out = String::new();
         let mut cloned = self.map.clone();
         if let Some(defaultmap) = cloned.get(&self.default_section) {
-            for (key, val) in defaultmap.iter() {
-                out.push_str(&key);
-                if let Some(value) = val {
-                    out.push_str("=");
-                    out.push_str(&value);
-                }
-                out.push_str("\n");
-            }
+            Ini::unparse_key_values(&mut out, defaultmap);
             cloned.remove(&self.default_section);
         }
         for (section, secmap) in cloned.iter() {
             out.push_str(&format!("[{}]", section));
-            out.push_str("\n");
-            for (key, val) in secmap.iter() {
-                out.push_str(&key);
-                if let Some(value) = val {
-                    out.push_str("=");
-                    out.push_str(&value);
-                }
-                out.push_str("\n");
-            }
+            out.push('\n');
+            Ini::unparse_key_values(&mut out, secmap);
         }
         out
+    }
+
+    fn unparse_key_values(out: &mut String, defaultmap: &HashMap<String, Option<String>>) {
+        for (key, val) in defaultmap.iter() {
+            out.push_str(&key);
+            if let Some(value) = val {
+                out.push('=');
+                out.push_str(&value);
+            }
+            out.push('\n');
+        }
     }
 
     ///Private function that parses ini-style syntax into a HashMap.
