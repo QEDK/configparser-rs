@@ -374,8 +374,8 @@ impl Ini {
     }
 
     ///Parses the stored value from the key stored in the defined section to a `bool`. For ease of use, the function converts the type coerces a match.
-    ///It attempts to case-insenstively find `true`, `yes`, `t`, `y` and `1` to parse it as `True`.
-    ///Similarly it attempts to case-insensitvely find `false`, `no`, `f`, `n` and `0` to parse it as `False`.
+    ///It attempts to case-insenstively find `true`, `yes`, `t`, `y`, `1` and `on` to parse it as `True`.
+    ///Similarly it attempts to case-insensitvely find `false`, `no`, `f`, `n`, `0` and `off` to parse it as `False`.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -394,9 +394,9 @@ impl Ini {
                 Some(val) => match val {
                     Some(inner) => {
                         let boolval = &inner.to_lowercase()[..];
-                        if ["true", "yes", "t", "y", "1"].contains(&boolval) {
+                        if ["true", "yes", "t", "y", "1", "on"].contains(&boolval) {
                             Ok(Some(true))
-                        } else if ["false", "no", "f", "n", "0"].contains(&boolval) {
+                        } else if ["false", "no", "f", "n", "0", "off"].contains(&boolval) {
                             Ok(Some(false))
                         } else {
                             Err(format!(
