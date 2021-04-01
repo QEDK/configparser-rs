@@ -22,6 +22,15 @@ pub struct Ini {
     case_sensitive: bool,
 }
 
+#[derive(Debug, Clone, Eq, PartialEq, Default)]
+pub struct Default {
+    pub default_section: std::string::String,
+    pub comment_symbols: Vec<char>,
+    pub delimiters: Vec<char>,
+    pub case_sensitive: bool,
+}
+
+
 impl Ini {
     ///Creates a new `HashMap` of `HashMap<String, HashMap<String, Option<String>>>` type for the struct.
     ///All values in the HashMap are stored in `String` type.
@@ -58,6 +67,15 @@ impl Ini {
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
             case_sensitive: true,
+        }
+    }
+
+    pub fn defaults(self) -> Default {
+        Default {
+            default_section: self.default_section,
+            comment_symbols: self.comment_symbols,
+            delimiters: self.delimiters,
+            case_sensitive: self.case_sensitive,
         }
     }
 
