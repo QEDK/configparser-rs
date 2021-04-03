@@ -23,13 +23,12 @@ pub struct Ini {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Default)]
-pub struct Default {
+pub struct IniDefault {
     pub default_section: std::string::String,
     pub comment_symbols: Vec<char>,
     pub delimiters: Vec<char>,
     pub case_sensitive: bool,
 }
-
 
 impl Ini {
     ///Creates a new `HashMap` of `HashMap<String, HashMap<String, Option<String>>>` type for the struct.
@@ -70,13 +69,20 @@ impl Ini {
         }
     }
 
-    pub fn defaults(self) -> Default {
-        Default {
+    pub fn defaults(self) -> IniDefault {
+        IniDefault {
             default_section: self.default_section,
             comment_symbols: self.comment_symbols,
             delimiters: self.delimiters,
             case_sensitive: self.case_sensitive,
         }
+    }
+
+    pub fn load_defaults(&mut self, defaults: IniDefault) {
+        self.default_section = defaults.default_section;
+        self.comment_symbols = defaults.comment_symbols;
+        self.delimiters = defaults.delimiters;
+        self.case_sensitive = defaults.case_sensitive;
     }
 
     ///Sets the default section header to the defined string (the default is `default`).
