@@ -69,6 +69,25 @@ impl Ini {
         }
     }
 
+    pub fn new_from_defaults(defaults: IniDefault) -> Ini {
+        Ini {
+            map: HashMap::new(),
+            default_section: defaults.default_section,
+            comment_symbols: defaults.comment_symbols,
+            delimiters: defaults.delimiters,
+            case_sensitive: defaults.case_sensitive,
+        }
+    }
+
+    ///Fetches the defaults from the current `Ini` object and stores it as a `IniDefault` struct for usage elsewhere.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///let default = config.defaults();
+    ///```
+    ///Returns an `IniDefault` object.
     pub fn defaults(self) -> IniDefault {
         IniDefault {
             default_section: self.default_section,
@@ -78,6 +97,22 @@ impl Ini {
         }
     }
 
+    ///Takes an `IniDefault` object and stores its properties in the calling `Ini` object. This happens in-place and
+    ///does not work retroactively, only future operations are affected.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///let default = IniDefault {
+    ///    default_section: "default".to_owned(),
+    ///    comment_symbols: vec![';', '#'],
+    ///    delimiters: vec!['=', ':'],
+    ///    case_sensitive: true,
+    ///} // This is equivalent to ini_cs() defaults
+    ///config.load_defaults(default);
+    ///```
+    ///Returns nothing.
     pub fn load_defaults(&mut self, defaults: IniDefault) {
         self.default_section = defaults.default_section;
         self.comment_symbols = defaults.comment_symbols;
