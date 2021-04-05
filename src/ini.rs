@@ -22,6 +22,17 @@ pub struct Ini {
     case_sensitive: bool,
 }
 
+
+///The `IniDefault` struct serves as a template to create other `Ini` objects from. It can be used to store and load
+///default properties from different `Ini` objects.
+///## Example
+///```rust
+///use configparser::ini::Ini;
+///
+///let mut config = Ini::new();
+///let default = config.defaults();
+///let mut config2 = Ini::new_from_defaults(default);
+///```
 #[derive(Debug, Clone, Eq, PartialEq, Default)]
 pub struct IniDefault {
     pub default_section: std::string::String,
@@ -69,6 +80,23 @@ impl Ini {
         }
     }
 
+    ///Creates a new `Ini` with the given defaults from an existing `IniDefault` object.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///use configparser::ini::IniDefault;
+    ///
+    ///let default = IniDefault {
+    ///    default_section: "default".to_owned(),
+    ///    comment_symbols: vec![';'],
+    ///    delimiters: vec!['='],
+    ///    case_sensitive: true,
+    ///};
+    ///let mut config = Ini::new_from_defaults(default);
+    ///// Now, load as usual with new defaults:
+    ///let map = config.load("tests/test.ini").unwrap();
+    ///
+    ///```
     pub fn new_from_defaults(defaults: IniDefault) -> Ini {
         Ini {
             map: HashMap::new(),
@@ -102,6 +130,7 @@ impl Ini {
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
+    ///use configparser::ini::IniDefault;
     ///
     ///let mut config = Ini::new();
     ///let default = IniDefault {
@@ -109,7 +138,7 @@ impl Ini {
     ///    comment_symbols: vec![';', '#'],
     ///    delimiters: vec!['=', ':'],
     ///    case_sensitive: true,
-    ///} // This is equivalent to ini_cs() defaults
+    ///}; // This is equivalent to ini_cs() defaults
     ///config.load_defaults(default);
     ///```
     ///Returns nothing.
