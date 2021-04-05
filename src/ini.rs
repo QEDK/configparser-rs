@@ -22,7 +22,6 @@ pub struct Ini {
     case_sensitive: bool,
 }
 
-
 ///The `IniDefault` struct serves as a template to create other `Ini` objects from. It can be used to store and load
 ///default properties from different `Ini` objects.
 ///## Example
@@ -31,7 +30,7 @@ pub struct Ini {
 ///
 ///let mut config = Ini::new();
 ///let default = config.defaults();
-///let mut config2 = Ini::new_from_defaults(default);
+///let mut config2 = Ini::new_from_defaults(default); // default gets consumed
 ///```
 #[derive(Debug, Clone, Eq, PartialEq, Default)]
 pub struct IniDefault {
@@ -92,9 +91,11 @@ impl Ini {
     ///    delimiters: vec!['='],
     ///    case_sensitive: true,
     ///};
-    ///let mut config = Ini::new_from_defaults(default);
+    ///let mut config = Ini::new_from_defaults(default.clone());
     ///// Now, load as usual with new defaults:
     ///let map = config.load("tests/test.ini").unwrap();
+    ///assert_eq!(config.defaults(), default);
+    ///assert_eq!(config.defaults(), config.defaults());
     ///
     ///```
     pub fn new_from_defaults(defaults: IniDefault) -> Ini {
@@ -115,12 +116,12 @@ impl Ini {
     ///let mut config = Ini::new();
     ///let default = config.defaults();
     ///```
-    ///Returns an `IniDefault` object.
-    pub fn defaults(self) -> IniDefault {
+    ///Returns an `IniDefault` object. Keep in mind that it will get borrowed since it has non-`Copy` types.
+    pub fn defaults(&self) -> IniDefault {
         IniDefault {
-            default_section: self.default_section,
-            comment_symbols: self.comment_symbols,
-            delimiters: self.delimiters,
+            default_section: self.default_section.to_owned(),
+            comment_symbols: self.comment_symbols.to_owned(),
+            delimiters: self.delimiters.to_owned(),
             case_sensitive: self.case_sensitive,
         }
     }
@@ -139,7 +140,8 @@ impl Ini {
     ///    delimiters: vec!['=', ':'],
     ///    case_sensitive: true,
     ///}; // This is equivalent to ini_cs() defaults
-    ///config.load_defaults(default);
+    ///config.load_defaults(default.clone());
+    ///assert_eq!(config.defaults(), default);
     ///```
     ///Returns nothing.
     pub fn load_defaults(&mut self, defaults: IniDefault) {

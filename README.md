@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "2.0.0"
+configparser = "2.0.1"
 ```
 
 ## ➕ Supported datatypes
@@ -187,13 +187,16 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 0.13.2 (**FINAL BETA**)
   - Erroneous docs fixed.
   - Final release before stable.
-- 1.0.0 (**STABLE**)
+- 1.0.0
   - Dropped support for `ini::load()`
   - Updated tests
 - 2.0.0
   - **BREAKING** Added Python-esque support for `:` as a delimiter.
   - :new: Add support for case-sensitive maps with automatic handling under the hood.
   - :hammer: Fixed buggy setters which went uncaught, to preserve case-insensitive nature.
+- 2.0.1 (**STABLE**)
+  - Add first-class support for setting, loading and reading defaults
+  - New available struct `IniDefault` for fast templating
 
 ### 🔜 Future plans
 
