@@ -1,6 +1,7 @@
 //!The ini module provides all the things necessary to load and parse ini-syntax files. The most important of which is the `Ini` struct.
 //!See the [implementation](https://docs.rs/configparser/*/configparser/ini/struct.Ini.html) documentation for more details.
 use std::collections::HashMap;
+use std::convert::AsRef;
 use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
@@ -209,11 +210,11 @@ impl Ini {
     ///```
     ///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
     ///Use `get_mut_map()` if you want a mutable reference.
-    pub fn load(
+    pub fn load<T: AsRef<Path>>(
         &mut self,
-        path: &str,
+        path: T,
     ) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
-        let path = Path::new(path);
+        let path = path.as_ref();
         let display = path.display();
 
         let mut file = match File::open(&path) {
@@ -276,8 +277,8 @@ impl Ini {
     ///}
     ///```
     ///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
-    pub fn write(&self, path: &str) -> std::io::Result<()> {
-        fs::write(path, self.unparse())
+    pub fn write<T: AsRef<Path>>(&self, path: T) -> std::io::Result<()> {
+        fs::write(path.as_ref(), self.unparse())
     }
 
     ///Returns a string with the current configuration formatted with valid ini-syntax. This is always safe since the configuration is validated during
