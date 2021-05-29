@@ -348,18 +348,18 @@ impl Ini {
                 continue;
             }
             match trimmed.find('[') {
-                Some(start) => match trimmed.rfind(']') {
+                Some(0) => match trimmed.rfind(']') {
                     Some(end) => {
-                        section = caser(trimmed[start + 1..end].trim());
+                        section = caser(trimmed[1..end].trim());
                     }
                     None => {
                         return Err(format!(
-                            "line {}:{}: Found opening bracket for section name but no closing bracket",
-                            num, start
+                            "line {}: Found opening bracket for section name but no closing bracket",
+                            num
                         ));
                     }
                 },
-                None => match trimmed.find(&self.delimiters[..]) {
+                Some(_) | None => match trimmed.find(&self.delimiters[..]) {
                     Some(delimiter) => match map.get_mut(&section) {
                         Some(valmap) => {
                             let key = caser(trimmed[..delimiter].trim());

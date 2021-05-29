@@ -13,6 +13,7 @@ fn non_cs() -> Result<(), Box<dyn Error>> {
                 colon:value after colon
 		Empty string =
 		None string
+        Password=[in-brackets]
 		[ spacing ]
 			indented=indented
 		not indented = not indented				;testcomment
@@ -116,6 +117,7 @@ fn cs() -> Result<(), Box<dyn Error>> {
                 colon:value after colon
         Empty string =
         None string
+        Password=[in-brackets]
         [ spacing ]
             indented=indented
         not indented = not indented             ;testcomment
