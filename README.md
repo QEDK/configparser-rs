@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "2.0.1"
+configparser = "2.1.0"
 ```
 
 ## ➕ Supported datatypes
@@ -178,12 +178,6 @@ additional terms or conditions.
 ## 🆕 Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.13.0 (**BETA 9**)
-  - New functions added, `clear()` and `remove_section()` to make handling similar to hashmaps.
-  - Docs fixed. On track to stable.
-- 0.13.1 (yanked)
-  - New function added, `remove_key()` to remove a key from a section
-  - All doctests passing!
 - 0.13.2 (**FINAL BETA**)
   - Erroneous docs fixed.
   - Final release before stable.
@@ -194,9 +188,14 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - **BREAKING** Added Python-esque support for `:` as a delimiter.
   - :new: Add support for case-sensitive maps with automatic handling under the hood.
   - :hammer: Fixed buggy setters which went uncaught, to preserve case-insensitive nature.
-- 2.0.1 (**STABLE**)
+- 2.0.1
   - Add first-class support for setting, loading and reading defaults
   - New available struct `IniDefault` for fast templating
+- 2.1.0 (**STABLE**)
+  - 😯 **BREAKING** Parse keys with higher priority, both brackets `[` and `]` can be part of values now.
+  - ℹ Only affects current behaviour **iff** your section headers had comments in front of them like, `comment[HEADER]`, you can fix it by adding the comment after the header like `[HEADER]#comment` or otherwise.
+  - 🚀 `load()` and `write()` work with `Path`-like arguments now.
+  - 📜 Add docs for new struct
 
 ### 🔜 Future plans
 

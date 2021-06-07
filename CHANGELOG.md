@@ -70,5 +70,11 @@
 - 0.12.0 (**BETA 8**)
   - New function added, `writes()` to support writing configuration to a string.
   - More doctests passed.
+- 0.13.0 (**BETA 9**)
+  - New functions added, `clear()` and `remove_section()` to make handling similar to hashmaps.
+  - Docs fixed. On track to stable.
+- 0.13.1 (yanked)
+  - New function added, `remove_key()` to remove a key from a section
+  - All doctests passing!
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).
