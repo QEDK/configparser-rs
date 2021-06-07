@@ -35,9 +35,45 @@ pub struct Ini {
 ///```
 #[derive(Debug, Clone, Eq, PartialEq, Default)]
 pub struct IniDefault {
+    ///Denotes the default section header name.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///let default = config.defaults();
+    ///assert_eq!(default.default_section, "default");
+    ///```
     pub default_section: std::string::String,
+    ///Denotes the set comment symbols for the object.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///let default = config.defaults();
+    ///assert_eq!(default.comment_symbols, vec![';', '#']);
+    ///```
     pub comment_symbols: Vec<char>,
+    ///Denotes the set delimiters for the key-value pairs.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///let default = config.defaults();
+    ///assert_eq!(default.delimiters, vec!['=', ':']);
+    ///```
     pub delimiters: Vec<char>,
+    ///Denotes if the `Ini` object is case-sensitive.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///let default = config.defaults();
+    ///assert_eq!(default.case_sensitive, false);
+    ///```
     pub case_sensitive: bool,
 }
 
@@ -96,7 +132,6 @@ impl Ini {
     ///// Now, load as usual with new defaults:
     ///let map = config.load("tests/test.ini").unwrap();
     ///assert_eq!(config.defaults(), default);
-    ///assert_eq!(config.defaults(), config.defaults());
     ///
     ///```
     pub fn new_from_defaults(defaults: IniDefault) -> Ini {
@@ -728,6 +763,7 @@ impl Ini {
     }
 
     ///Removes a section from the hashmap, returning the properties stored in the section if the section was previously in the map.
+    ///## Example
     ///```rust
     ///use configparser::ini::Ini;
     ///
@@ -749,6 +785,7 @@ impl Ini {
     }
 
     ///Removes a key from a section in the hashmap, returning the value attached to the key if it was previously in the map.
+    ///## Example
     ///```rust
     ///use configparser::ini::Ini;
     ///
