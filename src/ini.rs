@@ -20,6 +20,7 @@ pub struct Ini {
     default_section: std::string::String,
     comment_symbols: Vec<char>,
     delimiters: Vec<char>,
+    boolean_values: HashMap<bool, Vec<String>>,
     case_sensitive: bool,
 }
 
@@ -65,6 +66,7 @@ pub struct IniDefault {
     ///assert_eq!(default.delimiters, vec!['=', ':']);
     ///```
     pub delimiters: Vec<char>,
+    pub boolean_values: HashMap<bool, Vec<String>>,
     ///Denotes if the `Ini` object is case-sensitive.
     ///## Example
     ///```rust
@@ -93,6 +95,13 @@ impl Ini {
             default_section: "default".to_owned(),
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
+            boolean_values: [
+                (true, vec!["true", "yes", "t", "y", "on", "1"].iter().map(|&s| s.to_owned()).collect()),
+                (false, vec!["false", "no", "f", "n", "off", "0"].iter().map(|&s| s.to_owned()).collect()),
+            ]
+            .iter()
+            .cloned()
+            .collect(),
             case_sensitive: false,
         }
     }
@@ -112,6 +121,13 @@ impl Ini {
             default_section: "default".to_owned(),
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
+            boolean_values: [
+                (true, vec!["true", "yes", "t", "y", "on", "1"].iter().map(|&s| s.to_owned()).collect()),
+                (false, vec!["false", "no", "f", "n", "off", "0"].iter().map(|&s| s.to_owned()).collect()),
+            ]
+            .iter()
+            .cloned()
+            .collect(),
             case_sensitive: true,
         }
     }
@@ -140,6 +156,7 @@ impl Ini {
             default_section: defaults.default_section,
             comment_symbols: defaults.comment_symbols,
             delimiters: defaults.delimiters,
+            boolean_values: defaults.boolean_values,
             case_sensitive: defaults.case_sensitive,
         }
     }
@@ -158,6 +175,7 @@ impl Ini {
             default_section: self.default_section.to_owned(),
             comment_symbols: self.comment_symbols.to_owned(),
             delimiters: self.delimiters.to_owned(),
+            boolean_values: self.boolean_values.to_owned(),
             case_sensitive: self.case_sensitive,
         }
     }
@@ -184,6 +202,7 @@ impl Ini {
         self.default_section = defaults.default_section;
         self.comment_symbols = defaults.comment_symbols;
         self.delimiters = defaults.delimiters;
+        self.boolean_values = defaults.boolean_values;
         self.case_sensitive = defaults.case_sensitive;
     }
 
@@ -520,9 +539,9 @@ impl Ini {
                 Some(val) => match val {
                     Some(inner) => {
                         let boolval = &inner.to_lowercase()[..];
-                        if ["true", "yes", "t", "y", "1", "on"].contains(&boolval) {
+                        if self.boolean_values.get(&true).unwrap().iter().any(|elem| elem == boolval) {
                             Ok(Some(true))
-                        } else if ["false", "no", "f", "n", "0", "off"].contains(&boolval) {
+                        } else if self.boolean_values.get(&false).unwrap().iter().any(|elem| elem == boolval) {
                             Ok(Some(false))
                         } else {
                             Err(format!(
