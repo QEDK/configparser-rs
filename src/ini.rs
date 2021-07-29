@@ -96,8 +96,20 @@ impl Ini {
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
             boolean_values: [
-                (true, vec!["true", "yes", "t", "y", "on", "1"].iter().map(|&s| s.to_owned()).collect()),
-                (false, vec!["false", "no", "f", "n", "off", "0"].iter().map(|&s| s.to_owned()).collect()),
+                (
+                    true,
+                    vec!["true", "yes", "t", "y", "on", "1"]
+                        .iter()
+                        .map(|&s| s.to_owned())
+                        .collect(),
+                ),
+                (
+                    false,
+                    vec!["false", "no", "f", "n", "off", "0"]
+                        .iter()
+                        .map(|&s| s.to_owned())
+                        .collect(),
+                ),
             ]
             .iter()
             .cloned()
@@ -122,8 +134,20 @@ impl Ini {
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
             boolean_values: [
-                (true, vec!["true", "yes", "t", "y", "on", "1"].iter().map(|&s| s.to_owned()).collect()),
-                (false, vec!["false", "no", "f", "n", "off", "0"].iter().map(|&s| s.to_owned()).collect()),
+                (
+                    true,
+                    vec!["true", "yes", "t", "y", "on", "1"]
+                        .iter()
+                        .map(|&s| s.to_owned())
+                        .collect(),
+                ),
+                (
+                    false,
+                    vec!["false", "no", "f", "n", "off", "0"]
+                        .iter()
+                        .map(|&s| s.to_owned())
+                        .collect(),
+                ),
             ]
             .iter()
             .cloned()
@@ -142,6 +166,10 @@ impl Ini {
     ///    default_section: "default".to_owned(),
     ///    comment_symbols: vec![';'],
     ///    delimiters: vec!['='],
+    ///    boolean_values: [
+    ///        (true, vec!["true", "yes", "t", "y", "on", "1"].iter().map(|&s| s.to_owned()).collect()),
+    ///        (false, vec!["false", "no", "f", "n", "off", "0"].iter().map(|&s| s.to_owned()).collect()),
+    ///    ].iter().cloned().collect(),
     ///    case_sensitive: true,
     ///};
     ///let mut config = Ini::new_from_defaults(default.clone());
@@ -192,6 +220,10 @@ impl Ini {
     ///    default_section: "default".to_owned(),
     ///    comment_symbols: vec![';', '#'],
     ///    delimiters: vec!['=', ':'],
+    ///    boolean_values: [
+    ///        (true, vec!["true", "yes", "t", "y", "on", "1"].iter().map(|&s| s.to_owned()).collect()),
+    ///        (false, vec!["false", "no", "f", "n", "off", "0"].iter().map(|&s| s.to_owned()).collect()),
+    ///    ].iter().cloned().collect(),
     ///    case_sensitive: true,
     ///}; // This is equivalent to ini_cs() defaults
     ///config.load_defaults(default.clone());
@@ -539,9 +571,21 @@ impl Ini {
                 Some(val) => match val {
                     Some(inner) => {
                         let boolval = &inner.to_lowercase()[..];
-                        if self.boolean_values.get(&true).unwrap().iter().any(|elem| elem == boolval) {
+                        if self
+                            .boolean_values
+                            .get(&true)
+                            .unwrap()
+                            .iter()
+                            .any(|elem| elem == boolval)
+                        {
                             Ok(Some(true))
-                        } else if self.boolean_values.get(&false).unwrap().iter().any(|elem| elem == boolval) {
+                        } else if self
+                            .boolean_values
+                            .get(&false)
+                            .unwrap()
+                            .iter()
+                            .any(|elem| elem == boolval)
+                        {
                             Ok(Some(false))
                         } else {
                             Err(format!(
