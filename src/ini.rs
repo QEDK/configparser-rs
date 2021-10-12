@@ -1,5 +1,10 @@
 //!The ini module provides all the things necessary to load and parse ini-syntax files. The most important of which is the `Ini` struct.
 //!See the [implementation](https://docs.rs/configparser/*/configparser/ini/struct.Ini.html) documentation for more details.
+#[cfg(feature = "indexmap")]
+use indexmap::IndexMap as Map;
+#[cfg(not(feature = "indexmap"))]
+use std::collections::HashMap as Map;
+
 use std::collections::HashMap;
 use std::convert::AsRef;
 use std::fs;
@@ -16,7 +21,7 @@ use std::path::Path;
 ///```
 #[derive(Debug, Clone, Eq, PartialEq, Default)]
 pub struct Ini {
-    map: HashMap<String, HashMap<String, Option<String>>>,
+    map: Map<String, Map<String, Option<String>>>,
     default_section: std::string::String,
     comment_symbols: Vec<char>,
     delimiters: Vec<char>,
@@ -80,8 +85,8 @@ pub struct IniDefault {
 }
 
 impl Ini {
-    ///Creates a new `HashMap` of `HashMap<String, HashMap<String, Option<String>>>` type for the struct.
-    ///All values in the HashMap are stored in `String` type.
+    ///Creates a new `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
+    ///All values in the Map are stored in `String` type.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -91,7 +96,7 @@ impl Ini {
     ///Returns the struct and stores it in the calling variable.
     pub fn new() -> Ini {
         Ini {
-            map: HashMap::new(),
+            map: Map::new(),
             default_section: "default".to_owned(),
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
@@ -118,8 +123,8 @@ impl Ini {
         }
     }
 
-    ///Creates a new **case-sensitive** `HashMap` of `HashMap<String, HashMap<String, Option<String>>>` type for the struct.
-    ///All values in the HashMap are stored in `String` type.
+    ///Creates a new **case-sensitive** `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
+    ///All values in the Map are stored in `String` type.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -129,7 +134,7 @@ impl Ini {
     ///Returns the struct and stores it in the calling variable.
     pub fn new_cs() -> Ini {
         Ini {
-            map: HashMap::new(),
+            map: Map::new(),
             default_section: "default".to_owned(),
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
@@ -180,7 +185,7 @@ impl Ini {
     ///```
     pub fn new_from_defaults(defaults: IniDefault) -> Ini {
         Ini {
-            map: HashMap::new(),
+            map: Map::new(),
             default_section: defaults.default_section,
             comment_symbols: defaults.comment_symbols,
             delimiters: defaults.delimiters,
@@ -269,7 +274,7 @@ impl Ini {
         self.comment_symbols = symlist.to_vec();
     }
 
-    ///Gets all the sections of the currently-stored `HashMap` in a vector.
+    ///Gets all the sections of the currently-stored `Map` in a vector.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -284,7 +289,7 @@ impl Ini {
     }
 
     ///Loads a file from a defined path, parses it and puts the hashmap into our struct.
-    ///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `HashMap`, if present.
+    ///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `Map`, if present.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -294,12 +299,12 @@ impl Ini {
     /////Then, we can use standard hashmap functions like:
     ///let values = map.get("values").unwrap();
     ///```
-    ///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
+    ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
     ///Use `get_mut_map()` if you want a mutable reference.
     pub fn load<T: AsRef<Path>>(
         &mut self,
         path: T,
-    ) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
+    ) -> Result<Map<String, Map<String, Option<String>>>, String> {
         let path = path.as_ref();
         let display = path.display();
 
@@ -320,7 +325,7 @@ impl Ini {
     }
 
     ///Reads an input string, parses it and puts the hashmap into our struct.
-    ///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `HashMap`, if present.
+    ///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `Map`, if present.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -335,12 +340,12 @@ impl Ini {
     ///let this_year = map["2000s"]["2020"].clone().unwrap();
     ///assert_eq!(this_year, "bad"); // value accessible!
     ///```
-    ///Returns `Ok(map)` with a clone of the stored `HashMap` if no errors are thrown or else `Err(error_string)`.
+    ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
     ///Use `get_mut_map()` if you want a mutable reference.
     pub fn read(
         &mut self,
         input: String,
-    ) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
+    ) -> Result<Map<String, Map<String, Option<String>>>, String> {
         self.map = match self.parse(input) {
             Err(why) => return Err(why),
             Ok(map) => map,
@@ -387,7 +392,7 @@ impl Ini {
     ///Private function that converts the currently stored configuration into a valid ini-syntax string.
     fn unparse(&self) -> String {
         // push key/value pairs in outmap to out string.
-        fn unparse_key_values(out: &mut String, outmap: &HashMap<String, Option<String>>) {
+        fn unparse_key_values(out: &mut String, outmap: &Map<String, Option<String>>) {
             for (key, val) in outmap.iter() {
                 out.push_str(&key);
                 if let Some(value) = val {
@@ -398,25 +403,22 @@ impl Ini {
             }
         }
         let mut out = String::new();
-        let mut cloned = self.map.clone();
-        if let Some(defaultmap) = cloned.get(&self.default_section) {
+        if let Some(defaultmap) = self.map.get(&self.default_section) {
             unparse_key_values(&mut out, defaultmap);
-            cloned.remove(&self.default_section);
         }
-        for (section, secmap) in cloned.iter() {
-            out.push_str(&format!("[{}]", section));
-            out.push('\n');
-            unparse_key_values(&mut out, secmap);
+        for (section, secmap) in self.map.iter() {
+            if section != &self.default_section {
+                out.push_str(&format!("[{}]", section));
+                out.push('\n');
+                unparse_key_values(&mut out, secmap);
+            }
         }
         out
     }
 
-    ///Private function that parses ini-style syntax into a HashMap.
-    fn parse(
-        &self,
-        input: String,
-    ) -> Result<HashMap<String, HashMap<String, Option<String>>>, String> {
-        let mut map: HashMap<String, HashMap<String, Option<String>>> = HashMap::new();
+    ///Private function that parses ini-style syntax into a Map.
+    fn parse(&self, input: String) -> Result<Map<String, Map<String, Option<String>>>, String> {
+        let mut map: Map<String, Map<String, Option<String>>> = Map::new();
         let mut section = self.default_section.clone();
         let caser = |val: &str| {
             if self.case_sensitive {
@@ -460,7 +462,7 @@ impl Ini {
                             }
                         }
                         None => {
-                            let mut valmap: HashMap<String, Option<String>> = HashMap::new();
+                            let mut valmap: Map<String, Option<String>> = Map::new();
                             let key = caser(trimmed[..delimiter].trim());
                             let value = trimmed[delimiter + 1..].trim().to_owned();
                             if key.is_empty() {
@@ -480,7 +482,7 @@ impl Ini {
                             valmap.insert(key, None);
                         }
                         None => {
-                            let mut valmap: HashMap<String, Option<String>> = HashMap::new();
+                            let mut valmap: Map<String, Option<String>> = Map::new();
                             let key = caser(trimmed);
                             valmap.insert(key, None);
                             map.insert(section.clone(), valmap);
@@ -689,7 +691,7 @@ impl Ini {
         }
     }
 
-    ///Returns a clone of the `HashMap` stored in our struct.
+    ///Returns a clone of the `Map` stored in our struct.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -702,8 +704,8 @@ impl Ini {
     ///assert_eq!(map, *config.get_map_ref());  // the cloned map is basically a snapshot that you own
     ///```
     ///Returns `Some(map)` if map is non-empty or else returns `None`.
-    ///Similar to `load()` but returns an `Option` type with the currently stored `HashMap`.
-    pub fn get_map(&self) -> Option<HashMap<String, HashMap<String, Option<String>>>> {
+    ///Similar to `load()` but returns an `Option` type with the currently stored `Map`.
+    pub fn get_map(&self) -> Option<Map<String, Map<String, Option<String>>>> {
         if self.map.is_empty() {
             None
         } else {
@@ -711,7 +713,7 @@ impl Ini {
         }
     }
 
-    ///Returns an immutable reference to the `HashMap` stored in our struct.
+    ///Returns an immutable reference to the `Map` stored in our struct.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -725,11 +727,11 @@ impl Ini {
     ///```
     ///If you just need to definitely mutate the map, use `get_mut_map()` instead. Alternatively, you can generate a snapshot by getting a clone
     ///with `get_map()` and work with that.
-    pub fn get_map_ref(&self) -> &HashMap<String, HashMap<String, Option<String>>> {
+    pub fn get_map_ref(&self) -> &Map<String, Map<String, Option<String>>> {
         &self.map
     }
 
-    ///Returns a mutable reference to the `HashMap` stored in our struct.
+    ///Returns a mutable reference to the `Map` stored in our struct.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -743,11 +745,11 @@ impl Ini {
     ///assert_eq!(config.get("topsecrets", "nuclear launch codes"), None);  // inserted successfully!
     ///```
     ///If you just need to access the map without mutating, use `get_map_ref()` or make a clone with `get_map()` instead.
-    pub fn get_mut_map(&mut self) -> &mut HashMap<String, HashMap<String, Option<String>>> {
+    pub fn get_mut_map(&mut self) -> &mut Map<String, Map<String, Option<String>>> {
         &mut self.map
     }
 
-    ///Sets an `Option<String>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
+    ///Sets an `Option<String>` in the `Map` stored in our struct. If a particular section or key does not exist, it will be automatically created.
     ///An existing value in the map  will be overwritten. You can also set `None` safely.
     ///## Example
     ///```rust
@@ -774,7 +776,7 @@ impl Ini {
         match self.map.get_mut(&section) {
             Some(secmap) => secmap.insert(key, value),
             None => {
-                let mut valmap: HashMap<String, Option<String>> = HashMap::new();
+                let mut valmap: Map<String, Option<String>> = Map::new();
                 valmap.insert(key, value);
                 self.map.insert(section, valmap);
                 None
@@ -782,7 +784,7 @@ impl Ini {
         }
     }
 
-    ///Sets an `Option<&str>` in the `HashMap` stored in our struct. If a particular section or key does not exist, it will be automatically created.
+    ///Sets an `Option<&str>` in the `Map` stored in our struct. If a particular section or key does not exist, it will be automatically created.
     ///An existing value in the map  will be overwritten. You can also set `None` safely.
     ///## Example
     ///```rust
@@ -838,7 +840,7 @@ impl Ini {
     ///assert!(config.get_map_ref().is_empty());  // with the last section removed, our map is now empty!
     ///```
     ///Returns `Some(section_map)` if the section exists or else, `None`.
-    pub fn remove_section(&mut self, section: &str) -> Option<HashMap<String, Option<String>>> {
+    pub fn remove_section(&mut self, section: &str) -> Option<Map<String, Option<String>>> {
         let section = if self.case_sensitive {
             section.to_owned()
         } else {
