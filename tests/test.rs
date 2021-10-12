@@ -208,3 +208,33 @@ fn cs() -> Result<(), Box<dyn Error>> {
     assert_eq!(config.get_map_ref(), config2.get_map_ref());
     Ok(())
 }
+
+#[test]
+#[cfg(feature = "indexmap")]
+fn sort_on_write() -> Result<(), Box<dyn Error>> {
+    let mut config = Ini::new_cs();
+    config.load("tests/test.ini")?;
+
+    assert_eq!(
+        config.writes(),
+        "defaultvalues=defaultvalues
+[topsecret]
+KFC=the secret herb is orega-
+colon=value after colon
+Empty string=
+None string
+Password=[in-brackets]
+[spacing]
+indented=indented
+not indented=not indented
+[values]
+Bool=True
+Boolcoerce=0
+Int=-31415
+Uint=31415
+Float=3.1415
+"
+    );
+
+    Ok(())
+}
