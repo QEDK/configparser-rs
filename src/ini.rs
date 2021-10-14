@@ -39,7 +39,7 @@ pub struct Ini {
 ///let default = config.defaults();
 ///let mut config2 = Ini::new_from_defaults(default); // default gets consumed
 ///```
-#[derive(Debug, Clone, Eq, PartialEq, Default)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct IniDefault {
     ///Denotes the default section header name.
     ///## Example
@@ -84,24 +84,9 @@ pub struct IniDefault {
     pub case_sensitive: bool,
 }
 
-impl Ini {
-    ///Creates a new `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
-    ///All values in the Map are stored in `String` type.
-    ///
-    ///By default, [`std::collections::HashMap`] is used for the Map object.
-    ///The `indexmap` feature can be used to use an [`indexmap::map::IndexMap`] instead, which
-    ///allows keeping the insertion order for sections and keys.
-    ///
-    ///## Example
-    ///```rust
-    ///use configparser::ini::Ini;
-    ///
-    ///let mut config = Ini::new();
-    ///```
-    ///Returns the struct and stores it in the calling variable.
-    pub fn new() -> Ini {
-        Ini {
-            map: Map::new(),
+impl Default for IniDefault {
+    fn default() -> Self {
+        Self {
             default_section: "default".to_owned(),
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
@@ -127,6 +112,26 @@ impl Ini {
             case_sensitive: false,
         }
     }
+}
+
+impl Ini {
+    ///Creates a new `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
+    ///All values in the Map are stored in `String` type.
+    ///
+    ///By default, [`std::collections::HashMap`] is used for the Map object.
+    ///The `indexmap` feature can be used to use an [`indexmap::map::IndexMap`] instead, which
+    ///allows keeping the insertion order for sections and keys.
+    ///
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///```
+    ///Returns the struct and stores it in the calling variable.
+    pub fn new() -> Ini {
+        Ini::new_from_defaults(IniDefault::default())
+    }
 
     ///Creates a new **case-sensitive** `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
     ///All values in the Map are stored in `String` type.
@@ -138,32 +143,10 @@ impl Ini {
     ///```
     ///Returns the struct and stores it in the calling variable.
     pub fn new_cs() -> Ini {
-        Ini {
-            map: Map::new(),
-            default_section: "default".to_owned(),
-            comment_symbols: vec![';', '#'],
-            delimiters: vec!['=', ':'],
-            boolean_values: [
-                (
-                    true,
-                    vec!["true", "yes", "t", "y", "on", "1"]
-                        .iter()
-                        .map(|&s| s.to_owned())
-                        .collect(),
-                ),
-                (
-                    false,
-                    vec!["false", "no", "f", "n", "off", "0"]
-                        .iter()
-                        .map(|&s| s.to_owned())
-                        .collect(),
-                ),
-            ]
-            .iter()
-            .cloned()
-            .collect(),
-            case_sensitive: true,
-        }
+        let mut defaults = IniDefault::default();
+        defaults.case_sensitive = true;
+
+        Ini::new_from_defaults(defaults)
     }
 
     ///Creates a new `Ini` with the given defaults from an existing `IniDefault` object.
