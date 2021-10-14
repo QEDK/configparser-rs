@@ -40,6 +40,7 @@ pub struct Ini {
 ///let mut config2 = Ini::new_from_defaults(default); // default gets consumed
 ///```
 #[derive(Debug, Clone, Eq, PartialEq)]
+#[non_exhaustive]
 pub struct IniDefault {
     ///Denotes the default section header name.
     ///## Example
@@ -155,16 +156,9 @@ impl Ini {
     ///use configparser::ini::Ini;
     ///use configparser::ini::IniDefault;
     ///
-    ///let default = IniDefault {
-    ///    default_section: "default".to_owned(),
-    ///    comment_symbols: vec![';'],
-    ///    delimiters: vec!['='],
-    ///    boolean_values: [
-    ///        (true, vec!["true", "yes", "t", "y", "on", "1"].iter().map(|&s| s.to_owned()).collect()),
-    ///        (false, vec!["false", "no", "f", "n", "off", "0"].iter().map(|&s| s.to_owned()).collect()),
-    ///    ].iter().cloned().collect(),
-    ///    case_sensitive: true,
-    ///};
+    ///let mut default = IniDefault::default();
+    ///default.comment_symbols = vec![';'];
+    ///default.delimiters = vec!['='];
     ///let mut config = Ini::new_from_defaults(default.clone());
     ///// Now, load as usual with new defaults:
     ///let map = config.load("tests/test.ini").unwrap();
@@ -209,16 +203,9 @@ impl Ini {
     ///use configparser::ini::IniDefault;
     ///
     ///let mut config = Ini::new();
-    ///let default = IniDefault {
-    ///    default_section: "default".to_owned(),
-    ///    comment_symbols: vec![';', '#'],
-    ///    delimiters: vec!['=', ':'],
-    ///    boolean_values: [
-    ///        (true, vec!["true", "yes", "t", "y", "on", "1"].iter().map(|&s| s.to_owned()).collect()),
-    ///        (false, vec!["false", "no", "f", "n", "off", "0"].iter().map(|&s| s.to_owned()).collect()),
-    ///    ].iter().cloned().collect(),
-    ///    case_sensitive: true,
-    ///}; // This is equivalent to ini_cs() defaults
+    ///let mut default = IniDefault::default();
+    ///default.case_sensitive = true;
+    ///// This is equivalent to ini_cs() defaults
     ///config.load_defaults(default.clone());
     ///assert_eq!(config.defaults(), default);
     ///```
