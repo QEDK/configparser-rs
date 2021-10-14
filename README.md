@@ -160,6 +160,14 @@ fn main() -> Result<(), Box<dyn Error>> {
 ```
 The `Ini` struct offers great support for type conversion and type setting safely, as well as map accesses. See the API for more verbose documentation.
 
+## 📖Features
+
+ - *indexmap*: Activating the `indexmap` feature allows using [indexmap](https://crates.io/crates/indexmap) in place
+   of `HashMap` to store the sections and keys. This ensures that insertion order is preserved when iterating on or
+   serializing the Ini object.
+   Due to the nature of indexmap, it offers mostly similar performance to stdlib HashMaps but with
+   [slower lookup times](https://github.com/bluss/indexmap#performance).
+
 ## 📜 License
 
 Licensed under either of

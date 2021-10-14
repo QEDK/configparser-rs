@@ -87,6 +87,11 @@ pub struct IniDefault {
 impl Ini {
     ///Creates a new `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
     ///All values in the Map are stored in `String` type.
+    ///
+    ///By default, [`std::collections::HashMap`] is used for the Map object.
+    ///The `indexmap` feature can be used to use an [`indexmap::map::IndexMap`] instead, which
+    ///allows keeping the insertion order for sections and keys.
+    ///
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
