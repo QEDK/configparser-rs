@@ -12,11 +12,14 @@ env:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.rust == 'nightly' }}
     strategy:
+      fail-fast: false
       matrix:
         rust:
           - stable
           - beta
+          - nightly
           
     steps:
       - uses: actions/checkout@v2
