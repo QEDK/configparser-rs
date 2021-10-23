@@ -163,10 +163,17 @@ The `Ini` struct offers great support for type conversion and type setting safel
 ## 📖Features
 
  - *indexmap*: Activating the `indexmap` feature allows using [indexmap](https://crates.io/crates/indexmap) in place
-   of `HashMap` to store the sections and keys. This ensures that insertion order is preserved when iterating on or
-   serializing the Ini object.
-   Due to the nature of indexmap, it offers mostly similar performance to stdlib HashMaps but with
-   [slower lookup times](https://github.com/bluss/indexmap#performance).
+  of `HashMap` to store the sections and keys. This ensures that insertion order is preserved when iterating on or
+  serializing the Ini object.
+  Due to the nature of indexmap, it offers mostly similar performance to stdlib HashMaps but with
+  [slower lookup times](https://github.com/bluss/indexmap#performance).
+
+You can activate it by adding it as a feature like this:
+```TOML
+[dependencies]
+configparser = { version = "3.0.0", features = ["indexmap"] }
+```
+
 
 ## 📜 License
 
@@ -186,9 +193,6 @@ additional terms or conditions.
 ## 🆕 Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.13.2 (**FINAL BETA**)
-  - Erroneous docs fixed.
-  - Final release before stable.
 - 1.0.0
   - Dropped support for `ini::load()`
   - Updated tests
@@ -199,11 +203,15 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 2.0.1
   - Add first-class support for setting, loading and reading defaults
   - New available struct `IniDefault` for fast templating
-- 2.1.0 (**STABLE**)
+- 2.1.0
   - 😯 **BREAKING** Parse keys with higher priority, both brackets `[` and `]` can be part of values now.
   - ℹ Only affects current behaviour **iff** your section headers had comments in front of them like, `comment[HEADER]`, you can fix it by adding the comment after the header like `[HEADER]#comment` or otherwise.
   - 🚀 `load()` and `write()` work with `Path`-like arguments now.
   - 📜 Add docs for new struct
+- 3.0.0 (**STABLE**)
+  - 😅 **BREAKING** `IniDefault` is now a non-exhaustive struct, this will make future upgrades easier and non-breaking in nature. This change might also have a few implications in updating your existing codebase, please read the [official docs](https://doc.rust-lang.org/reference/attributes/type_system.html#the-non_exhaustive-attribute) for more guidance.
+  - `IniDefault` is now internally used for generating defaults, reducing crate size.
+  - 🚀 There is now a new optional `indexmap` feature that preserves insertion order of your loaded configurations.
 
 ### 🔜 Future plans
 

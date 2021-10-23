@@ -76,5 +76,8 @@
 - 0.13.1 (yanked)
   - New function added, `remove_key()` to remove a key from a section
   - All doctests passing!
+- 0.13.2 (**FINAL BETA**)
+  - Erroneous docs fixed.
+  - Final release before stable.
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).
