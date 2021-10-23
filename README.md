@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "2.1.0"
+configparser = "3.0.0"
 ```
 
 ## ➕ Supported datatypes
