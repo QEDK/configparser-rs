@@ -115,6 +115,11 @@ impl Default for IniDefault {
     }
 }
 
+#[cfg(windows)]
+const LINE_ENDING: &'static str = "\r\n";
+#[cfg(not(windows))]
+const LINE_ENDING: &'static str = "\n";
+
 impl Ini {
     ///Creates a new `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
     ///All values in the Map are stored in `String` type.
@@ -374,7 +379,7 @@ impl Ini {
                     out.push('=');
                     out.push_str(&value);
                 }
-                out.push('\n');
+                out.push_str(LINE_ENDING);
             }
         }
         let mut out = String::new();
@@ -384,7 +389,7 @@ impl Ini {
         for (section, secmap) in self.map.iter() {
             if section != &self.default_section {
                 out.push_str(&format!("[{}]", section));
-                out.push('\n');
+                out.push_str(LINE_ENDING);
                 unparse_key_values(&mut out, secmap);
             }
         }
