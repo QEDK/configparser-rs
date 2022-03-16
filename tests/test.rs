@@ -60,11 +60,8 @@ fn non_cs() -> Result<(), Box<dyn Error>> {
         config.get("topsecret", "colon").unwrap(),
         "value after colon"
     );
-    assert_eq!(config.getbool("values", "Bool")?.unwrap(), true);
-    assert_eq!(
-        config.getboolcoerce("values", "Boolcoerce")?.unwrap(),
-        false
-    );
+    assert!(config.getbool("values", "Bool")?.unwrap());
+    assert!(!config.getboolcoerce("values", "Boolcoerce")?.unwrap());
     assert_eq!(config.getint("values", "Int")?.unwrap(), -31415);
     assert_eq!(config.getuint("values", "Uint")?.unwrap(), 31415);
     assert_eq!(config.getfloat("values", "Float")?.unwrap(), 3.1415);
@@ -164,11 +161,9 @@ fn cs() -> Result<(), Box<dyn Error>> {
         config.get("topsecret", "colon").unwrap(),
         "value after colon"
     );
-    assert_eq!(config.getbool("values", "Bool")?.unwrap(), true);
-    assert_eq!(
-        config.getboolcoerce("values", "Boolcoerce")?.unwrap(),
-        false
-    );
+    assert!(config.getbool("values", "Bool")?.unwrap());
+
+    assert!(!config.getboolcoerce("values", "Boolcoerce")?.unwrap(),);
     assert_eq!(config.getint("values", "Int")?.unwrap(), -31415);
     assert_eq!(config.getuint("values", "Uint")?.unwrap(), 31415);
     assert_eq!(config.getfloat("values", "Float")?.unwrap(), 3.1415);
@@ -233,6 +228,69 @@ Boolcoerce=0
 Int=-31415
 Uint=31415
 Float=3.1415
+"
+    );
+
+    Ok(())
+}
+
+#[test]
+#[cfg(feature = "indexmap")]
+fn multiline_off() -> Result<(), Box<dyn Error>> {
+    let mut config = Ini::new_cs();
+    config.load("tests/test_multiline.ini")?;
+
+    let map = config.get_map_ref();
+
+    let section = map.get("Section").unwrap();
+
+    assert_eq!(config.get("Section", "Key1").unwrap(), "Value1");
+    assert_eq!(config.get("Section", "Key2").unwrap(), "Value Two");
+    assert_eq!(config.get("Section", "Key3").unwrap(), "this is a haiku");
+    assert!(section.contains_key("spread across separate lines"));
+    assert!(section.contains_key("a single value"));
+
+    assert_eq!(config.get("Section", "Key4").unwrap(), "Four");
+
+    assert_eq!(
+        config.writes(),
+        "[Section]
+Key1=Value1
+Key2=Value Two
+Key3=this is a haiku
+spread across separate lines
+a single value
+Key4=Four
+"
+    );
+
+    Ok(())
+}
+
+#[test]
+#[cfg(feature = "indexmap")]
+fn multiline_on() -> Result<(), Box<dyn Error>> {
+    let mut config = Ini::new_cs();
+    config.set_multiline(true);
+    config.load("tests/test_multiline.ini")?;
+
+    assert_eq!(config.get("Section", "Key1").unwrap(), "Value1");
+    assert_eq!(config.get("Section", "Key2").unwrap(), "Value Two");
+    assert_eq!(
+        config.get("Section", "Key3").unwrap(),
+        "this is a haiku\nspread across separate lines\na single value"
+    );
+    assert_eq!(config.get("Section", "Key4").unwrap(), "Four");
+
+    assert_eq!(
+        config.writes(),
+        "[Section]
+Key1=Value1
+Key2=Value Two
+Key3=this is a haiku
+    spread across separate lines
+    a single value
+Key4=Four
 "
     );
 
