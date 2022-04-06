@@ -36,8 +36,8 @@ let mut config = Ini::new();
 config.read(String::from(
   "[somesection]
   someintvalue = 5"));
-let my_value = config.getint("somesection", "someintvalue").unwrap().unwrap();
-assert_eq!(my_value, 5); // value accessible!
+let my_value = config.getint("somesection", "someintvalue").unwrap();
+assert_eq!(my_value, vec![5]); // value accessible!
 
 //You can ofcourse just choose to parse the values yourself:
 let my_string = String::from("1984");
@@ -118,16 +118,16 @@ fn main() -> Result<(), Box<dyn Error>> {
   let val = config.get("TOPSECRET", "KFC").unwrap();
   // Notice how get() can access indexes case-insensitively.
 
-  assert_eq!(val, "the secret herb is orega-"); // value accessible!
+  assert_eq!(val, vec!["the secret herb is orega-"]); // value accessible!
 
   // What if you want remove KFC's secret recipe? Just use set():
   config.set("topsecret", "kfc", None);
 
-  assert_eq!(config.get("TOPSECRET", "KFC"), None); // as expected!
+  assert_eq!(config.get("TOPSECRET", "KFC").unwrap(), Vec::<String>::new()); // as expected!
 
   // What if you want to get an unsigned integer?
-  let my_number = config.getuint("values", "Uint")?.unwrap();
-  assert_eq!(my_number, 31415); // and we got it!
+  let my_number = config.getuint("values", "Uint").unwrap();
+  assert_eq!(my_number, vec![31415]); // and we got it!
   // The Ini struct provides more getters for primitive datatypes.
 
   // You can also access it like a normal hashmap:

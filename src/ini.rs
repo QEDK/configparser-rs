@@ -317,8 +317,8 @@ impl Ini {
     ///    Err(why) => panic!("{}", why),
     ///    Ok(inner) => inner
     ///};
-    ///let this_year = map["2000s"]["2020"].clone().unwrap();
-    ///assert_eq!(this_year, "bad"); // value accessible!
+    ///let this_year = map["2000s"]["2020"].clone();
+    ///assert_eq!(this_year, vec!["bad"]); // value accessible!
     ///```
     ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
     ///Use `get_mut_map()` if you want a mutable reference.
@@ -509,7 +509,7 @@ impl Ini {
     ///let mut config = Ini::new();
     ///config.load("tests/test.ini");
     ///let value = config.get("default", "defaultvalues").unwrap();
-    ///assert_eq!(value, String::from("defaultvalues"));
+    ///assert_eq!(value, vec!["defaultvalues"]);
     ///```
     ///Returns `Some(value)` of type `String` if value is found or else returns `None`.
     pub fn get(&self, section: &str, key: &str) -> Option<Vec<String>> {
@@ -525,8 +525,8 @@ impl Ini {
     ///
     ///let mut config = Ini::new();
     ///config.load("tests/test.ini");
-    ///let value = config.getbool("values", "bool").unwrap().unwrap();
-    ///assert!(value);  // value accessible!
+    ///let value = config.getbool("values", "bool").unwrap();
+    ///assert_eq!(value, vec![true]);  // value accessible!
     ///```
     ///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
@@ -560,8 +560,8 @@ impl Ini {
     ///
     ///let mut config = Ini::new();
     ///config.load("tests/test.ini");
-    ///let value = config.getboolcoerce("values", "boolcoerce").unwrap().unwrap();
-    ///assert!(!value);  // value accessible!
+    ///let value = config.getboolcoerce("values", "boolcoerce").unwrap();
+    ///assert_eq!(value, vec![false]);  // value accessible!
     ///```
     ///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
@@ -612,8 +612,8 @@ impl Ini {
     ///
     ///let mut config = Ini::new();
     ///config.load("tests/test.ini");
-    ///let value = config.getint("values", "int").unwrap().unwrap();
-    ///assert_eq!(value, -31415);  // value accessible!
+    ///let value = config.getint("values", "int").unwrap();
+    ///assert_eq!(value, vec![-31415]);  // value accessible!
     ///```
     ///Returns `Ok(Some(value))` of type `i64` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
@@ -645,8 +645,8 @@ impl Ini {
     ///
     ///let mut config = Ini::new();
     ///config.load("tests/test.ini");
-    ///let value = config.getint("values", "Uint").unwrap().unwrap();
-    ///assert_eq!(value, 31415);  // value accessible!
+    ///let value = config.getint("values", "Uint").unwrap();
+    ///assert_eq!(value, vec![31415]);  // value accessible!
     ///```
     ///Returns `Ok(Some(value))` of type `u64` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
@@ -678,8 +678,8 @@ impl Ini {
     ///
     ///let mut config = Ini::new();
     ///config.load("tests/test.ini");
-    ///let value = config.getfloat("values", "float").unwrap().unwrap();
-    ///assert_eq!(value, 3.1415);  // value accessible!
+    ///let value = config.getfloat("values", "float").unwrap();
+    ///assert_eq!(value, vec![3.1415]);  // value accessible!
     ///```
     ///Returns `Ok(Some(value))` of type `f64` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
@@ -754,8 +754,8 @@ impl Ini {
     ///  ("[topsecrets]
     ///  Valueless key"));
     /////We can then get the mutable map and insert a value like:
-    ///config.get_mut_map().get_mut("topsecrets").unwrap().insert(String::from("nuclear launch codes"), None);
-    ///assert_eq!(config.get("topsecrets", "nuclear launch codes"), None);  // inserted successfully!
+    ///config.get_mut_map().get_mut("topsecrets").unwrap().insert(String::from("nuclear launch codes"), vec![]);
+    ///assert_eq!(config.get("topsecrets", "nuclear launch codes").unwrap(), Vec::<String>::new());  // inserted successfully!
     ///```
     ///If you just need to access the map without mutating, use `get_map_ref()` or make a clone with `get_map()` instead.
     pub fn get_mut_map(&mut self) -> &mut Map<String, Map<String, Vec<String>>> {
@@ -775,7 +775,7 @@ impl Ini {
     ///let key_value = String::from("value");
     ///config.set("section", "key", Some(key_value));
     ///config.set("section", "key", None);  // also valid!
-    ///assert_eq!(config.get("section", "key"), None);  // correct!
+    ///assert_eq!(config.get("section", "key").unwrap(), Vec::<String>::new());  // correct!
     ///```
     ///Returns `None` if there is no existing value, else returns `Some(Option<String>)`, with the existing value being the wrapped `Option<String>`.
     ///If you want to insert using a string literal, use `setstr()` instead.
@@ -821,7 +821,7 @@ impl Ini {
     ///  key=notvalue"));
     ///config.setstr("section", "key", Some("value"));
     ///config.setstr("section", "key", None);  // also valid!
-    ///assert_eq!(config.get("section", "key"), None);  // correct!
+    ///assert_eq!(config.get("section", "key").unwrap(), Vec::<String>::new());  // correct!
     ///```
     ///Returns `None` if there is no existing value, else returns `Some(Option<String>)`, with the existing value being the wrapped `Option<String>`.
     ///If you want to insert using a `String`, use `set()` instead.
@@ -880,8 +880,8 @@ impl Ini {
     ///  updog=whatsupdog
     ///  [anothersection]
     ///  updog=differentdog"));
-    ///let val = config.remove_key("anothersection", "updog").unwrap().unwrap();
-    ///assert_eq!(val, String::from("differentdog"));  // with the last section removed, our map is now empty!
+    ///let val = config.remove_key("anothersection", "updog").unwrap();
+    ///assert_eq!(val, vec![String::from("differentdog")]);  // with the last section removed, our map is now empty!
     ///```
     ///Returns `Some(Option<String>)` if the value exists or else, `None`.
     pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Vec<String>> {
