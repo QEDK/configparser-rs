@@ -371,10 +371,18 @@ impl Ini {
         // push key/value pairs in outmap to out string.
         fn unparse_key_values(out: &mut String, outmap: &Map<String, Vec<String>>) {
             for (key, val) in outmap.iter() {
-                for item in val {
+                if val.is_empty() {
                     out.push_str(&key);
-                    out.push('=');
-                    out.push_str(&item);
+                } else {
+                    let length = val.len();
+                    for (index, item) in val.iter().enumerate() {
+                        out.push_str(&key);
+                        out.push('=');
+                        out.push_str(&item);
+                        if index + 1 < length {
+                            out.push_str(LINE_ENDING);
+                        }
+                    }
                 }
                 out.push_str(LINE_ENDING);
             }
@@ -529,7 +537,7 @@ impl Ini {
                 Some(val) => {
                     let mut result = vec![];
                     for item in val {
-                        match item.parse::<bool>() {
+                        match item.to_lowercase().parse::<bool>() {
                             Ok(val) => result.push(val),
                             Err(_) => return Err(format!("{} is not a bool", item)),
                         }
