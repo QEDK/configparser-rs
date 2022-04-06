@@ -7,10 +7,10 @@ use std::collections::HashMap as Map;
 
 use std::collections::HashMap;
 use std::convert::AsRef;
-use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
+use std::{fs, vec};
 
 ///The `Ini` struct simply contains a nested hashmap of the loaded configuration, the default section header and comment symbols.
 ///## Example
@@ -21,7 +21,7 @@ use std::path::Path;
 ///```
 #[derive(Debug, Clone, Eq, PartialEq, Default)]
 pub struct Ini {
-    map: Map<String, Map<String, Option<String>>>,
+    map: Map<String, Map<String, Vec<String>>>,
     default_section: std::string::String,
     comment_symbols: Vec<char>,
     delimiters: Vec<char>,
@@ -284,7 +284,7 @@ impl Ini {
     pub fn load<T: AsRef<Path>>(
         &mut self,
         path: T,
-    ) -> Result<Map<String, Map<String, Option<String>>>, String> {
+    ) -> Result<Map<String, Map<String, Vec<String>>>, String> {
         let path = path.as_ref();
         let display = path.display();
 
@@ -322,10 +322,7 @@ impl Ini {
     ///```
     ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
     ///Use `get_mut_map()` if you want a mutable reference.
-    pub fn read(
-        &mut self,
-        input: String,
-    ) -> Result<Map<String, Map<String, Option<String>>>, String> {
+    pub fn read(&mut self, input: String) -> Result<Map<String, Map<String, Vec<String>>>, String> {
         self.map = match self.parse(input) {
             Err(why) => return Err(why),
             Ok(map) => map,
@@ -372,12 +369,12 @@ impl Ini {
     ///Private function that converts the currently stored configuration into a valid ini-syntax string.
     fn unparse(&self) -> String {
         // push key/value pairs in outmap to out string.
-        fn unparse_key_values(out: &mut String, outmap: &Map<String, Option<String>>) {
+        fn unparse_key_values(out: &mut String, outmap: &Map<String, Vec<String>>) {
             for (key, val) in outmap.iter() {
-                out.push_str(&key);
-                if let Some(value) = val {
+                for item in val {
+                    out.push_str(&key);
                     out.push('=');
-                    out.push_str(&value);
+                    out.push_str(&item);
                 }
                 out.push_str(LINE_ENDING);
             }
@@ -397,8 +394,8 @@ impl Ini {
     }
 
     ///Private function that parses ini-style syntax into a Map.
-    fn parse(&self, input: String) -> Result<Map<String, Map<String, Option<String>>>, String> {
-        let mut map: Map<String, Map<String, Option<String>>> = Map::new();
+    fn parse(&self, input: String) -> Result<Map<String, Map<String, Vec<String>>>, String> {
+        let mut map: Map<String, Map<String, Vec<String>>> = Map::new();
         let mut section = self.default_section.clone();
         let caser = |val: &str| {
             if self.case_sensitive {
@@ -438,11 +435,16 @@ impl Ini {
                                     num, delimiter
                                 ));
                             } else {
-                                valmap.insert(key, Some(value));
+                                let items = valmap.get_mut(&key);
+                                if let Some(items) = items {
+                                    items.push(value);
+                                } else {
+                                    valmap.insert(key, vec![value]);
+                                }
                             }
                         }
                         None => {
-                            let mut valmap: Map<String, Option<String>> = Map::new();
+                            let mut valmap: Map<String, Vec<String>> = Map::new();
                             let key = caser(trimmed[..delimiter].trim());
                             let value = trimmed[delimiter + 1..].trim().to_owned();
                             if key.is_empty() {
@@ -451,7 +453,12 @@ impl Ini {
                                     num, delimiter
                                 ));
                             } else {
-                                valmap.insert(key, Some(value));
+                                let items = valmap.get_mut(&key);
+                                if let Some(items) = items {
+                                    items.push(value);
+                                } else {
+                                    valmap.insert(key, vec![value]);
+                                }
                             }
                             map.insert(section.clone(), valmap);
                         }
@@ -459,12 +466,12 @@ impl Ini {
                     None => match map.get_mut(&section) {
                         Some(valmap) => {
                             let key = caser(trimmed);
-                            valmap.insert(key, None);
+                            valmap.insert(key, vec![]);
                         }
                         None => {
-                            let mut valmap: Map<String, Option<String>> = Map::new();
+                            let mut valmap: Map<String, Vec<String>> = Map::new();
                             let key = caser(trimmed);
-                            valmap.insert(key, None);
+                            valmap.insert(key, vec![]);
                             map.insert(section.clone(), valmap);
                         }
                     },
@@ -497,9 +504,9 @@ impl Ini {
     ///assert_eq!(value, String::from("defaultvalues"));
     ///```
     ///Returns `Some(value)` of type `String` if value is found or else returns `None`.
-    pub fn get(&self, section: &str, key: &str) -> Option<String> {
+    pub fn get(&self, section: &str, key: &str) -> Option<Vec<String>> {
         let (section, key) = self.autocase(section, key);
-        self.map.get(&section)?.get(&key)?.clone()
+        Some(self.map.get(&section)?.get(&key)?.clone())
     }
 
     ///Parses the stored value from the key stored in the defined section to a `bool`.
@@ -515,20 +522,24 @@ impl Ini {
     ///```
     ///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
-    pub fn getbool(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
+    pub fn getbool(&self, section: &str, key: &str) -> Result<Vec<bool>, String> {
         let (section, key) = self.autocase(section, key);
         match self.map.get(&section) {
             Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => match inner.to_lowercase().parse::<bool>() {
-                        Err(why) => Err(why.to_string()),
-                        Ok(boolean) => Ok(Some(boolean)),
-                    },
-                    None => Ok(None),
-                },
-                None => Ok(None),
+                Some(val) => {
+                    let mut result = vec![];
+                    for item in val {
+                        match item.parse::<bool>() {
+                            Ok(val) => result.push(val),
+                            Err(_) => return Err(format!("{} is not a bool", item)),
+                        }
+                    }
+
+                    Ok(result)
+                }
+                None => Ok(vec![]),
             },
-            None => Ok(None),
+            None => Ok(vec![]),
         }
     }
 
@@ -546,13 +557,14 @@ impl Ini {
     ///```
     ///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
-    pub fn getboolcoerce(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
+    pub fn getboolcoerce(&self, section: &str, key: &str) -> Result<Vec<bool>, String> {
         let (section, key) = self.autocase(section, key);
         match self.map.get(&section) {
             Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => {
-                        let boolval = &inner.to_lowercase()[..];
+                Some(val) => {
+                    let mut result = vec![];
+                    for item in val {
+                        let boolval = &item.to_lowercase()[..];
                         if self
                             .boolean_values
                             .get(&true)
@@ -560,7 +572,7 @@ impl Ini {
                             .iter()
                             .any(|elem| elem == boolval)
                         {
-                            Ok(Some(true))
+                            result.push(true)
                         } else if self
                             .boolean_values
                             .get(&false)
@@ -568,19 +580,20 @@ impl Ini {
                             .iter()
                             .any(|elem| elem == boolval)
                         {
-                            Ok(Some(false))
+                            result.push(false)
                         } else {
-                            Err(format!(
+                            return Err(format!(
                                 "Unable to parse value into bool at {}:{}",
                                 section, key
-                            ))
+                            ));
                         }
                     }
-                    None => Ok(None),
-                },
-                None => Ok(None),
+
+                    Ok(result)
+                }
+                None => Ok(vec![]),
             },
-            None => Ok(None),
+            None => Ok(vec![]),
         }
     }
 
@@ -596,20 +609,24 @@ impl Ini {
     ///```
     ///Returns `Ok(Some(value))` of type `i64` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
-    pub fn getint(&self, section: &str, key: &str) -> Result<Option<i64>, String> {
+    pub fn getint(&self, section: &str, key: &str) -> Result<Vec<i64>, String> {
         let (section, key) = self.autocase(section, key);
         match self.map.get(&section) {
             Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => match inner.parse::<i64>() {
-                        Err(why) => Err(why.to_string()),
-                        Ok(int) => Ok(Some(int)),
-                    },
-                    None => Ok(None),
-                },
-                None => Ok(None),
+                Some(val) => {
+                    let mut result = vec![];
+                    for item in val {
+                        match item.parse::<i64>() {
+                            Ok(val) => result.push(val),
+                            Err(why) => return Err(why.to_string()),
+                        }
+                    }
+
+                    Ok(result)
+                }
+                None => Ok(vec![]),
             },
-            None => Ok(None),
+            None => Ok(vec![]),
         }
     }
 
@@ -625,20 +642,24 @@ impl Ini {
     ///```
     ///Returns `Ok(Some(value))` of type `u64` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
-    pub fn getuint(&self, section: &str, key: &str) -> Result<Option<u64>, String> {
+    pub fn getuint(&self, section: &str, key: &str) -> Result<Vec<u64>, String> {
         let (section, key) = self.autocase(section, key);
         match self.map.get(&section) {
             Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => match inner.parse::<u64>() {
-                        Err(why) => Err(why.to_string()),
-                        Ok(uint) => Ok(Some(uint)),
-                    },
-                    None => Ok(None),
-                },
-                None => Ok(None),
+                Some(val) => {
+                    let mut result = vec![];
+                    for item in val {
+                        match item.parse::<u64>() {
+                            Ok(val) => result.push(val),
+                            Err(why) => return Err(why.to_string()),
+                        }
+                    }
+
+                    Ok(result)
+                }
+                None => Ok(vec![]),
             },
-            None => Ok(None),
+            None => Ok(vec![]),
         }
     }
 
@@ -654,20 +675,24 @@ impl Ini {
     ///```
     ///Returns `Ok(Some(value))` of type `f64` if value is found or else returns `Ok(None)`.
     ///If the parsing fails, it returns an `Err(string)`.
-    pub fn getfloat(&self, section: &str, key: &str) -> Result<Option<f64>, String> {
+    pub fn getfloat(&self, section: &str, key: &str) -> Result<Vec<f64>, String> {
         let (section, key) = self.autocase(section, key);
         match self.map.get(&section) {
             Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => match inner.parse::<f64>() {
-                        Err(why) => Err(why.to_string()),
-                        Ok(float) => Ok(Some(float)),
-                    },
-                    None => Ok(None),
-                },
-                None => Ok(None),
+                Some(val) => {
+                    let mut result = vec![];
+                    for item in val {
+                        match item.parse::<f64>() {
+                            Ok(val) => result.push(val),
+                            Err(why) => return Err(why.to_string()),
+                        }
+                    }
+
+                    Ok(result)
+                }
+                None => Ok(vec![]),
             },
-            None => Ok(None),
+            None => Ok(vec![]),
         }
     }
 
@@ -685,7 +710,7 @@ impl Ini {
     ///```
     ///Returns `Some(map)` if map is non-empty or else returns `None`.
     ///Similar to `load()` but returns an `Option` type with the currently stored `Map`.
-    pub fn get_map(&self) -> Option<Map<String, Map<String, Option<String>>>> {
+    pub fn get_map(&self) -> Option<Map<String, Map<String, Vec<String>>>> {
         if self.map.is_empty() {
             None
         } else {
@@ -707,7 +732,7 @@ impl Ini {
     ///```
     ///If you just need to definitely mutate the map, use `get_mut_map()` instead. Alternatively, you can generate a snapshot by getting a clone
     ///with `get_map()` and work with that.
-    pub fn get_map_ref(&self) -> &Map<String, Map<String, Option<String>>> {
+    pub fn get_map_ref(&self) -> &Map<String, Map<String, Vec<String>>> {
         &self.map
     }
 
@@ -725,12 +750,12 @@ impl Ini {
     ///assert_eq!(config.get("topsecrets", "nuclear launch codes"), None);  // inserted successfully!
     ///```
     ///If you just need to access the map without mutating, use `get_map_ref()` or make a clone with `get_map()` instead.
-    pub fn get_mut_map(&mut self) -> &mut Map<String, Map<String, Option<String>>> {
+    pub fn get_mut_map(&mut self) -> &mut Map<String, Map<String, Vec<String>>> {
         &mut self.map
     }
 
     ///Sets an `Option<String>` in the `Map` stored in our struct. If a particular section or key does not exist, it will be automatically created.
-    ///An existing value in the map  will be overwritten. You can also set `None` safely.
+    ///You can also set `None` safely.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -746,18 +771,30 @@ impl Ini {
     ///```
     ///Returns `None` if there is no existing value, else returns `Some(Option<String>)`, with the existing value being the wrapped `Option<String>`.
     ///If you want to insert using a string literal, use `setstr()` instead.
-    pub fn set(
-        &mut self,
-        section: &str,
-        key: &str,
-        value: Option<String>,
-    ) -> Option<Option<String>> {
+    pub fn set(&mut self, section: &str, key: &str, value: Option<String>) -> Option<Vec<String>> {
         let (section, key) = self.autocase(section, key);
         match self.map.get_mut(&section) {
-            Some(secmap) => secmap.insert(key, value),
+            Some(secmap) => {
+                if let Some(value) = value {
+                    let items = secmap.get_mut(&key);
+                    if let Some(items) = items {
+                        items.push(value);
+
+                        Some(items.to_vec())
+                    } else {
+                        secmap.insert(key, vec![value])
+                    }
+                } else {
+                    secmap.insert(key, vec![])
+                }
+            }
             None => {
-                let mut valmap: Map<String, Option<String>> = Map::new();
-                valmap.insert(key, value);
+                let mut valmap: Map<String, Vec<String>> = Map::new();
+                if let Some(value) = value {
+                    valmap.insert(key, vec![value]);
+                } else {
+                    valmap.insert(key, vec![]);
+                }
                 self.map.insert(section, valmap);
                 None
             }
@@ -780,12 +817,7 @@ impl Ini {
     ///```
     ///Returns `None` if there is no existing value, else returns `Some(Option<String>)`, with the existing value being the wrapped `Option<String>`.
     ///If you want to insert using a `String`, use `set()` instead.
-    pub fn setstr(
-        &mut self,
-        section: &str,
-        key: &str,
-        value: Option<&str>,
-    ) -> Option<Option<String>> {
+    pub fn setstr(&mut self, section: &str, key: &str, value: Option<&str>) -> Option<Vec<String>> {
         let (section, key) = self.autocase(section, key);
         self.set(&section, &key, value.map(String::from))
     }
@@ -820,7 +852,7 @@ impl Ini {
     ///assert!(config.get_map_ref().is_empty());  // with the last section removed, our map is now empty!
     ///```
     ///Returns `Some(section_map)` if the section exists or else, `None`.
-    pub fn remove_section(&mut self, section: &str) -> Option<Map<String, Option<String>>> {
+    pub fn remove_section(&mut self, section: &str) -> Option<Map<String, Vec<String>>> {
         let section = if self.case_sensitive {
             section.to_owned()
         } else {
@@ -844,7 +876,7 @@ impl Ini {
     ///assert_eq!(val, String::from("differentdog"));  // with the last section removed, our map is now empty!
     ///```
     ///Returns `Some(Option<String>)` if the value exists or else, `None`.
-    pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Option<String>> {
+    pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Vec<String>> {
         let (section, key) = self.autocase(section, key);
         self.map.get_mut(&section)?.remove(&key)
     }
