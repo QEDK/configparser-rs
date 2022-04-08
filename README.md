@@ -212,6 +212,8 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - 😅 **BREAKING** `IniDefault` is now a non-exhaustive struct, this will make future upgrades easier and non-breaking in nature. This change might also have a few implications in updating your existing codebase, please read the [official docs](https://doc.rust-lang.org/reference/attributes/type_system.html#the-non_exhaustive-attribute) for more guidance.
   - `IniDefault` is now internally used for generating defaults, reducing crate size.
   - 🚀 There is now a new optional `indexmap` feature that preserves insertion order of your loaded configurations.
+- 4.0.0 (**STABLE**)
+  - 🥵 **BREAKING** `HashMap` values are now `Vec<String>` instead of `Option<String>`. This allows the parser to now handle duplicate keys.
 
 ### 🔜 Future plans
 

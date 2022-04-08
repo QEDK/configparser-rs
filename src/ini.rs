@@ -121,7 +121,7 @@ const LINE_ENDING: &'static str = "\r\n";
 const LINE_ENDING: &'static str = "\n";
 
 impl Ini {
-    ///Creates a new `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
+    ///Creates a new `Map` of `Map<String, Map<String, Vec<String>>>` type for the struct.
     ///All values in the Map are stored in `String` type.
     ///
     ///By default, [`std::collections::HashMap`] is used for the Map object.
@@ -139,7 +139,7 @@ impl Ini {
         Ini::new_from_defaults(IniDefault::default())
     }
 
-    ///Creates a new **case-sensitive** `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
+    ///Creates a new **case-sensitive** `Map` of `Map<String, Map<String, Vec<String>>>` type for the struct.
     ///All values in the Map are stored in `String` type.
     ///## Example
     ///```rust
@@ -498,7 +498,7 @@ impl Ini {
         }
     }
 
-    ///Returns a clone of the stored value from the key stored in the defined section.
+    ///Returns a clone of the stored value(s) from the key stored in the defined section.
     ///Unlike accessing the map directly, `get()` can process your input to make case-insensitive access *if* the
     ///default constructor is used.
     ///All `get` functions will do this automatically under the hood.
@@ -511,13 +511,13 @@ impl Ini {
     ///let value = config.get("default", "defaultvalues").unwrap();
     ///assert_eq!(value, vec!["defaultvalues"]);
     ///```
-    ///Returns `Some(value)` of type `String` if value is found or else returns `None`.
+    ///Returns `Some(values)` of type `Vec<String>` if at least one value is found or else returns `None`.
     pub fn get(&self, section: &str, key: &str) -> Option<Vec<String>> {
         let (section, key) = self.autocase(section, key);
         Some(self.map.get(&section)?.get(&key)?.clone())
     }
 
-    ///Parses the stored value from the key stored in the defined section to a `bool`.
+    ///Parses the stored value(s) from the key stored in the defined section to a `bool`.
     ///For ease of use, the function converts the type case-insensitively (`true` == `True`).
     ///## Example
     ///```rust
@@ -528,7 +528,8 @@ impl Ini {
     ///let value = config.getbool("values", "bool").unwrap();
     ///assert_eq!(value, vec![true]);  // value accessible!
     ///```
-    ///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
+    ///Returns `Ok(values)` of type `Vec<bool>`.
+    ///If no value is found for the given key, it returns an empty array.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getbool(&self, section: &str, key: &str) -> Result<Vec<bool>, String> {
         let (section, key) = self.autocase(section, key);
@@ -551,7 +552,7 @@ impl Ini {
         }
     }
 
-    ///Parses the stored value from the key stored in the defined section to a `bool`. For ease of use, the function converts the type coerces a match.
+    ///Parses the stored value(s) from the key stored in the defined section to a `bool`. For ease of use, the function converts the type coerces a match.
     ///It attempts to case-insenstively find `true`, `yes`, `t`, `y`, `1` and `on` to parse it as `True`.
     ///Similarly it attempts to case-insensitvely find `false`, `no`, `f`, `n`, `0` and `off` to parse it as `False`.
     ///## Example
@@ -563,7 +564,8 @@ impl Ini {
     ///let value = config.getboolcoerce("values", "boolcoerce").unwrap();
     ///assert_eq!(value, vec![false]);  // value accessible!
     ///```
-    ///Returns `Ok(Some(value))` of type `bool` if value is found or else returns `Ok(None)`.
+    ///Returns `Ok(values)` of type `Vec<bool>`.
+    ///If no value is found for the given key, it returns an empty array.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getboolcoerce(&self, section: &str, key: &str) -> Result<Vec<bool>, String> {
         let (section, key) = self.autocase(section, key);
@@ -605,7 +607,7 @@ impl Ini {
         }
     }
 
-    ///Parses the stored value from the key stored in the defined section to an `i64`.
+    ///Parses the stored value(s) from the key stored in the defined section to an `i64`.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -615,7 +617,8 @@ impl Ini {
     ///let value = config.getint("values", "int").unwrap();
     ///assert_eq!(value, vec![-31415]);  // value accessible!
     ///```
-    ///Returns `Ok(Some(value))` of type `i64` if value is found or else returns `Ok(None)`.
+    ///Returns `Ok(values)` of type `Vec<i64>`.
+    ///If no value is found for the given key, it returns an empty array.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getint(&self, section: &str, key: &str) -> Result<Vec<i64>, String> {
         let (section, key) = self.autocase(section, key);
@@ -638,7 +641,7 @@ impl Ini {
         }
     }
 
-    ///Parses the stored value from the key stored in the defined section to a `u64`.
+    ///Parses the stored value(s) from the key stored in the defined section to a `u64`.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -648,7 +651,8 @@ impl Ini {
     ///let value = config.getint("values", "Uint").unwrap();
     ///assert_eq!(value, vec![31415]);  // value accessible!
     ///```
-    ///Returns `Ok(Some(value))` of type `u64` if value is found or else returns `Ok(None)`.
+    ///Returns `Ok(values)` of type `Vec<u64>`.
+    ///If no value is found for the given key, it returns an empty array.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getuint(&self, section: &str, key: &str) -> Result<Vec<u64>, String> {
         let (section, key) = self.autocase(section, key);
@@ -671,7 +675,7 @@ impl Ini {
         }
     }
 
-    ///Parses the stored value from the key stored in the defined section to a `f64`.
+    ///Parses the stored value(s) from the key stored in the defined section to a `f64`.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -681,7 +685,8 @@ impl Ini {
     ///let value = config.getfloat("values", "float").unwrap();
     ///assert_eq!(value, vec![3.1415]);  // value accessible!
     ///```
-    ///Returns `Ok(Some(value))` of type `f64` if value is found or else returns `Ok(None)`.
+    ///Returns `Ok(values)` of type `Vec<f64>`.
+    ///If no value is found for the given key, it returns an empty array.
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getfloat(&self, section: &str, key: &str) -> Result<Vec<f64>, String> {
         let (section, key) = self.autocase(section, key);
@@ -762,7 +767,8 @@ impl Ini {
         &mut self.map
     }
 
-    ///Sets an `Option<String>` in the `Map` stored in our struct. If a particular section or key does not exist, it will be automatically created.
+    ///Adds an `Option<String>` in the `Map` stored in our struct.
+    ///If a particular section or key does not exist, it will be automatically created.
     ///You can also set `None` safely.
     ///## Example
     ///```rust
@@ -777,7 +783,7 @@ impl Ini {
     ///config.set("section", "key", None);  // also valid!
     ///assert_eq!(config.get("section", "key").unwrap(), Vec::<String>::new());  // correct!
     ///```
-    ///Returns `None` if there is no existing value, else returns `Some(Option<String>)`, with the existing value being the wrapped `Option<String>`.
+    ///Returns `None` if there is no existing value, else returns `Some(Vec<String>)`, with the existing value being the wrapped `Vec<String>`.
     ///If you want to insert using a string literal, use `setstr()` instead.
     pub fn set(&mut self, section: &str, key: &str, value: Option<String>) -> Option<Vec<String>> {
         let (section, key) = self.autocase(section, key);
@@ -809,7 +815,8 @@ impl Ini {
         }
     }
 
-    ///Sets an `Option<&str>` in the `Map` stored in our struct. If a particular section or key does not exist, it will be automatically created.
+    ///Adds an `Option<&str>` in the `Map` stored in our struct.
+    ///If a particular section or key does not exist, it will be automatically created.
     ///An existing value in the map  will be overwritten. You can also set `None` safely.
     ///## Example
     ///```rust
@@ -823,7 +830,7 @@ impl Ini {
     ///config.setstr("section", "key", None);  // also valid!
     ///assert_eq!(config.get("section", "key").unwrap(), Vec::<String>::new());  // correct!
     ///```
-    ///Returns `None` if there is no existing value, else returns `Some(Option<String>)`, with the existing value being the wrapped `Option<String>`.
+    ///Returns `None` if there is no existing value, else returns `Some(Vec<String>)`, with the existing value being the wrapped `Vec<String>`.
     ///If you want to insert using a `String`, use `set()` instead.
     pub fn setstr(&mut self, section: &str, key: &str, value: Option<&str>) -> Option<Vec<String>> {
         let (section, key) = self.autocase(section, key);
@@ -883,7 +890,7 @@ impl Ini {
     ///let val = config.remove_key("anothersection", "updog").unwrap();
     ///assert_eq!(val, vec![String::from("differentdog")]);  // with the last section removed, our map is now empty!
     ///```
-    ///Returns `Some(Option<String>)` if the value exists or else, `None`.
+    ///Returns `Some(Vec<String>)` if the value exists or else, `None`.
     pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Vec<String>> {
         let (section, key) = self.autocase(section, key);
         self.map.get_mut(&section)?.remove(&key)
