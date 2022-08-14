@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "3.0.0"
+configparser = "3.0.1"
 ```
 
 ## ➕ Supported datatypes
@@ -212,6 +212,7 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
 - 3.0.1 (**STABLE**)
   - Uses `CRLF` line endings for Windows files.
   - Bumps crate to 2021 edition.
+  - Adds features to CI pipeline.
 
 ### 🔜 Future plans
 
