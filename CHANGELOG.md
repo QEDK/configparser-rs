@@ -79,5 +79,8 @@
 - 0.13.2 (**FINAL BETA**)
   - Erroneous docs fixed.
   - Final release before stable.
+- 1.0.0
+  - Dropped support for `ini::load()`
+  - Updated tests
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).

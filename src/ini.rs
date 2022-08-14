@@ -121,7 +121,7 @@ impl Default for IniDefault {
 #[cfg(windows)]
 const LINE_ENDING: &'static str = "\r\n";
 #[cfg(not(windows))]
-const LINE_ENDING: &'static str = "\n";
+const LINE_ENDING: &str = "\n";
 
 impl Ini {
     ///Creates a new `Map` of `Map<String, Map<String, Option<String>>>` type for the struct.
@@ -377,10 +377,10 @@ impl Ini {
         // push key/value pairs in outmap to out string.
         fn unparse_key_values(out: &mut String, outmap: &Map<String, Option<String>>) {
             for (key, val) in outmap.iter() {
-                out.push_str(&key);
+                out.push_str(key);
                 if let Some(value) = val {
                     out.push('=');
-                    out.push_str(&value);
+                    out.push_str(value);
                 }
                 out.push_str(LINE_ENDING);
             }
