@@ -235,27 +235,7 @@ Float=3.1415
 
 #[test]
 #[cfg(feature = "async-std")]
-fn async_read() -> Result<(), Box<dyn Error>> {
-    let mut config_sync = Ini::new();
-    config_sync.load("tests/test.ini")?;
-
-    let config_async = async_std::task::block_on::<_, Result<_, String>>(async {
-        let mut config_async = Ini::new();
-        config_async.load_async("tests/test.ini").await?;
-        Ok(config_async)
-    })?;
-
-    assert_eq!(config_sync, config_async);
-
-    Ok(())
-}
-
-#[cfg(feature = "async-std")]
-use std::fs;
-
-#[test]
-#[cfg(feature = "async-std")]
-fn async_write() -> Result<(), Box<dyn Error>> {
+fn async_load_write() -> Result<(), Box<dyn Error>> {
     const OUT_FILE_CONTENTS: &str = "defaultvalues=defaultvalues
     [topsecret]
     KFC = the secret herb is orega-
@@ -288,8 +268,14 @@ fn async_write() -> Result<(), Box<dyn Error>> {
         Ok(())
     })?;
 
-    let sync_content = fs::read_to_string("output_sync.ini")?;
-    let async_content = fs::read_to_string("output_async.ini")?;
+    let mut sync_content = Ini::new();
+    sync_content.load("output_sync.ini")?;
+
+    let async_content = async_std::task::block_on::<_, Result<_, String>>(async {
+        let mut async_content = Ini::new();
+        async_content.load_async("output_async.ini").await?;
+        Ok(async_content)
+    })?;
 
     assert_eq!(sync_content, async_content);
 
