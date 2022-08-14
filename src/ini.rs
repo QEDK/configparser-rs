@@ -6,11 +6,7 @@ use indexmap::IndexMap as Map;
 use std::collections::HashMap as Map;
 
 #[cfg(feature = "async-std")]
-use async_std::{
-    fs as async_fs,
-    fs::File as AsyncFile,
-    io::ReadExt,
-};
+use async_std::{fs as async_fs, fs::File as AsyncFile, io::ReadExt};
 
 use std::collections::HashMap;
 use std::convert::AsRef;
@@ -861,9 +857,9 @@ impl Ini {
 impl Ini {
     ///Loads a file asynchronously from a defined path, parses it and puts the hashmap into our struct.
     ///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `Map`, if present.
-    /// 
+    ///
     ///Usage is similar to `load`, but `.await` must be called after along with the usual async rules.
-    /// 
+    ///
     ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
     ///Use `get_mut_map()` if you want a mutable reference.
     pub async fn load_async<T: AsRef<Path>>(
@@ -891,9 +887,9 @@ impl Ini {
 
     ///Writes the current configuation to the specified path asynchronously. If a file is not present, it is automatically created for you, if a file already
     ///exists, it is truncated and the configuration is written to it.
-    /// 
+    ///
     ///Usage is the same as `write`, but `.await` must be called after along with the usual async rules.
-    /// 
+    ///
     ///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
     pub async fn write_async<T: AsRef<Path>>(&self, path: T) -> std::io::Result<()> {
         async_fs::write(path.as_ref(), self.unparse()).await

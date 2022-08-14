@@ -5,3 +5,5 @@ output.ini
 output2.ini
 test2.ini
 .vscode
+output_async.ini
+output_sync.ini
