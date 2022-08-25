@@ -28,6 +28,7 @@ pub struct Ini {
     delimiters: Vec<char>,
     boolean_values: HashMap<bool, Vec<String>>,
     case_sensitive: bool,
+    multiline: bool,
 }
 
 ///The `IniDefault` struct serves as a template to create other `Ini` objects from. It can be used to store and load
@@ -84,6 +85,16 @@ pub struct IniDefault {
     ///assert_eq!(default.case_sensitive, false);
     ///```
     pub case_sensitive: bool,
+    ///Denotes if the `Ini` object is parses multiline strings.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///let default = config.defaults();
+    ///assert_eq!(default.multiline, false);
+    ///```
+    pub multiline: bool,
 }
 
 impl Default for IniDefault {
@@ -92,6 +103,7 @@ impl Default for IniDefault {
             default_section: "default".to_owned(),
             comment_symbols: vec![';', '#'],
             delimiters: vec!['=', ':'],
+            multiline: false,
             boolean_values: [
                 (
                     true,
@@ -117,7 +129,7 @@ impl Default for IniDefault {
 }
 
 #[cfg(windows)]
-const LINE_ENDING: &'static str = "\r\n";
+const LINE_ENDING: &str = "\r\n";
 #[cfg(not(windows))]
 const LINE_ENDING: &str = "\n";
 
@@ -179,6 +191,7 @@ impl Ini {
             delimiters: defaults.delimiters,
             boolean_values: defaults.boolean_values,
             case_sensitive: defaults.case_sensitive,
+            multiline: defaults.multiline,
         }
     }
 
@@ -198,6 +211,7 @@ impl Ini {
             delimiters: self.delimiters.to_owned(),
             boolean_values: self.boolean_values.to_owned(),
             case_sensitive: self.case_sensitive,
+            multiline: self.multiline,
         }
     }
 
@@ -253,6 +267,21 @@ impl Ini {
     ///Returns nothing.
     pub fn set_comment_symbols(&mut self, symlist: &[char]) {
         self.comment_symbols = symlist.to_vec();
+    }
+
+    ///Sets multiline string support.
+    ///It must be set before `load()` or `read()` is called in order to take effect.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///config.set_multiline(true);
+    ///let map = config.load("tests/test.ini").unwrap();
+    ///```
+    ///Returns nothing.
+    pub fn set_multiline(&mut self, multiline: bool) {
+        self.multiline = multiline;
     }
 
     ///Gets all the sections of the currently-stored `Map` in a vector.
@@ -377,25 +406,47 @@ impl Ini {
     ///Private function that converts the currently stored configuration into a valid ini-syntax string.
     fn unparse(&self) -> String {
         // push key/value pairs in outmap to out string.
-        fn unparse_key_values(out: &mut String, outmap: &Map<String, Option<String>>) {
+        fn unparse_key_values(
+            out: &mut String,
+            outmap: &Map<String, Option<String>>,
+            multiline: bool,
+        ) {
             for (key, val) in outmap.iter() {
                 out.push_str(key);
+
                 if let Some(value) = val {
                     out.push('=');
-                    out.push_str(value);
+
+                    if multiline {
+                        let mut lines = value.lines();
+
+                        out.push_str(lines.next().unwrap());
+
+                        for line in lines {
+                            out.push_str(LINE_ENDING);
+                            out.push_str("    ");
+                            out.push_str(line);
+                        }
+                    } else {
+                        out.push_str(value);
+                    }
                 }
+
                 out.push_str(LINE_ENDING);
             }
         }
+
         let mut out = String::new();
+
         if let Some(defaultmap) = self.map.get(&self.default_section) {
-            unparse_key_values(&mut out, defaultmap);
+            unparse_key_values(&mut out, defaultmap, self.multiline);
         }
+
         for (section, secmap) in self.map.iter() {
             if section != &self.default_section {
                 out.push_str(&format!("[{}]", section));
                 out.push_str(LINE_ENDING);
-                unparse_key_values(&mut out, secmap);
+                unparse_key_values(&mut out, secmap, self.multiline);
             }
         }
         out
@@ -405,6 +456,8 @@ impl Ini {
     fn parse(&self, input: String) -> Result<Map<String, Map<String, Option<String>>>, String> {
         let mut map: Map<String, Map<String, Option<String>>> = Map::new();
         let mut section = self.default_section.clone();
+        let mut current_key: Option<String> = None;
+
         let caser = |val: &str| {
             if self.case_sensitive {
                 val.to_owned()
@@ -412,70 +465,89 @@ impl Ini {
                 val.to_lowercase()
             }
         };
-        for (num, lines) in input.lines().enumerate() {
-            let trimmed = match lines.find(|c: char| self.comment_symbols.contains(&c)) {
-                Some(idx) => lines[..idx].trim(),
-                None => lines.trim(),
+
+        for (num, raw_line) in input.lines().enumerate() {
+            let line = match raw_line.find(|c: char| self.comment_symbols.contains(&c)) {
+                Some(idx) => &raw_line[..idx],
+                None => raw_line,
             };
+
+            let trimmed = line.trim();
+
             if trimmed.is_empty() {
                 continue;
             }
-            match trimmed.find('[') {
-                Some(0) => match trimmed.rfind(']') {
-                    Some(end) => {
-                        section = caser(trimmed[1..end].trim());
-                    }
+
+            match (trimmed.find('['), trimmed.rfind(']')) {
+                (Some(0), Some(end)) => {
+                    section = caser(trimmed[1..end].trim());
+
+                    continue;
+                }
+                (Some(0), None) => {
+                    return Err(format!(
+                        "line {}: Found opening bracket for section name but no closing bracket",
+                        num
+                    ));
+                }
+                _ => {}
+            }
+
+            if line.starts_with(char::is_whitespace) && self.multiline {
+                let key = match current_key.as_ref() {
+                    Some(x) => x,
                     None => {
                         return Err(format!(
-                            "line {}: Found opening bracket for section name but no closing bracket",
-                            num
-                        ));
+                            "line {} started with identation but there is no current entry",
+                            num,
+                        ))
                     }
-                },
-                Some(_) | None => match trimmed.find(&self.delimiters[..]) {
-                    Some(delimiter) => match map.get_mut(&section) {
-                        Some(valmap) => {
-                            let key = caser(trimmed[..delimiter].trim());
-                            let value = trimmed[delimiter + 1..].trim().to_owned();
-                            if key.is_empty() {
-                                return Err(format!(
-                                    "line {}:{}: Key cannot be empty",
-                                    num, delimiter
-                                ));
-                            } else {
-                                valmap.insert(key, Some(value));
-                            }
-                        }
-                        None => {
-                            let mut valmap: Map<String, Option<String>> = Map::new();
-                            let key = caser(trimmed[..delimiter].trim());
-                            let value = trimmed[delimiter + 1..].trim().to_owned();
-                            if key.is_empty() {
-                                return Err(format!(
-                                    "line {}:{}: Key cannot be empty",
-                                    num, delimiter
-                                ));
-                            } else {
-                                valmap.insert(key, Some(value));
-                            }
-                            map.insert(section.clone(), valmap);
-                        }
-                    },
-                    None => match map.get_mut(&section) {
-                        Some(valmap) => {
-                            let key = caser(trimmed);
-                            valmap.insert(key, None);
-                        }
-                        None => {
-                            let mut valmap: Map<String, Option<String>> = Map::new();
-                            let key = caser(trimmed);
-                            valmap.insert(key, None);
-                            map.insert(section.clone(), valmap);
-                        }
-                    },
-                },
+                };
+
+                let valmap = map.entry(section.clone()).or_insert_with(Map::new);
+
+                let val = valmap
+                    .entry(key.clone())
+                    .or_insert_with(|| Some(String::new()));
+
+                match val {
+                    Some(x) => {
+                        x.push_str(LINE_ENDING);
+                        x.push_str(trimmed);
+                    }
+                    None => {
+                        *val = Some(format!("{}{}", LINE_ENDING, trimmed));
+                    }
+                }
+
+                continue;
+            }
+
+            let valmap = map.entry(section.clone()).or_insert_with(Map::new);
+
+            match trimmed.find(&self.delimiters[..]) {
+                Some(delimiter) => {
+                    let key = caser(trimmed[..delimiter].trim());
+
+                    if key.is_empty() {
+                        return Err(format!("line {}:{}: Key cannot be empty", num, delimiter));
+                    } else {
+                        current_key = Some(key.clone());
+
+                        let value = trimmed[delimiter + 1..].trim().to_owned();
+
+                        valmap.insert(key, Some(value));
+                    }
+                }
+                None => {
+                    let key = caser(trimmed);
+                    current_key = Some(key.clone());
+
+                    valmap.insert(key, None);
+                }
             }
         }
+
         Ok(map)
     }
 
