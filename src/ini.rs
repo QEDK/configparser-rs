@@ -285,22 +285,38 @@ impl Ini {
         &mut self,
         path: T,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
-        let path = path.as_ref();
-        let display = path.display();
-
-        let mut file = match File::open(&path) {
-            Err(why) => return Err(format!("couldn't open {}: {}", display, why)),
-            Ok(file) => file,
+        self.map = match File::open(&path.as_ref()) {
+            Err(why) => {
+                return Err(format!(
+                    "couldn't open {}: {}",
+                    &path.as_ref().display(),
+                    why
+                ))
+            }
+            Ok(mut file) => {
+                let mut s = String::new();
+                match file.read_to_string(&mut s) {
+                    Err(why) => {
+                        return Err(format!(
+                            "couldn't read {}: {}",
+                            &path.as_ref().display(),
+                            why
+                        ))
+                    }
+                    Ok(_) => match self.parse(s) {
+                        Err(why) => {
+                            return Err(format!(
+                                "couldn't read {}: {}",
+                                &path.as_ref().display(),
+                                why
+                            ))
+                        }
+                        Ok(map) => map,
+                    },
+                }
+            }
         };
 
-        let mut s = String::new();
-        self.map = match file.read_to_string(&mut s) {
-            Err(why) => return Err(format!("couldn't read {}: {}", display, why)),
-            Ok(_) => match self.parse(s) {
-                Err(why) => return Err(why),
-                Ok(map) => map,
-            },
-        };
         Ok(self.map.clone())
     }
 
