@@ -6,7 +6,7 @@ use indexmap::IndexMap as Map;
 use std::collections::HashMap as Map;
 
 #[cfg(feature = "async-std")]
-use async_std::{fs as async_fs, fs::File as AsyncFile, io::ReadExt};
+use async_std::{fs as async_fs, path::Path as AsyncPath};
 
 use std::collections::HashMap;
 use std::convert::AsRef;
@@ -864,26 +864,14 @@ impl Ini {
     ///
     ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
     ///Use `get_mut_map()` if you want a mutable reference.
-    pub async fn load_async<T: AsRef<Path>>(
+    pub async fn load_async<T: AsRef<AsyncPath>>(
         &mut self,
         path: T,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
-        let path = path.as_ref();
-        let display = path.display();
-
-        let mut file = match AsyncFile::open(&path).await {
-            Err(why) => return Err(format!("couldn't open {}: {}", display, why)),
-            Ok(file) => file,
-        };
-
-        let mut s = String::new();
-        self.map = match file.read_to_string(&mut s).await {
-            Err(why) => return Err(format!("couldn't read {}: {}", display, why)),
-            Ok(_) => match self.parse(s) {
-                Err(why) => return Err(why),
-                Ok(map) => map,
-            },
-        };
+        let s = async_fs::read_to_string(&path)
+            .await
+            .map_err(|why| format!("couldn't read {}: {}", path.as_ref().display(), why))?;
+        self.map = self.parse(s)?;
         Ok(self.map.clone())
     }
 
