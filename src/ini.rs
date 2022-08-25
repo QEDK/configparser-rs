@@ -868,10 +868,25 @@ impl Ini {
         &mut self,
         path: T,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
-        let s = async_fs::read_to_string(&path)
-            .await
-            .map_err(|why| format!("couldn't read {}: {}", path.as_ref().display(), why))?;
-        self.map = self.parse(s)?;
+        self.map = match self.parse(match async_fs::read_to_string(&path).await {
+            Err(why) => {
+                return Err(format!(
+                    "couldn't read {}: {}",
+                    &path.as_ref().display(),
+                    why
+                ))
+            }
+            Ok(s) => s,
+        }) {
+            Err(why) => {
+                return Err(format!(
+                    "couldn't read {}: {}",
+                    &path.as_ref().display(),
+                    why
+                ))
+            }
+            Ok(map) => map,
+        };
         Ok(self.map.clone())
     }
 
