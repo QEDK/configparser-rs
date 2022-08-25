@@ -60,11 +60,8 @@ fn non_cs() -> Result<(), Box<dyn Error>> {
         config.get("topsecret", "colon").unwrap(),
         "value after colon"
     );
-    assert_eq!(config.getbool("values", "Bool")?.unwrap(), true);
-    assert_eq!(
-        config.getboolcoerce("values", "Boolcoerce")?.unwrap(),
-        false
-    );
+    assert!(config.getbool("values", "Bool")?.unwrap());
+    assert!(!config.getboolcoerce("values", "Boolcoerce")?.unwrap());
     assert_eq!(config.getint("values", "Int")?.unwrap(), -31415);
     assert_eq!(config.getuint("values", "Uint")?.unwrap(), 31415);
     assert_eq!(config.getfloat("values", "Float")?.unwrap(), 3.1415);
@@ -164,11 +161,8 @@ fn cs() -> Result<(), Box<dyn Error>> {
         config.get("topsecret", "colon").unwrap(),
         "value after colon"
     );
-    assert_eq!(config.getbool("values", "Bool")?.unwrap(), true);
-    assert_eq!(
-        config.getboolcoerce("values", "Boolcoerce")?.unwrap(),
-        false
-    );
+    assert!(config.getbool("values", "Bool")?.unwrap());
+    assert!(!config.getboolcoerce("values", "Boolcoerce")?.unwrap());
     assert_eq!(config.getint("values", "Int")?.unwrap(), -31415);
     assert_eq!(config.getuint("values", "Uint")?.unwrap(), 31415);
     assert_eq!(config.getfloat("values", "Float")?.unwrap(), 3.1415);
@@ -235,6 +229,55 @@ Uint=31415
 Float=3.1415
 "
     );
+
+    Ok(())
+}
+
+#[test]
+#[cfg(feature = "async-std")]
+fn async_load_write() -> Result<(), Box<dyn Error>> {
+    const OUT_FILE_CONTENTS: &str = "defaultvalues=defaultvalues
+    [topsecret]
+    KFC = the secret herb is orega-
+            colon:value after colon
+    Empty string =
+    None string
+    Password=[in-brackets]
+    [ spacing ]
+        indented=indented
+    not indented = not indented             ;testcomment
+    !modified comment
+    [values]#another comment
+    Bool = True
+    Boolcoerce = 0
+    Int = -31415
+    Uint = 31415
+    Float = 3.1415";
+
+    let mut config = Ini::new();
+    config.read(OUT_FILE_CONTENTS.to_owned())?;
+    config.write("output_sync.ini")?;
+
+    async_std::task::block_on::<_, Result<_, String>>(async {
+        let mut config_async = Ini::new();
+        config_async.read(OUT_FILE_CONTENTS.to_owned())?;
+        config_async
+            .write_async("output_async.ini")
+            .await
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    })?;
+
+    let mut sync_content = Ini::new();
+    sync_content.load("output_sync.ini")?;
+
+    let async_content = async_std::task::block_on::<_, Result<_, String>>(async {
+        let mut async_content = Ini::new();
+        async_content.load_async("output_async.ini").await?;
+        Ok(async_content)
+    })?;
+
+    assert_eq!(sync_content, async_content);
 
     Ok(())
 }
