@@ -8,8 +8,6 @@ use std::collections::HashMap as Map;
 use std::collections::HashMap;
 use std::convert::AsRef;
 use std::fs;
-use std::fs::File;
-use std::io::prelude::*;
 use std::path::Path;
 
 ///The `Ini` struct simply contains a nested hashmap of the loaded configuration, the default section header and comment symbols.
@@ -285,36 +283,24 @@ impl Ini {
         &mut self,
         path: T,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
-        self.map = match File::open(&path.as_ref()) {
+        self.map = match fs::read_to_string(&path) {
             Err(why) => {
                 return Err(format!(
-                    "couldn't open {}: {}",
+                    "couldn't read {}: {}",
                     &path.as_ref().display(),
                     why
                 ))
             }
-            Ok(mut file) => {
-                let mut s = String::new();
-                match file.read_to_string(&mut s) {
-                    Err(why) => {
-                        return Err(format!(
-                            "couldn't read {}: {}",
-                            &path.as_ref().display(),
-                            why
-                        ))
-                    }
-                    Ok(_) => match self.parse(s) {
-                        Err(why) => {
-                            return Err(format!(
-                                "couldn't read {}: {}",
-                                &path.as_ref().display(),
-                                why
-                            ))
-                        }
-                        Ok(map) => map,
-                    },
+            Ok(s) => match self.parse(s) {
+                Err(why) => {
+                    return Err(format!(
+                        "couldn't read {}: {}",
+                        &path.as_ref().display(),
+                        why
+                    ))
                 }
-            }
+                Ok(map) => map,
+            },
         };
 
         Ok(self.map.clone())
