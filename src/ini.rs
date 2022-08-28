@@ -85,7 +85,7 @@ pub struct IniDefault {
     ///assert_eq!(default.case_sensitive, false);
     ///```
     pub case_sensitive: bool,
-    ///Denotes if the `Ini` object is parses multiline strings.
+    ///Denotes if the `Ini` object parses multiline strings.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
