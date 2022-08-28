@@ -498,7 +498,7 @@ impl Ini {
                     Some(x) => x,
                     None => {
                         return Err(format!(
-                            "line {} started with identation but there is no current entry",
+                            "line {}: Started with indentation but there is no current entry",
                             num,
                         ))
                     }
