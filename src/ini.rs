@@ -21,6 +21,7 @@ use std::path::Path;
 ///let mut config = Ini::new();
 ///```
 #[derive(Debug, Clone, Eq, PartialEq, Default)]
+#[non_exhaustive]
 pub struct Ini {
     map: Map<String, Map<String, Option<String>>>,
     default_section: std::string::String,
@@ -315,7 +316,7 @@ impl Ini {
         &mut self,
         path: T,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
-        self.map = match fs::read_to_string(&path) {
+        self.map = match self.parse(match fs::read_to_string(&path) {
             Err(why) => {
                 return Err(format!(
                     "couldn't read {}: {}",
@@ -323,18 +324,17 @@ impl Ini {
                     why
                 ))
             }
-            Ok(s) => match self.parse(s) {
-                Err(why) => {
-                    return Err(format!(
-                        "couldn't read {}: {}",
-                        &path.as_ref().display(),
-                        why
-                    ))
-                }
-                Ok(map) => map,
-            },
+            Ok(s) => s,
+        }) {
+            Err(why) => {
+                return Err(format!(
+                    "couldn't read {}: {}",
+                    &path.as_ref().display(),
+                    why
+                ))
+            }
+            Ok(map) => map,
         };
-
         Ok(self.map.clone())
     }
 
