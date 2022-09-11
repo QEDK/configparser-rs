@@ -10,9 +10,9 @@ use async_std::{fs as async_fs, path::Path as AsyncPath};
 
 use std::collections::HashMap;
 use std::convert::AsRef;
+use std::fmt::Write;
 use std::fs;
 use std::path::Path;
-use std::fmt::Write;
 
 ///The `Ini` struct simply contains a nested hashmap of the loaded configuration, the default section header and comment symbols.
 ///## Example
@@ -164,7 +164,10 @@ impl Ini {
     ///```
     ///Returns the struct and stores it in the calling variable.
     pub fn new_cs() -> Ini {
-        Ini::new_from_defaults(IniDefault { case_sensitive: true, ..Default::default() })
+        Ini::new_from_defaults(IniDefault {
+            case_sensitive: true,
+            ..Default::default()
+        })
     }
 
     ///Creates a new `Ini` with the given defaults from an existing `IniDefault` object.
