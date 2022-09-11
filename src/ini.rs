@@ -12,6 +12,7 @@ use std::collections::HashMap;
 use std::convert::AsRef;
 use std::fs;
 use std::path::Path;
+use std::fmt::Write;
 
 ///The `Ini` struct simply contains a nested hashmap of the loaded configuration, the default section header and comment symbols.
 ///## Example
@@ -163,10 +164,7 @@ impl Ini {
     ///```
     ///Returns the struct and stores it in the calling variable.
     pub fn new_cs() -> Ini {
-        let mut defaults = IniDefault::default();
-        defaults.case_sensitive = true;
-
-        Ini::new_from_defaults(defaults)
+        Ini::new_from_defaults(IniDefault { case_sensitive: true, ..Default::default() })
     }
 
     ///Creates a new `Ini` with the given defaults from an existing `IniDefault` object.
@@ -444,7 +442,7 @@ impl Ini {
 
         for (section, secmap) in self.map.iter() {
             if section != &self.default_section {
-                out.push_str(&format!("[{}]", section));
+                write!(out, "[{}]", section).unwrap();
                 out.push_str(LINE_ENDING);
                 unparse_key_values(&mut out, secmap, self.multiline);
             }
