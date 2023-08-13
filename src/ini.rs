@@ -421,7 +421,7 @@ impl Ini {
                     if multiline {
                         let mut lines = value.lines();
 
-                        out.push_str(lines.next().unwrap());
+                        out.push_str(lines.next().unwrap_or_default());
 
                         for line in lines {
                             out.push_str(LINE_ENDING);
