@@ -100,6 +100,32 @@ fn non_cs() -> Result<(), Box<dyn Error>> {
     mut_map.clear();
     config2.clear();
     assert_eq!(config.get_map_ref(), config2.get_map_ref());
+
+    config.load("tests/test.ini")?;
+    config.read_and_append("defaultvalues=somenewvalue".to_owned())?;
+    assert_eq!(
+        config.get("default", "defaultvalues").unwrap(),
+        "somenewvalue"
+    );
+    assert_eq!(
+        config.get("topsecret", "KFC").unwrap(),
+        "the secret herb is orega-"
+    );
+
+    let mut config3 = config.clone();
+    let mut_map = config3.get_mut_map();
+    mut_map.clear();
+    config3.load("tests/test.ini")?;
+    config3.load_and_append("tests/test_more.ini")?;
+    assert_eq!(
+        config3.get("default", "defaultvalues").unwrap(),
+        "overwritten"
+    );
+    assert_eq!(config3.get("topsecret", "KFC").unwrap(), "redacted");
+    // spacing -> indented exists in tests/test.ini, but not tests/test_more.ini
+    assert_eq!(config3.get("spacing", "indented").unwrap(), "indented");
+    assert_eq!(config3.getbool("values", "Bool")?.unwrap(), false);
+
     Ok(())
 }
 
@@ -276,6 +302,27 @@ fn async_load_write() -> Result<(), Box<dyn Error>> {
     let async_content = async_std::task::block_on::<_, Result<_, String>>(async {
         let mut async_content = Ini::new();
         async_content.load_async("output_async.ini").await?;
+        Ok(async_content)
+    })?;
+
+    assert_eq!(sync_content, async_content);
+
+    Ok(())
+}
+
+#[test]
+#[cfg(feature = "async-std")]
+fn async_load_and_append() -> Result<(), Box<dyn Error>> {
+    let mut sync_content = Ini::new();
+    sync_content.load("tests/test.ini")?;
+    sync_content.load_and_append("tests/test_more.ini")?;
+
+    let async_content = async_std::task::block_on::<_, Result<_, String>>(async {
+        let mut async_content = Ini::new();
+        async_content.load_async("tests/test.ini").await?;
+        async_content
+            .load_and_append_async("tests/test_more.ini")
+            .await?;
         Ok(async_content)
     })?;
 
