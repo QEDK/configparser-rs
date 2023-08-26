@@ -339,6 +339,57 @@ impl Ini {
         Ok(self.map.clone())
     }
 
+    ///Loads a file from a defined path, parses it and applies it to the existing hashmap in our struct.
+    ///While `load()` will clear the existing `Map`, `load_and_append()` applies the new values on top of
+    ///the existing hashmap, preserving previous values.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///config.load("tests/test.ini").unwrap();
+    ///config.load_and_append("tests/sys_cfg.ini").ok();  // we don't have to worry if this doesn't succeed
+    ///config.load_and_append("tests/user_cfg.ini").ok();  // we don't have to worry if this doesn't succeed
+    ///let map = config.get_map().unwrap();
+    /////Then, we can use standard hashmap functions like:
+    ///let values = map.get("values").unwrap();
+    ///```
+    ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
+    ///Use `get_mut_map()` if you want a mutable reference.
+    pub fn load_and_append<T: AsRef<Path>>(
+        &mut self,
+        path: T,
+    ) -> Result<Map<String, Map<String, Option<String>>>, String> {
+        let loaded = match self.parse(match fs::read_to_string(&path) {
+            Err(why) => {
+                return Err(format!(
+                    "couldn't read {}: {}",
+                    &path.as_ref().display(),
+                    why
+                ))
+            }
+            Ok(s) => s,
+        }) {
+            Err(why) => {
+                return Err(format!(
+                    "couldn't read {}: {}",
+                    &path.as_ref().display(),
+                    why
+                ))
+            }
+            Ok(map) => map,
+        };
+
+        for (section, section_map) in loaded.iter() {
+            self.map
+                .entry(section.clone())
+                .or_insert_with(Map::new)
+                .extend(section_map.clone());
+        }
+
+        Ok(self.map.clone())
+    }
+
     ///Reads an input string, parses it and puts the hashmap into our struct.
     ///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `Map`, if present.
     ///## Example
@@ -365,6 +416,52 @@ impl Ini {
             Err(why) => return Err(why),
             Ok(map) => map,
         };
+        Ok(self.map.clone())
+    }
+
+    ///Reads an input string, parses it and applies it to the existing hashmap in our struct.
+    ///While `read()` and `load()` will clear the existing `Map`, `read_and_append()` applies the new
+    ///values on top of the existing hashmap, preserving previous values.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///if let Err(why) = config.read(String::from(
+    ///    "[2000s]
+    ///    2020 = bad
+    ///    2023 = better")) {
+    ///    panic!("{}", why);
+    ///};
+    ///if let Err(why) = config.read_and_append(String::from(
+    ///    "[2000s]
+    ///    2020 = terrible")) {
+    ///    panic!("{}", why);
+    ///};
+    ///let map = config.get_map().unwrap();
+    ///let few_years_ago = map["2000s"]["2020"].clone().unwrap();
+    ///let this_year = map["2000s"]["2023"].clone().unwrap();
+    ///assert_eq!(few_years_ago, "terrible"); // value updated!
+    ///assert_eq!(this_year, "better"); // keeps old values!
+    ///```
+    ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
+    ///Use `get_mut_map()` if you want a mutable reference.
+    pub fn read_and_append(
+        &mut self,
+        input: String,
+    ) -> Result<Map<String, Map<String, Option<String>>>, String> {
+        let loaded = match self.parse(input) {
+            Err(why) => return Err(why),
+            Ok(map) => map,
+        };
+
+        for (section, section_map) in loaded.iter() {
+            self.map
+                .entry(section.clone())
+                .or_insert_with(Map::new)
+                .extend(section_map.clone());
+        }
+
         Ok(self.map.clone())
     }
 
@@ -960,6 +1057,48 @@ impl Ini {
             }
             Ok(map) => map,
         };
+        Ok(self.map.clone())
+    }
+
+    ///Loads a file from a defined path, parses it and applies it to the existing hashmap in our struct.
+    ///While `load_async()` will clear the existing `Map`, `load_and_append_async()` applies the new values on top
+    ///of the existing hashmap, preserving previous values.
+    ///
+    ///Usage is similar to `load_and_append`, but `.await` must be called after along with the usual async rules.
+    ///
+    ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
+    ///Use `get_mut_map()` if you want a mutable reference.
+    pub async fn load_and_append_async<T: AsRef<AsyncPath>>(
+        &mut self,
+        path: T,
+    ) -> Result<Map<String, Map<String, Option<String>>>, String> {
+        let loaded = match self.parse(match async_fs::read_to_string(&path).await {
+            Err(why) => {
+                return Err(format!(
+                    "couldn't read {}: {}",
+                    &path.as_ref().display(),
+                    why
+                ))
+            }
+            Ok(s) => s,
+        }) {
+            Err(why) => {
+                return Err(format!(
+                    "couldn't read {}: {}",
+                    &path.as_ref().display(),
+                    why
+                ))
+            }
+            Ok(map) => map,
+        };
+
+        for (section, section_map) in loaded.iter() {
+            self.map
+                .entry(section.clone())
+                .or_insert_with(Map::new)
+                .extend(section_map.clone());
+        }
+
         Ok(self.map.clone())
     }
 
