@@ -1,5 +1,5 @@
 # configparser
-[![Build Status](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml/badge.svg)](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2022)](https://github.com/QEDK/configparser-rs)
+[![Build Status](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml/badge.svg)](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2023)](https://github.com/QEDK/configparser-rs)
 
 This crate provides the `Ini` struct which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
 
@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "3.0.2"
+configparser = "3.0.3"
 ```
 
 ## ➕ Supported datatypes
