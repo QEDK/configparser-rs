@@ -82,5 +82,9 @@
 - 1.0.0
   - Dropped support for `ini::load()`
   - Updated tests
+- 2.0.0
+  - **BREAKING** Added Python-esque support for `:` as a delimiter.
+  - :new: Add support for case-sensitive maps with automatic handling under the hood.
+  - :hammer: Fixed buggy setters which went uncaught, to preserve case-insensitive nature.
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).
