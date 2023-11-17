@@ -1,5 +1,5 @@
 # configparser
-[![Build Status](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml/badge.svg)](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2022)](https://github.com/QEDK/configparser-rs)
+[![Build Status](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml/badge.svg)](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2023)](https://github.com/QEDK/configparser-rs)
 
 This crate provides the `Ini` struct which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
 
@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "3.0.2"
+configparser = "3.0.3"
 ```
 
 ## ➕ Supported datatypes
@@ -201,10 +201,6 @@ additional terms or conditions.
 ## 🆕 Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 2.0.0
-  - **BREAKING** Added Python-esque support for `:` as a delimiter.
-  - :new: Add support for case-sensitive maps with automatic handling under the hood.
-  - :hammer: Fixed buggy setters which went uncaught, to preserve case-insensitive nature.
 - 2.0.1
   - Add first-class support for setting, loading and reading defaults
   - New available struct `IniDefault` for fast templating
@@ -221,10 +217,14 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Uses `CRLF` line endings for Windows files.
   - Bumps crate to 2021 edition.
   - Adds features to CI pipeline.
-- 3.0.2 (**STABLE**)
+- 3.0.2
   - Adds support for multi-line key-value pairs.
   - Adds `async-std` feature for asynchronous file operations.
   - Some performance optimizations.
+- 3.0.3 (**STABLE**)
+  - Add default empty line on empty strings.
+  - Feature to append to existing `Ini` objects.
+  - Minor lint fixes.
 
 ### 🔜 Future plans
 
