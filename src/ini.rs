@@ -8,6 +8,9 @@ use std::collections::HashMap as Map;
 #[cfg(feature = "async-std")]
 use async_std::{fs as async_fs, path::Path as AsyncPath};
 
+#[cfg(feature = "derive_builder")]
+use derive_builder::Builder;
+
 use std::collections::HashMap;
 use std::convert::AsRef;
 use std::fmt::Write;
@@ -128,6 +131,35 @@ impl Default for IniDefault {
             case_sensitive: false,
         }
     }
+}
+
+/// Use this struct to define formatting options for the `pretty_write` functions.
+/// If the `derive_builder` feature is enabled then a WriteOptionsBuilder struct is provided.
+#[derive(Debug, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "derive_builder", derive(Builder))]
+pub struct WriteOptions {
+    /// If true the keys and values will be separated by " = ". If false then they will be
+    /// separated by "=".
+    /// Default is `false`.
+    pub space_around_delimiters: bool,
+
+    /// Defines the number of spaces for indentation of for multiline values.
+    /// Default is 4 spaces.
+    pub multiline_line_indentation: usize,
+
+    /// Defines the number of blank lines between sections.
+    /// Default is 0.
+    pub blank_lines_between_sections: usize,
+}
+
+impl Default for WriteOptions {
+   fn default() -> Self {
+      Self {
+          space_around_delimiters: false,
+          multiline_line_indentation: 4,
+          blank_lines_between_sections: 0,
+      }
+   }
 }
 
 #[cfg(windows)]
@@ -465,8 +497,8 @@ impl Ini {
         Ok(self.map.clone())
     }
 
-    ///Writes the current configuation to the specified path. If a file is not present, it is automatically created for you, if a file already
-    ///exists, it is truncated and the configuration is written to it.
+    ///Writes the current configuation to the specified path using default formatting.
+    ///If a file is not present then it is automatically created for you. If a file already exists then it is overwritten.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -481,11 +513,36 @@ impl Ini {
     ///```
     ///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
     pub fn write<T: AsRef<Path>>(&self, path: T) -> std::io::Result<()> {
-        fs::write(path.as_ref(), self.unparse())
+        fs::write(path.as_ref(), self.unparse(&WriteOptions::default()))
     }
 
-    ///Returns a string with the current configuration formatted with valid ini-syntax. This is always safe since the configuration is validated during
-    ///parsing.
+    ///Writes the current configuation to the specified path using the given formatting options.
+    ///If a file is not present then it is automatically created for you. If a file already exists then it is overwritten.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::{Ini, WriteOptions};
+    ///
+    ///fn main() -> std::io::Result<()> {
+    ///let write_options = WriteOptions {
+    ///    space_around_delimiters: true,
+    ///    multiline_line_indentation: 2,
+    ///    blank_lines_between_sections: 1,
+    ///};
+    ///
+    ///  let mut config = Ini::new();
+    ///  config.read(String::from(
+    ///    "[2000s]
+    ///    2020 = bad"));
+    ///  config.pretty_write("output.ini", &write_options)
+    ///}
+    ///```
+    ///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
+    pub fn pretty_write<T: AsRef<Path>>(&self, path: T, write_options: &WriteOptions) -> std::io::Result<()> {
+        fs::write(path.as_ref(), self.unparse(write_options))
+    }
+
+    ///Returns a string with the current configuration formatted with valid ini-syntax using default formatting.
+    ///This is always safe since the configuration is validated during parsing.
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
@@ -498,22 +555,52 @@ impl Ini {
     ///```
     ///Returns a `String` type contatining the ini-syntax file.
     pub fn writes(&self) -> String {
-        self.unparse()
+        self.unparse(&WriteOptions::default())
+    }
+
+    ///Returns a string with the current configuration formatted with valid ini-syntax using the given formatting options.
+    ///This is always safe since the configuration is validated during parsing.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::{Ini, WriteOptions};
+    ///
+    ///let write_options = WriteOptions {
+    ///    space_around_delimiters: true,
+    ///    multiline_line_indentation: 2,
+    ///    blank_lines_between_sections: 1,
+    ///};
+    ///
+    ///let mut config = Ini::new();
+    ///config.read(String::from(
+    ///  "[2000s]
+    ///  2020 = bad"));
+    ///let outstring = config.pretty_writes(&write_options);
+    ///```
+    ///Returns a `String` type contatining the ini-syntax file.
+    pub fn pretty_writes(&self, write_options: &WriteOptions) -> String {
+        self.unparse(write_options)
     }
 
     ///Private function that converts the currently stored configuration into a valid ini-syntax string.
-    fn unparse(&self) -> String {
+    fn unparse(&self, write_options: &WriteOptions) -> String {
         // push key/value pairs in outmap to out string.
         fn unparse_key_values(
             out: &mut String,
             outmap: &Map<String, Option<String>>,
             multiline: bool,
+            space_around_delimiters: bool,
+            indent: usize,
         ) {
+            let delimiter = if space_around_delimiters {
+                " = "
+            } else {
+                "="
+            };
             for (key, val) in outmap.iter() {
                 out.push_str(key);
 
                 if let Some(value) = val {
-                    out.push('=');
+                    out.push_str(delimiter);
 
                     if multiline {
                         let mut lines = value.lines();
@@ -522,7 +609,7 @@ impl Ini {
 
                         for line in lines {
                             out.push_str(LINE_ENDING);
-                            out.push_str("    ");
+                            out.push_str(" ".repeat(indent).as_ref());
                             out.push_str(line);
                         }
                     } else {
@@ -534,18 +621,24 @@ impl Ini {
             }
         }
 
+        let line_endings = LINE_ENDING.repeat(write_options.blank_lines_between_sections);
         let mut out = String::new();
 
         if let Some(defaultmap) = self.map.get(&self.default_section) {
-            unparse_key_values(&mut out, defaultmap, self.multiline);
+            unparse_key_values(&mut out, defaultmap, self.multiline, write_options.space_around_delimiters, write_options.multiline_line_indentation);
         }
 
+        let mut is_first = true;
         for (section, secmap) in self.map.iter() {
+            if !is_first {
+                out.push_str(line_endings.as_ref());
+            }
             if section != &self.default_section {
                 write!(out, "[{}]", section).unwrap();
                 out.push_str(LINE_ENDING);
-                unparse_key_values(&mut out, secmap, self.multiline);
+                unparse_key_values(&mut out, secmap, self.multiline, write_options.space_around_delimiters, write_options.multiline_line_indentation);
             }
+            is_first = false;
         }
         out
     }
@@ -1102,13 +1195,23 @@ impl Ini {
         Ok(self.map.clone())
     }
 
-    ///Writes the current configuation to the specified path asynchronously. If a file is not present, it is automatically created for you, if a file already
+    ///Writes the current configuation to the specified path asynchronously using default formatting. If a file is not present, it is automatically created for you, if a file already
     ///exists, it is truncated and the configuration is written to it.
     ///
     ///Usage is the same as `write`, but `.await` must be called after along with the usual async rules.
     ///
     ///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
     pub async fn write_async<T: AsRef<Path>>(&self, path: T) -> std::io::Result<()> {
-        async_fs::write(path.as_ref(), self.unparse()).await
+        async_fs::write(path.as_ref(), self.unparse(&WriteOptions::default())).await
+    }
+
+    ///Writes the current configuation to the specified path asynchronously using the given formatting options. If a file is not present, it is automatically created for you, if a file already
+    ///exists, it is truncated and the configuration is written to it.
+    ///
+    ///Usage is the same as `write`, but `.await` must be called after along with the usual async rules.
+    ///
+    ///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
+    pub async fn pretty_write_async<T: AsRef<Path>>(&self, path: T, write_options: &WriteOptions) -> std::io::Result<()> {
+        async_fs::write(path.as_ref(), self.unparse(write_options)).await
     }
 }
