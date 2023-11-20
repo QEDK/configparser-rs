@@ -137,11 +137,9 @@ fn main() -> Result<(), Box<dyn Error>> {
   // You can easily write the currently stored configuration to a file with the `write` method. This creates a compact format with as little spacing as possible:
   config.write("output.ini");
 
-  // You can write the currently stored configuration with more spacing to a file with the `pretty_write` method. You must supply the method with a configuratio specification:
-  let mut write_options = WriteOptions::default(); // The defaults match the formatting used in the `write` method
-  write_options.space_around_delimiters = true;
-  write_options.multiline_line_indentation = 2;
-  write_options.blank_lines_between_sections = 1;
+  // You can write the currently stored configuration with different spacing to a file with the `pretty_write` method:
+  let write_options = WriteOptions::new_with_params(true, 2, 1);
+  // or you can use the default configuration as `WriteOptions::new()`
   config.pretty_write("pretty_output.ini", &write_options);
 
   // If you want to simply mutate the stored hashmap, you can use get_mut_map()

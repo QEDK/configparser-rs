@@ -180,6 +180,46 @@ impl Default for WriteOptions {
     }
 }
 
+impl WriteOptions {
+    ///Creates a new `WriteOptions` object with the default values.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::WriteOptions;
+    ///
+    ///let write_options = WriteOptions::new();
+    ///assert_eq!(write_options.space_around_delimiters, false);
+    ///assert_eq!(write_options.multiline_line_indentation, 4);
+    ///assert_eq!(write_options.blank_lines_between_sections, 0);
+    ///```
+    ///Returns the struct and stores it in the calling variable.
+    pub fn new() -> WriteOptions {
+        WriteOptions::default()
+    }
+
+    ///Creates a new `WriteOptions` object with the given parameters.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::WriteOptions;
+    ///
+    ///let write_options = WriteOptions::new_with_params(true, 2, 1);
+    ///assert_eq!(write_options.space_around_delimiters, true);
+    ///assert_eq!(write_options.multiline_line_indentation, 2);
+    ///assert_eq!(write_options.blank_lines_between_sections, 1);
+    ///```
+    ///Returns the struct and stores it in the calling variable.
+    pub fn new_with_params(
+        space_around_delimiters: bool,
+        multiline_line_indentation: usize,
+        blank_lines_between_sections: usize,
+    ) -> WriteOptions {
+        Self {
+            space_around_delimiters,
+            multiline_line_indentation,
+            blank_lines_between_sections,
+        }
+    }
+}
+
 #[cfg(windows)]
 const LINE_ENDING: &str = "\r\n";
 #[cfg(not(windows))]

@@ -7,3 +7,5 @@ test2.ini
 .vscode
 output_async.ini
 output_sync.ini
+pretty_output.ini
+pretty_output_async.ini
