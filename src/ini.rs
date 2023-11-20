@@ -8,9 +8,6 @@ use std::collections::HashMap as Map;
 #[cfg(feature = "async-std")]
 use async_std::{fs as async_fs, path::Path as AsyncPath};
 
-#[cfg(feature = "derive_builder")]
-use derive_builder::Builder;
-
 use std::collections::HashMap;
 use std::convert::AsRef;
 use std::fmt::Write;
@@ -134,32 +131,53 @@ impl Default for IniDefault {
 }
 
 /// Use this struct to define formatting options for the `pretty_write` functions.
-/// If the `derive_builder` feature is enabled then a WriteOptionsBuilder struct is provided.
 #[derive(Debug, Clone, Eq, PartialEq)]
-#[cfg_attr(feature = "derive_builder", derive(Builder))]
+#[non_exhaustive]
 pub struct WriteOptions {
-    /// If true the keys and values will be separated by " = ". If false then they will be
-    /// separated by "=".
-    /// Default is `false`.
+    ///If true then the keys and values will be separated by " = ". In the special case where the value is empty, the
+    ///line ends with " =".
+    ///If false then keys and values will be separated by "=".
+    ///Default is `false`.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::WriteOptions;
+    ///
+    ///let mut write_options = WriteOptions::default();
+    ///assert_eq!(write_options.space_around_delimiters, false);
+    ///```
     pub space_around_delimiters: bool,
 
-    /// Defines the number of spaces for indentation of for multiline values.
-    /// Default is 4 spaces.
+    ///Defines the number of spaces for indentation of for multiline values.
+    ///Default is 4 spaces.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::WriteOptions;
+    ///
+    ///let mut write_options = WriteOptions::default();
+    ///assert_eq!(write_options.multiline_line_indentation, 4);
+    ///```
     pub multiline_line_indentation: usize,
 
-    /// Defines the number of blank lines between sections.
-    /// Default is 0.
+    ///Defines the number of blank lines between sections.
+    ///Default is 0.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::WriteOptions;
+    ///
+    ///let mut write_options = WriteOptions::default();
+    ///assert_eq!(write_options.blank_lines_between_sections, 0);
+    ///```
     pub blank_lines_between_sections: usize,
 }
 
 impl Default for WriteOptions {
-   fn default() -> Self {
-      Self {
-          space_around_delimiters: false,
-          multiline_line_indentation: 4,
-          blank_lines_between_sections: 0,
-      }
-   }
+    fn default() -> Self {
+        Self {
+            space_around_delimiters: false,
+            multiline_line_indentation: 4,
+            blank_lines_between_sections: 0,
+        }
+    }
 }
 
 #[cfg(windows)]
@@ -523,11 +541,10 @@ impl Ini {
     ///use configparser::ini::{Ini, WriteOptions};
     ///
     ///fn main() -> std::io::Result<()> {
-    ///let write_options = WriteOptions {
-    ///    space_around_delimiters: true,
-    ///    multiline_line_indentation: 2,
-    ///    blank_lines_between_sections: 1,
-    ///};
+    ///  let mut write_options = WriteOptions::default();
+    ///  write_options.space_around_delimiters = true;
+    ///  write_options.multiline_line_indentation = 2;
+    ///  write_options.blank_lines_between_sections = 1;
     ///
     ///  let mut config = Ini::new();
     ///  config.read(String::from(
@@ -537,7 +554,11 @@ impl Ini {
     ///}
     ///```
     ///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
-    pub fn pretty_write<T: AsRef<Path>>(&self, path: T, write_options: &WriteOptions) -> std::io::Result<()> {
+    pub fn pretty_write<T: AsRef<Path>>(
+        &self,
+        path: T,
+        write_options: &WriteOptions,
+    ) -> std::io::Result<()> {
         fs::write(path.as_ref(), self.unparse(write_options))
     }
 
@@ -564,11 +585,10 @@ impl Ini {
     ///```rust
     ///use configparser::ini::{Ini, WriteOptions};
     ///
-    ///let write_options = WriteOptions {
-    ///    space_around_delimiters: true,
-    ///    multiline_line_indentation: 2,
-    ///    blank_lines_between_sections: 1,
-    ///};
+    ///let mut write_options = WriteOptions::default();
+    ///write_options.space_around_delimiters = true;
+    ///write_options.multiline_line_indentation = 2;
+    ///write_options.blank_lines_between_sections = 1;
     ///
     ///let mut config = Ini::new();
     ///config.read(String::from(
@@ -591,16 +611,16 @@ impl Ini {
             space_around_delimiters: bool,
             indent: usize,
         ) {
-            let delimiter = if space_around_delimiters {
-                " = "
-            } else {
-                "="
-            };
+            let delimiter = if space_around_delimiters { " = " } else { "=" };
             for (key, val) in outmap.iter() {
                 out.push_str(key);
 
                 if let Some(value) = val {
-                    out.push_str(delimiter);
+                    if value.is_empty() {
+                        out.push_str(delimiter.trim_end());
+                    } else {
+                        out.push_str(delimiter);
+                    }
 
                     if multiline {
                         let mut lines = value.lines();
@@ -625,7 +645,13 @@ impl Ini {
         let mut out = String::new();
 
         if let Some(defaultmap) = self.map.get(&self.default_section) {
-            unparse_key_values(&mut out, defaultmap, self.multiline, write_options.space_around_delimiters, write_options.multiline_line_indentation);
+            unparse_key_values(
+                &mut out,
+                defaultmap,
+                self.multiline,
+                write_options.space_around_delimiters,
+                write_options.multiline_line_indentation,
+            );
         }
 
         let mut is_first = true;
@@ -636,7 +662,13 @@ impl Ini {
             if section != &self.default_section {
                 write!(out, "[{}]", section).unwrap();
                 out.push_str(LINE_ENDING);
-                unparse_key_values(&mut out, secmap, self.multiline, write_options.space_around_delimiters, write_options.multiline_line_indentation);
+                unparse_key_values(
+                    &mut out,
+                    secmap,
+                    self.multiline,
+                    write_options.space_around_delimiters,
+                    write_options.multiline_line_indentation,
+                );
             }
             is_first = false;
         }
@@ -1208,10 +1240,14 @@ impl Ini {
     ///Writes the current configuation to the specified path asynchronously using the given formatting options. If a file is not present, it is automatically created for you, if a file already
     ///exists, it is truncated and the configuration is written to it.
     ///
-    ///Usage is the same as `write`, but `.await` must be called after along with the usual async rules.
+    ///Usage is the same as `pretty_pretty_write`, but `.await` must be called after along with the usual async rules.
     ///
     ///Returns a `std::io::Result<()>` type dependent on whether the write was successful or not.
-    pub async fn pretty_write_async<T: AsRef<Path>>(&self, path: T, write_options: &WriteOptions) -> std::io::Result<()> {
+    pub async fn pretty_write_async<T: AsRef<Path>>(
+        &self,
+        path: T,
+        write_options: &WriteOptions,
+    ) -> std::io::Result<()> {
         async_fs::write(path.as_ref(), self.unparse(write_options)).await
     }
 }

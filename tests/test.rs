@@ -1,4 +1,4 @@
-use configparser::ini::Ini;
+use configparser::ini::{Ini, WriteOptions};
 use std::error::Error;
 
 #[test]
@@ -255,6 +255,173 @@ Boolcoerce=0
 Int=-31415
 Uint=31415
 Float=3.1415
+"
+    );
+
+    Ok(())
+}
+
+#[test]
+#[cfg(feature = "indexmap")]
+fn pretty_writes_result_is_formatted_correctly() -> Result<(), Box<dyn Error>> {
+    use configparser::ini::IniDefault;
+
+    const OUT_FILE_CONTENTS: &str = "defaultvalues=defaultvalues
+[topsecret]
+KFC=the secret herb is orega-
+Empty string=
+None string
+Password=[in-brackets]
+[Section]
+Key1: Value1
+Key2: this is a haiku
+    spread across separate lines
+    a single value
+Key3: another value
+";
+
+    let mut ini_defaults = IniDefault::default();
+    ini_defaults.case_sensitive = true;
+    ini_defaults.multiline = true;
+    let mut config = Ini::new_from_defaults(ini_defaults);
+    config.read(OUT_FILE_CONTENTS.to_owned())?;
+
+    let mut write_options = WriteOptions::default();
+    write_options.space_around_delimiters = true;
+    write_options.multiline_line_indentation = 2;
+    write_options.blank_lines_between_sections = 1;
+    assert_eq!(
+        config.pretty_writes(&write_options),
+        "defaultvalues = defaultvalues
+
+[topsecret]
+KFC = the secret herb is orega-
+Empty string =
+None string
+Password = [in-brackets]
+
+[Section]
+Key1 = Value1
+Key2 = this is a haiku
+  spread across separate lines
+  a single value
+Key3 = another value
+"
+    );
+
+    Ok(())
+}
+
+#[test]
+#[cfg(feature = "indexmap")]
+#[cfg(feature = "async-std")]
+fn pretty_write_result_is_formatted_correctly() -> Result<(), Box<dyn Error>> {
+    use configparser::ini::IniDefault;
+
+    const OUT_FILE_CONTENTS: &str = "defaultvalues=defaultvalues
+[topsecret]
+KFC=the secret herb is orega-
+Empty string=
+None string
+Password=[in-brackets]
+[Section]
+Key1: Value1
+Key2: this is a haiku
+    spread across separate lines
+    a single value
+Key3: another value
+";
+
+    let mut ini_defaults = IniDefault::default();
+    ini_defaults.case_sensitive = true;
+    ini_defaults.multiline = true;
+    let mut config = Ini::new_from_defaults(ini_defaults);
+    config.read(OUT_FILE_CONTENTS.to_owned())?;
+
+    let mut write_options = WriteOptions::default();
+    write_options.space_around_delimiters = true;
+    write_options.multiline_line_indentation = 2;
+    write_options.blank_lines_between_sections = 1;
+    config.pretty_write("pretty_output.ini", &write_options)?;
+
+    let file_contents = std::fs::read_to_string("pretty_output.ini")?;
+    assert_eq!(
+        file_contents,
+        "defaultvalues = defaultvalues
+
+[topsecret]
+KFC = the secret herb is orega-
+Empty string =
+None string
+Password = [in-brackets]
+
+[Section]
+Key1 = Value1
+Key2 = this is a haiku
+  spread across separate lines
+  a single value
+Key3 = another value
+"
+    );
+
+    Ok(())
+}
+
+#[test]
+#[cfg(feature = "indexmap")]
+#[cfg(feature = "async-std")]
+fn async_pretty_print_result_is_formatted_correctly() -> Result<(), Box<dyn Error>> {
+    use configparser::ini::IniDefault;
+
+    const OUT_FILE_CONTENTS: &str = "defaultvalues=defaultvalues
+[topsecret]
+KFC=the secret herb is orega-
+Empty string=
+None string
+Password=[in-brackets]
+[Section]
+Key1: Value1
+Key2: this is a haiku
+    spread across separate lines
+    a single value
+Key3: another value
+";
+
+    let mut ini_defaults = IniDefault::default();
+    ini_defaults.case_sensitive = true;
+    ini_defaults.multiline = true;
+    let mut config = Ini::new_from_defaults(ini_defaults);
+    config.read(OUT_FILE_CONTENTS.to_owned())?;
+
+    let mut write_options = WriteOptions::default();
+    write_options.space_around_delimiters = true;
+    write_options.multiline_line_indentation = 2;
+    write_options.blank_lines_between_sections = 1;
+    async_std::task::block_on::<_, Result<_, String>>(async {
+        config
+            .pretty_write_async("pretty_output_async.ini", &write_options)
+            .await
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    })?;
+
+    let file_contents = std::fs::read_to_string("pretty_output_async.ini")?;
+    assert_eq!(
+        file_contents,
+        "defaultvalues = defaultvalues
+
+[topsecret]
+KFC = the secret herb is orega-
+Empty string =
+None string
+Password = [in-brackets]
+
+[Section]
+Key1 = Value1
+Key2 = this is a haiku
+  spread across separate lines
+  a single value
+Key3 = another value
 "
     );
 
