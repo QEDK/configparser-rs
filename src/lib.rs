@@ -103,7 +103,7 @@ If you read the above sections carefully, you'll know that 1) all the keys are s
 manner and 3) we can use `getint()` to parse the `Int` value into an `i64`. Let's see that in action.
 
 ```rust
-use configparser::ini::Ini;
+use configparser::ini::{Ini, WriteOptions};
 use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -134,8 +134,15 @@ fn main() -> Result<(), Box<dyn Error>> {
   let innermap = map["topsecret"].clone();
   // Remember that all indexes are stored in lowercase!
 
-  // You can easily write the currently stored configuration to a file like:
+  // You can easily write the currently stored configuration to a file with the `write` method. This creates a compact format with as little spacing as possible:
   config.write("output.ini");
+
+  // You can write the currently stored configuration with more spacing to a file with the `pretty_write` method. You must supply the method with a configuratio specification:
+  let mut write_options = WriteOptions::default(); // The defaults match the formatting used in the `write` method
+  write_options.space_around_delimiters = true;
+  write_options.multiline_line_indentation = 2;
+  write_options.blank_lines_between_sections = 1;
+  config.pretty_write("pretty_output.ini", &write_options);
 
   // If you want to simply mutate the stored hashmap, you can use get_mut_map()
   let map = config.get_mut_map();
