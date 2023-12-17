@@ -26,7 +26,7 @@ use std::path::Path;
 pub struct Ini {
     map: Map<String, Map<String, Option<String>>>,
     default_section: std::string::String,
-    comment_symbols: Vec<char>,
+    comment_symbols: Vec<String>,
     delimiters: Vec<char>,
     boolean_values: HashMap<bool, Vec<String>>,
     case_sensitive: bool,
@@ -63,9 +63,9 @@ pub struct IniDefault {
     ///
     ///let mut config = Ini::new();
     ///let default = config.defaults();
-    ///assert_eq!(default.comment_symbols, vec![';', '#']);
+    ///assert_eq!(default.comment_symbols, vec![";".to_string(), "#".to_string()]);
     ///```
-    pub comment_symbols: Vec<char>,
+    pub comment_symbols: Vec<String>,
     ///Denotes the set delimiters for the key-value pairs.
     ///## Example
     ///```rust
@@ -103,7 +103,7 @@ impl Default for IniDefault {
     fn default() -> Self {
         Self {
             default_section: "default".to_owned(),
-            comment_symbols: vec![';', '#'],
+            comment_symbols: vec![";".to_string(), "#".to_string()],
             delimiters: vec!['=', ':'],
             multiline: false,
             boolean_values: [
@@ -267,7 +267,7 @@ impl Ini {
     ///use configparser::ini::IniDefault;
     ///
     ///let mut default = IniDefault::default();
-    ///default.comment_symbols = vec![';'];
+    ///default.comment_symbols = vec![";".to_string()];
     ///default.delimiters = vec!['='];
     ///let mut config = Ini::new_from_defaults(default.clone());
     ///// Now, load as usual with new defaults:
@@ -346,7 +346,7 @@ impl Ini {
         self.default_section = section.to_owned();
     }
 
-    ///Sets the default comment symbols to the defined character slice (the defaults are `;` and `#`).
+    ///Sets the default comment symbols to the defined character slice (the defaults are `;` and `#`). Strings are also accepted.
     ///Keep in mind that this will remove the default symbols. It must be set before `load()` or `read()` is called in order to take effect.
     ///## Example
     ///```rust
@@ -354,13 +354,17 @@ impl Ini {
     ///
     ///let mut config = Ini::new();
     ///config.set_comment_symbols(&['!', '#']);
+    ///config.set_comment_symbols(&["!", "#", "//"]);   // also allowed
     ///let map = config.load("tests/test.ini").unwrap();
     ///```
     ///Returns nothing.
-    pub fn set_comment_symbols(&mut self, symlist: &[char]) {
-        self.comment_symbols = symlist.to_vec();
+    pub fn set_comment_symbols<T>(&mut self, symlist: T)
+    where
+        T: IntoIterator,
+        T::Item: std::string::ToString,
+    {
+        self.comment_symbols = symlist.into_iter().map(|c| c.to_string()).collect();
     }
-
     ///Sets multiline string support.
     ///It must be set before `load()` or `read()` is called in order to take effect.
     ///## Example
@@ -730,10 +734,12 @@ impl Ini {
         };
 
         for (num, raw_line) in input.lines().enumerate() {
-            let line = match raw_line.find(|c: char| self.comment_symbols.contains(&c)) {
-                Some(idx) => &raw_line[..idx],
-                None => raw_line,
-            };
+            let mut line = raw_line;
+            for comment_symbol in &self.comment_symbols {
+                if let Some(idx) = line.find(comment_symbol) {
+                    line = &line[..idx]
+                }
+            }
 
             let trimmed = line.trim();
 
