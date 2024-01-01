@@ -6,7 +6,8 @@ use indexmap::IndexMap as Map;
 use std::collections::HashMap as Map;
 
 #[cfg(feature = "async-std")]
-use async_std::{fs as async_fs, path::Path as AsyncPath};
+#[cfg(feature = "tokio")]
+use tokio::fs as async_fs;
 
 use std::collections::HashMap;
 use std::convert::AsRef;
@@ -109,14 +110,14 @@ impl Default for IniDefault {
             boolean_values: [
                 (
                     true,
-                    vec!["true", "yes", "t", "y", "on", "1"]
+                    ["true", "yes", "t", "y", "on", "1"]
                         .iter()
                         .map(|&s| s.to_owned())
                         .collect(),
                 ),
                 (
                     false,
-                    vec!["false", "no", "f", "n", "off", "0"]
+                    ["false", "no", "f", "n", "off", "0"]
                         .iter()
                         .map(|&s| s.to_owned())
                         .collect(),
@@ -473,7 +474,7 @@ impl Ini {
         for (section, section_map) in loaded.iter() {
             self.map
                 .entry(section.clone())
-                .or_insert_with(Map::new)
+                .or_default()
                 .extend(section_map.clone());
         }
 
@@ -548,7 +549,7 @@ impl Ini {
         for (section, section_map) in loaded.iter() {
             self.map
                 .entry(section.clone())
-                .or_insert_with(Map::new)
+                .or_default()
                 .extend(section_map.clone());
         }
 
@@ -767,7 +768,7 @@ impl Ini {
                     }
                 };
 
-                let valmap = map.entry(section.clone()).or_insert_with(Map::new);
+                let valmap = map.entry(section.clone()).or_default();
 
                 let val = valmap
                     .entry(key.clone())
@@ -786,7 +787,7 @@ impl Ini {
                 continue;
             }
 
-            let valmap = map.entry(section.clone()).or_insert_with(Map::new);
+            let valmap = map.entry(section.clone()).or_default();
 
             match trimmed.find(&self.delimiters[..]) {
                 Some(delimiter) => {
@@ -1199,7 +1200,7 @@ impl Ini {
     ///
     ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
     ///Use `get_mut_map()` if you want a mutable reference.
-    pub async fn load_async<T: AsRef<AsyncPath>>(
+    pub async fn load_async<T: AsRef<Path>>(
         &mut self,
         path: T,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
@@ -1233,7 +1234,7 @@ impl Ini {
     ///
     ///Returns `Ok(map)` with a clone of the stored `Map` if no errors are thrown or else `Err(error_string)`.
     ///Use `get_mut_map()` if you want a mutable reference.
-    pub async fn load_and_append_async<T: AsRef<AsyncPath>>(
+    pub async fn load_and_append_async<T: AsRef<Path>>(
         &mut self,
         path: T,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
