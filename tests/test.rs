@@ -1,4 +1,4 @@
-use configparser::ini::{Ini};
+use configparser::ini::{Ini, WriteOptions};
 use std::error::Error;
 
 #[test]

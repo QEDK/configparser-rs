@@ -86,5 +86,13 @@
   - **BREAKING** Added Python-esque support for `:` as a delimiter.
   - :new: Add support for case-sensitive maps with automatic handling under the hood.
   - :hammer: Fixed buggy setters which went uncaught, to preserve case-insensitive nature.
+- 2.0.1
+  - Add first-class support for setting, loading and reading defaults
+  - New available struct `IniDefault` for fast templating
+- 2.1.0
+  - 😯 **BREAKING** Parse keys with higher priority, both brackets `[` and `]` can be part of values now.
+  - ℹ Only affects current behaviour **iff** your section headers had comments in front of them like, `comment[HEADER]`, you can fix it by adding the comment after the header like `[HEADER]#comment` or otherwise.
+  - 🚀 `load()` and `write()` work with `Path`-like arguments now.
+  - 📜 Add docs for new struct
 
 Older changelogs are preserved here, current changelog is present in [README.md](README.md).

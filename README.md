@@ -1,5 +1,5 @@
 # configparser
-[![Build Status](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml/badge.svg)](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2023)](https://github.com/QEDK/configparser-rs)
+[![Build Status](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml/badge.svg)](https://github.com/QEDK/configparser-rs/actions/workflows/rust.yaml) [![Crates.io](https://img.shields.io/crates/l/configparser?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/configparser?color=black)](https://crates.io/crates/configparser) [![Released API docs](https://docs.rs/configparser/badge.svg)](https://docs.rs/configparser) [![Maintenance](https://img.shields.io/maintenance/yes/2024)](https://github.com/QEDK/configparser-rs)
 
 This crate provides the `Ini` struct which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
 
@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "3.0.3"
+configparser = "3.0.4"
 ```
 
 ## ➕ Supported datatypes
@@ -176,16 +176,16 @@ The `Ini` struct offers great support for type conversion and type setting safel
 You can activate it by adding it as a feature like this:
 ```TOML
 [dependencies]
-configparser = { version = "3.0.2", features = ["indexmap"] }
+configparser = { version = "3.0.4", features = ["indexmap"] }
 ```
 
- - *async-std*: Activating the `async-std` feature adds asynchronous functions for reading from (`load_async()`) and
-   writing to (`write_async()`) files using [async-std](https://crates.io/crates/async-std).
+ - *tokio*: Activating the `tokio` feature adds asynchronous functions for reading from (`load_async()`) and
+   writing to (`write_async()`) files using [tokio](https://crates.io/crates/tokio).
 
 You can activate it by adding it as a feature like this:
 ```TOML
 [dependencies]
-configparser = { version = "3.0.2", features = ["async-std"] }
+configparser = { version = "3.0.4", features = ["tokio"] }
 ```
 
 ## 📜 License
@@ -206,14 +206,6 @@ additional terms or conditions.
 ## 🆕 Changelog
 
 Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 2.0.1
-  - Add first-class support for setting, loading and reading defaults
-  - New available struct `IniDefault` for fast templating
-- 2.1.0
-  - 😯 **BREAKING** Parse keys with higher priority, both brackets `[` and `]` can be part of values now.
-  - ℹ Only affects current behaviour **iff** your section headers had comments in front of them like, `comment[HEADER]`, you can fix it by adding the comment after the header like `[HEADER]#comment` or otherwise.
-  - 🚀 `load()` and `write()` work with `Path`-like arguments now.
-  - 📜 Add docs for new struct
 - 3.0.0
   - 😅 **BREAKING** `IniDefault` is now a non-exhaustive struct, this will make future upgrades easier and non-breaking in nature. This change might also have a few implications in updating your existing codebase, please read the [official docs](https://doc.rust-lang.org/reference/attributes/type_system.html#the-non_exhaustive-attribute) for more guidance.
   - `IniDefault` is now internally used for generating defaults, reducing crate size.
@@ -226,10 +218,14 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Adds support for multi-line key-value pairs.
   - Adds `async-std` feature for asynchronous file operations.
   - Some performance optimizations.
-- 3.0.3 (**STABLE**)
+- 3.0.3 
   - Add default empty line on empty strings.
   - Feature to append to existing `Ini` objects.
   - Minor lint fixes.
+- 3.0.4 (**STABLE**)
+  - Adds pretty printing functionality
+  - Replaces `async-std` with `tokio` as the available async runtime
+  - *The `async-std` feature will be deprecated in a future release*
 
 ### 🔜 Future plans
 
