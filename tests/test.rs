@@ -534,7 +534,7 @@ fn multiline_on() -> Result<(), Box<dyn Error>> {
     assert_eq!(config.get("Section", "Key2").unwrap(), "Value Two");
     assert_eq!(
         config.get("Section", "Key3").unwrap(),
-        "this is a haiku\nspread across separate lines\na single value"
+        "this is a haiku\nspread across separate lines\n\na single value"
     );
     assert_eq!(config.get("Section", "Key4").unwrap(), "Four");
 
@@ -545,6 +545,7 @@ Key1=Value1
 Key2=Value Two
 Key3=this is a haiku
     spread across separate lines
+
     a single value
 Key4=Four
 "
