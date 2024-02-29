@@ -674,8 +674,10 @@ impl Ini {
 
                         for line in lines {
                             out.push_str(LINE_ENDING);
-                            out.push_str(" ".repeat(indent).as_ref());
-                            out.push_str(line);
+                            if !line.is_empty() {
+                                out.push_str(" ".repeat(indent).as_ref());
+                                out.push_str(line);
+                            }
                         }
                     } else {
                         out.push_str(value);
@@ -734,6 +736,9 @@ impl Ini {
             }
         };
 
+        // Track blank lines to preserve them in multiline values.
+        let mut blank_lines = 0usize;
+
         for (num, raw_line) in input.lines().enumerate() {
             let line = match raw_line.find(|c: char| self.comment_symbols.contains(&c)) {
                 Some(idx) => &raw_line[..idx],
@@ -742,7 +747,13 @@ impl Ini {
 
             let trimmed = line.trim();
 
+            // Skip empty lines, but keep track of them for multiline values.
             if trimmed.is_empty() {
+                // If a line is _just_ a comment (regardless of whether it's preceded by
+                // whitespace), ignore it.
+                if line == raw_line {
+                    blank_lines += 1;
+                }
                 continue;
             }
 
@@ -779,41 +790,52 @@ impl Ini {
                     .or_insert_with(|| Some(String::new()));
 
                 match val {
-                    Some(x) => {
-                        x.push_str(LINE_ENDING);
-                        x.push_str(trimmed);
+                    Some(s) => {
+                        for _ in 0..blank_lines {
+                            s.push_str(LINE_ENDING);
+                        }
+                        s.push_str(LINE_ENDING);
+                        s.push_str(trimmed);
                     }
                     None => {
-                        *val = Some(format!("{}{}", LINE_ENDING, trimmed));
+                        let mut s = String::with_capacity(
+                            (blank_lines + 1) * LINE_ENDING.len() + trimmed.len(),
+                        );
+                        for _ in 0..blank_lines {
+                            s.push_str(LINE_ENDING);
+                        }
+                        s.push_str(LINE_ENDING);
+                        s.push_str(trimmed);
+                        *val = Some(s);
                     }
                 }
+            } else {
+                let valmap = map.entry(section.clone()).or_default();
 
-                continue;
-            }
+                match trimmed.find(&self.delimiters[..]) {
+                    Some(delimiter) => {
+                        let key = caser(trimmed[..delimiter].trim());
 
-            let valmap = map.entry(section.clone()).or_default();
+                        if key.is_empty() {
+                            return Err(format!("line {}:{}: Key cannot be empty", num, delimiter));
+                        } else {
+                            current_key = Some(key.clone());
 
-            match trimmed.find(&self.delimiters[..]) {
-                Some(delimiter) => {
-                    let key = caser(trimmed[..delimiter].trim());
+                            let value = trimmed[delimiter + 1..].trim().to_owned();
 
-                    if key.is_empty() {
-                        return Err(format!("line {}:{}: Key cannot be empty", num, delimiter));
-                    } else {
+                            valmap.insert(key, Some(value));
+                        }
+                    }
+                    None => {
+                        let key = caser(trimmed);
                         current_key = Some(key.clone());
 
-                        let value = trimmed[delimiter + 1..].trim().to_owned();
-
-                        valmap.insert(key, Some(value));
+                        valmap.insert(key, None);
                     }
                 }
-                None => {
-                    let key = caser(trimmed);
-                    current_key = Some(key.clone());
-
-                    valmap.insert(key, None);
-                }
             }
+
+            blank_lines = 0;
         }
 
         Ok(map)
