@@ -6,7 +6,7 @@ use std::error::Error;
 fn non_cs() -> Result<(), Box<dyn Error>> {
     let mut config = Ini::new();
     let map = config.load("tests/test.ini")?;
-    config.set_comment_symbols(&[';', '#', '!']);
+    config.set_comment_symbols([";", "#", "!", "//"]);
     let inpstring = config.read(
         "defaultvalues=defaultvalues
 		[topsecret]
@@ -16,7 +16,7 @@ fn non_cs() -> Result<(), Box<dyn Error>> {
 		None string
         Password=[in-brackets]
 		[ spacing ]
-			indented=indented
+			indented=indented                   // String comment
 		not indented = not indented				;testcomment
 		!modified comment
 		[values]#another comment
