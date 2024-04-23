@@ -761,6 +761,8 @@ impl Ini {
                 (Some(0), Some(end)) => {
                     section = caser(trimmed[1..end].trim());
 
+                    map.entry(section.clone()).or_default();
+
                     continue;
                 }
                 (Some(0), None) => {
