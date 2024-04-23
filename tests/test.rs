@@ -232,6 +232,25 @@ fn cs() -> Result<(), Box<dyn Error>> {
 }
 
 #[test]
+fn ensure_empty_sections_exist() -> Result<(), Box<dyn Error>> {
+    const FILE_CONTENTS: &str = "
+[basic_section]
+basic_option=basic_value
+[empty_section]
+";
+
+    let mut config = Ini::new();
+    config.read(FILE_CONTENTS.to_owned())?;
+
+    assert_eq!(
+        config.sections(),
+        vec![String::from("basic_section"), String::from("empty_section")]
+    );
+
+    Ok(())
+}
+
+#[test]
 #[cfg(feature = "indexmap")]
 fn sort_on_write() -> Result<(), Box<dyn Error>> {
     let mut config = Ini::new_cs();
