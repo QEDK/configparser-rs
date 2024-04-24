@@ -1,5 +1,9 @@
-use configparser::ini::{Ini, WriteOptions};
+use configparser::ini::Ini;
+use std::collections::HashSet;
 use std::error::Error;
+
+#[cfg(feature = "indexmap")]
+use configparser::ini::WriteOptions;
 
 #[test]
 #[allow(clippy::approx_constant)]
@@ -243,8 +247,8 @@ basic_option=basic_value
     config.read(FILE_CONTENTS.to_owned())?;
 
     assert_eq!(
-        config.sections(),
-        vec![String::from("basic_section"), String::from("empty_section")]
+        HashSet::from_iter(config.sections().into_iter()),
+        HashSet::from([String::from("basic_section"), String::from("empty_section")])
     );
 
     Ok(())
