@@ -255,6 +255,81 @@ basic_option=basic_value
 }
 
 #[test]
+fn inline_comment_symbols() -> Result<(), Box<dyn Error>> {
+    const FILE_CONTENTS: &str = "
+[basic_section]
+; basic comment
+ ; comment with space
+! extra_comment=
+basic_option=value
+basic_with_comment=value ; Simple comment
+basic_with_extra_inline=value ! comment
+empty_option=
+";
+
+    let mut config = Ini::new();
+    config.read(FILE_CONTENTS.to_owned())?;
+
+    assert_eq!(
+        config.get("basic_section", "basic_option"),
+        Some(String::from("value"))
+    );
+    assert_eq!(
+        config.get("basic_section", "basic_with_comment"),
+        Some(String::from("value"))
+    );
+    assert_eq!(
+        config.get("basic_section", "basic_with_extra_inline"),
+        Some(String::from("value ! comment"))
+    );
+    assert_eq!(
+        config.get("basic_section", "! extra_comment"),
+        Some(String::from(""))
+    );
+
+    assert_eq!(
+        config.get("basic_section", "empty_option"),
+        Some(String::from(""))
+    );
+
+    config.set_inline_comment_symbols(Some(&['!']));
+
+    config.read(FILE_CONTENTS.to_owned())?;
+
+    assert_eq!(
+        config.get("basic_section", "basic_option"),
+        Some(String::from("value"))
+    );
+    assert_eq!(
+        config.get("basic_section", "basic_with_comment"),
+        Some(String::from("value ; Simple comment"))
+    );
+    assert_eq!(
+        config.get("basic_section", "basic_with_extra_inline"),
+        Some(String::from("value"))
+    );
+
+    config.set_inline_comment_symbols(Some(&[]));
+
+    config.read(FILE_CONTENTS.to_owned())?;
+
+    assert_eq!(
+        config.get("basic_section", "basic_option"),
+        Some(String::from("value"))
+    );
+    assert_eq!(
+        config.get("basic_section", "basic_with_comment"),
+        Some(String::from("value ; Simple comment"))
+    );
+    assert_eq!(
+        config.get("basic_section", "basic_with_extra_inline"),
+        Some(String::from("value ! comment"))
+    );
+
+    Ok(())
+}
+
+#[test]
 #[cfg(feature = "indexmap")]
 fn sort_on_write() -> Result<(), Box<dyn Error>> {
     let mut config = Ini::new_cs();

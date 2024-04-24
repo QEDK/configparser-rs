@@ -32,6 +32,7 @@ pub struct Ini {
     map: Map<String, Map<String, Option<String>>>,
     default_section: std::string::String,
     comment_symbols: Vec<char>,
+    inline_comment_symbols: Option<Vec<char>>,
     delimiters: Vec<char>,
     boolean_values: HashMap<bool, Vec<String>>,
     case_sensitive: bool,
@@ -71,6 +72,17 @@ pub struct IniDefault {
     ///assert_eq!(default.comment_symbols, vec![';', '#']);
     ///```
     pub comment_symbols: Vec<char>,
+    ///Denotes the set of inline comment symbols for the object. The default of
+    ///`None` means to fall back to the normal comment symbols.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///let default = config.defaults();
+    ///assert_eq!(default.inline_comment_symbols, None);
+    ///```
+    pub inline_comment_symbols: Option<Vec<char>>,
     ///Denotes the set delimiters for the key-value pairs.
     ///## Example
     ///```rust
@@ -109,6 +121,7 @@ impl Default for IniDefault {
         Self {
             default_section: "default".to_owned(),
             comment_symbols: vec![';', '#'],
+            inline_comment_symbols: None,
             delimiters: vec!['=', ':'],
             multiline: false,
             boolean_values: [
@@ -285,6 +298,7 @@ impl Ini {
             map: Map::new(),
             default_section: defaults.default_section,
             comment_symbols: defaults.comment_symbols,
+            inline_comment_symbols: defaults.inline_comment_symbols,
             delimiters: defaults.delimiters,
             boolean_values: defaults.boolean_values,
             case_sensitive: defaults.case_sensitive,
@@ -305,6 +319,7 @@ impl Ini {
         IniDefault {
             default_section: self.default_section.to_owned(),
             comment_symbols: self.comment_symbols.to_owned(),
+            inline_comment_symbols: self.inline_comment_symbols.to_owned(),
             delimiters: self.delimiters.to_owned(),
             boolean_values: self.boolean_values.to_owned(),
             case_sensitive: self.case_sensitive,
@@ -330,6 +345,7 @@ impl Ini {
     pub fn load_defaults(&mut self, defaults: IniDefault) {
         self.default_section = defaults.default_section;
         self.comment_symbols = defaults.comment_symbols;
+        self.inline_comment_symbols = defaults.inline_comment_symbols;
         self.delimiters = defaults.delimiters;
         self.boolean_values = defaults.boolean_values;
         self.case_sensitive = defaults.case_sensitive;
@@ -364,6 +380,21 @@ impl Ini {
     ///Returns nothing.
     pub fn set_comment_symbols(&mut self, symlist: &[char]) {
         self.comment_symbols = symlist.to_vec();
+    }
+
+    ///Sets the default inline comment symbols to the defined character slice (the default is `None` which falls back to the normal comment symbols).
+    ///Keep in mind that this will remove the default symbols. It must be set before `load()` or `read()` is called in order to take effect.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///config.set_inline_comment_symbols(Some(&['!', '#']));
+    ///let map = config.load("tests/test.ini").unwrap();
+    ///```
+    ///Returns nothing.
+    pub fn set_inline_comment_symbols(&mut self, symlist: Option<&[char]>) {
+        self.inline_comment_symbols = symlist.map(|val| val.to_vec());
     }
 
     ///Sets multiline string support.
@@ -724,6 +755,10 @@ impl Ini {
 
     ///Private function that parses ini-style syntax into a Map.
     fn parse(&self, input: String) -> Result<Map<String, Map<String, Option<String>>>, String> {
+        let inline_comment_symbols: &[char] = self
+            .inline_comment_symbols
+            .as_deref()
+            .unwrap_or_else(|| self.comment_symbols.as_ref());
         let mut map: Map<String, Map<String, Option<String>>> = Map::new();
         let mut section = self.default_section.clone();
         let mut current_key: Option<String> = None;
@@ -740,22 +775,28 @@ impl Ini {
         let mut blank_lines = 0usize;
 
         for (num, raw_line) in input.lines().enumerate() {
-            let line = match raw_line.find(|c: char| self.comment_symbols.contains(&c)) {
-                Some(idx) => &raw_line[..idx],
-                None => raw_line,
+            let line = raw_line.trim();
+
+            // If the line is _just_ a comment, skip it entirely.
+            let line = match line.find(|c: char| self.comment_symbols.contains(&c)) {
+                Some(0) => continue,
+                Some(_) | None => line,
+            };
+
+            let line = line.trim();
+
+            // Skip empty lines, but keep track of them for multiline values.
+            if line.is_empty() {
+                blank_lines += 1;
+                continue;
+            }
+
+            let line = match line.find(|c: char| inline_comment_symbols.contains(&c)) {
+                Some(idx) => &line[..idx],
+                None => line,
             };
 
             let trimmed = line.trim();
-
-            // Skip empty lines, but keep track of them for multiline values.
-            if trimmed.is_empty() {
-                // If a line is _just_ a comment (regardless of whether it's preceded by
-                // whitespace), ignore it.
-                if line == raw_line {
-                    blank_lines += 1;
-                }
-                continue;
-            }
 
             match (trimmed.find('['), trimmed.rfind(']')) {
                 (Some(0), Some(end)) => {
@@ -774,7 +815,7 @@ impl Ini {
                 _ => {}
             }
 
-            if line.starts_with(char::is_whitespace) && self.multiline {
+            if raw_line.starts_with(char::is_whitespace) && self.multiline {
                 let key = match current_key.as_ref() {
                     Some(x) => x,
                     None => {
