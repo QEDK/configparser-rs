@@ -22,29 +22,25 @@ jobs:
           - nightly
           
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: ${{ matrix.rust }}
-          override: true
           components: rustfmt
 
-      - uses: actions-rs/cargo@v1
+      - uses: Swatinem/rust-cache@v2
         with:
-          command: build
-          args: --release --all-features -v
+          cache-on-failure: true
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all-features -v
+      - name: build
+        run: cargo build --release --all-features -v
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - name: test
+        run: cargo test --all-features -v
+
+      - name: fmt 
+        run: cargo fmt --all -- --check
 
       - name: Security audit
         uses: actions-rs/audit-check@v1
