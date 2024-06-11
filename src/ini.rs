@@ -1230,7 +1230,14 @@ impl Ini {
         } else {
             section.to_lowercase()
         };
-        self.map.remove(&section)
+        #[cfg(not(feature = "indexmap"))]
+        {
+            self.map.remove(&section)
+        }
+        #[cfg(feature = "indexmap")]
+        {
+            self.map.swap_remove(&section)
+        }
     }
 
     ///Removes a key from a section in the hashmap, returning the value attached to the key if it was previously in the map.
@@ -1250,7 +1257,14 @@ impl Ini {
     ///Returns `Some(Option<String>)` if the value exists or else, `None`.
     pub fn remove_key(&mut self, section: &str, key: &str) -> Option<Option<String>> {
         let (section, key) = self.autocase(section, key);
-        self.map.get_mut(&section)?.remove(&key)
+        #[cfg(not(feature = "indexmap"))]
+        {
+            self.map.get_mut(&section)?.remove(&key)
+        }
+        #[cfg(feature = "indexmap")]
+        {
+            self.map.get_mut(&section)?.swap_remove(&key)
+        }
     }
 }
 
