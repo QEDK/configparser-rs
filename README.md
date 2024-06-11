@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "3.0.4"
+configparser = "3.0.5"
 ```
 
 ## ➕ Supported datatypes
@@ -176,7 +176,7 @@ The `Ini` struct offers great support for type conversion and type setting safel
 You can activate it by adding it as a feature like this:
 ```TOML
 [dependencies]
-configparser = { version = "3.0.4", features = ["indexmap"] }
+configparser = { version = "3.1.0", features = ["indexmap"] }
 ```
 
  - *tokio*: Activating the `tokio` feature adds asynchronous functions for reading from (`load_async()`) and
@@ -185,7 +185,7 @@ configparser = { version = "3.0.4", features = ["indexmap"] }
 You can activate it by adding it as a feature like this:
 ```TOML
 [dependencies]
-configparser = { version = "3.0.4", features = ["tokio"] }
+configparser = { version = "3.1.0", features = ["tokio"] }
 ```
 
 ## 📜 License
@@ -222,10 +222,15 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Add default empty line on empty strings.
   - Feature to append to existing `Ini` objects.
   - Minor lint fixes.
-- 3.0.4 (**STABLE**)
+- 3.0.4
   - Adds pretty printing functionality
   - Replaces `async-std` with `tokio` as the available async runtime
   - *The `async-std` feature will be deprecated in a future release*
+- 3.1.0 (**STABLE**)
+  - `async-std` has been deprecated
+  - Fixes a bug where multiline values did not preserve newlines
+  - Fixes a bug where empty sections were removed
+  - Adds a feature to support inline comments
 
 ### 🔜 Future plans
 

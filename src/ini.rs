@@ -4,12 +4,6 @@
 use indexmap::IndexMap as Map;
 #[cfg(not(feature = "indexmap"))]
 use std::collections::HashMap as Map;
-
-#[deprecated(
-    since = "3.0.4",
-    note = "async-std runtime has been replaced with tokio"
-)]
-#[cfg(feature = "async-std")]
 #[cfg(feature = "tokio")]
 use tokio::fs as async_fs;
 
