@@ -532,10 +532,7 @@ impl Ini {
         &mut self,
         input: String,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
-        self.map = match self.parse(input) {
-            Err(why) => return Err(why),
-            Ok(map) => map,
-        };
+        self.map = self.parse(input)?;
         Ok(self.map.clone())
     }
 
@@ -570,10 +567,7 @@ impl Ini {
         &mut self,
         input: String,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
-        let loaded = match self.parse(input) {
-            Err(why) => return Err(why),
-            Ok(map) => map,
-        };
+        let loaded = self.parse(input)?;
 
         for (section, section_map) in loaded.iter() {
             self.map
