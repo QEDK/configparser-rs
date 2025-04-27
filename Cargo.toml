@@ -1,6 +1,6 @@
 [package]
 name = "configparser"
-version = "3.1.0"
+version = "3.2.0"
 authors = ["QEDK <qedk.en@gmail.com>"]
 edition = "2021"
 description = "A simple configuration parsing utility with no dependencies that allows you to parse INI and ini-style syntax. You can use this to write Rust programs which can be customized by end users easily."
@@ -19,6 +19,9 @@ maintenance = { status = "actively-developed" }
 indexmap = { version = "^2.9", optional = true }
 tokio = { version = "^1.44", optional = true, features = ["fs"] }
 serde = { version = "^1.0", optional = true }
+
+[features]
+serde = ["dep:serde", "indexmap/serde"]
 
 [dev-dependencies]
 tokio = { version = "^1.44", features = ["fs", "macros", "rt-multi-thread"] }

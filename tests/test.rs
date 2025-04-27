@@ -708,3 +708,58 @@ fn serde_indexmap_roundtrip() -> Result<(), Box<dyn Error>> {
     );
     Ok(())
 }
+
+#[test]
+#[cfg(feature = "serde")]
+fn serde_multiline_roundtrip() -> Result<(), Box<dyn Error>> {
+    // 1. Build a case-sensitive Ini with multiline enabled
+    let mut orig = Ini::new();
+    orig.set_multiline(true);
+
+    // 2. Load the multiline fixture
+    let map1 = orig.load("tests/test_multiline.ini")?;
+    // 3. Capture the Key3 value before Serde
+    let before = orig.get("Section", "Key3").unwrap();
+
+    // 4. Serialize to JSON and back
+    let json = serde_json::to_string(&orig)?;
+    let mut deser: Ini = serde_json::from_str(&json)?;
+
+    // 5. Re-enable multiline on the deserialized Ini
+    deser.set_multiline(true);
+    let after = deser.get("Section", "Key3").unwrap();
+
+    // 6. The entire map should match and Key3 must survive intact
+    let map2 = deser.get_map().unwrap();
+    assert_eq!(map1, map2);
+    assert_eq!(after, before);
+
+    Ok(())
+}
+
+#[test]
+#[cfg(feature = "serde")]
+fn serde_case_sensitive_roundtrip() -> Result<(), Box<dyn Error>> {
+    // 1. Load in case-sensitive mode
+    let mut orig = Ini::new_cs();
+    let map1 = orig.load("tests/test.ini")?;
+    // 2. Check that mixed-case keys work, lowercase doesn't
+    let v1 = orig.get("default", "defaultvalues").unwrap();
+    assert!(orig.get("default", "DefaultValues").is_none());
+
+    // 3. Serde round-trip
+    let json = serde_json::to_string(&orig)?;
+    let deser_plain: Ini = serde_json::from_str(&json)?;
+    let map2 = deser_plain.get_map().unwrap();
+
+    // 4. Reconstruct a case-sensitive Ini and inject the map
+    let mut deser_cs = Ini::new_cs();
+    *deser_cs.get_mut_map() = map2;
+
+    // 5. Assert the exact-case key still exists and lowercase still fails
+    let v2 = deser_cs.get("default", "defaultvalues").unwrap();
+    assert_eq!(v2, v1);
+    assert!(deser_cs.get("default", "DefaultValues").is_none());
+
+    Ok(())
+}
