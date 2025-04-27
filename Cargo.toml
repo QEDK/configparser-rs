@@ -1,7 +1,7 @@
 [package]
 name = "configparser"
 version = "3.2.0"
-authors = ["QEDK <qedk.en@gmail.com>"]
+authors = ["QEDK <hi@qedk.xyz>"]
 edition = "2021"
 description = "A simple configuration parsing utility with no dependencies that allows you to parse INI and ini-style syntax. You can use this to write Rust programs which can be customized by end users easily."
 homepage = "https://github.com/QEDK/configparser-rs"

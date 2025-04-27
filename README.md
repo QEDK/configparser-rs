@@ -205,11 +205,7 @@ additional terms or conditions.
 
 ## 🆕 Changelog
 
-Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 3.0.0
-  - 😅 **BREAKING** `IniDefault` is now a non-exhaustive struct, this will make future upgrades easier and non-breaking in nature. This change might also have a few implications in updating your existing codebase, please read the [official docs](https://doc.rust-lang.org/reference/attributes/type_system.html#the-non_exhaustive-attribute) for more guidance.
-  - `IniDefault` is now internally used for generating defaults, reducing crate size.
-  - 🚀 There is now a new optional `indexmap` feature that preserves insertion order of your loaded configurations.
+Old changelogs are visible in the commit history.
 - 3.0.1
   - Uses `CRLF` line endings for Windows files.
   - Bumps crate to 2021 edition.
@@ -233,6 +229,7 @@ Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
   - Adds a feature to support inline comments
 - 3.2.0
   - `async-std` has been removed
+  - 🎉 Implements serde support
 
 ### 🔜 Future plans
 
