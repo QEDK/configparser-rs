@@ -412,7 +412,6 @@ Key3 = another value
 
 #[test]
 #[cfg(feature = "indexmap")]
-#[cfg(feature = "async-std")]
 #[cfg(feature = "tokio")]
 fn pretty_write_result_is_formatted_correctly() -> Result<(), Box<dyn Error>> {
     use configparser::ini::IniDefault;
@@ -468,7 +467,6 @@ Key3 = another value
 
 #[tokio::test]
 #[cfg(feature = "indexmap")]
-#[cfg(feature = "async-std")]
 #[cfg(feature = "tokio")]
 async fn async_pretty_print_result_is_formatted_correctly() -> Result<(), Box<dyn Error>> {
     use configparser::ini::IniDefault;
@@ -526,7 +524,6 @@ Key3 = another value
 }
 
 #[tokio::test]
-#[cfg(feature = "async-std")]
 #[cfg(feature = "tokio")]
 async fn async_load_write() -> Result<(), Box<dyn Error>> {
     const OUT_FILE_CONTENTS: &str = "defaultvalues=defaultvalues
@@ -570,7 +567,6 @@ async fn async_load_write() -> Result<(), Box<dyn Error>> {
 }
 
 #[tokio::test]
-#[cfg(feature = "async-std")]
 #[cfg(feature = "tokio")]
 async fn async_load_and_append() -> Result<(), Box<dyn Error>> {
     let mut sync_content = Ini::new();
@@ -649,5 +645,59 @@ Key4=Four
 "
     );
 
+    Ok(())
+}
+
+#[test]
+#[cfg(feature = "serde")]
+fn serde_roundtrip() -> Result<(), Box<dyn Error>> {
+    // 1. Load original from file
+    let mut original = Ini::new();
+    let map1 = original.load("tests/test.ini")?;
+
+    // 2. Serialize to JSON
+    let json = serde_json::to_string(&original)?;
+    
+    // 3. Deserialize back
+    let deserialized: Ini = serde_json::from_str(&json)?;
+    let map2 = deserialized.get_map()
+        .expect("deserialized map should be non-empty");
+
+    // 4a. Quick equality check on the entire map
+    assert_eq!(map1, map2, "entire maps must match");
+
+    // 4b. Cross-check every section, key, and value
+    for (section, secmap) in &map1 {
+        // Ensure section exists
+        let sec2 = map2.get(section)
+            .unwrap_or_else(|| panic!("section `{}` missing", section));
+        for (key, val1) in secmap {
+            let val2 = sec2.get(key)
+                .unwrap_or_else(|| panic!("key `{}` missing in section `{}`", key, section));
+            assert_eq!(
+                val1, val2,
+                "mismatch at [{}] {}: {:?} != {:?}",
+                section, key, val1, val2
+            );
+        }
+    }
+
+    Ok(())
+}
+
+#[test]
+#[cfg(all(feature = "serde", feature = "indexmap"))]
+fn serde_indexmap_roundtrip() -> Result<(), Box<dyn Error>> {
+    // Same as above but with IndexMap ordering preserved
+    let mut original = Ini::new();
+    let map1 = original.load("tests/test.ini")?;
+
+    let json = serde_json::to_string(&original)?;
+    let deserialized: Ini = serde_json::from_str(&json)?;
+    let map2 = deserialized.get_map()
+        .expect("deserialized map should be non-empty");
+
+    // Because IndexMap preserves insertion order, we still use equality
+    assert_eq!(map1, map2, "IndexMap-backed maps must match in content and order");
     Ok(())
 }

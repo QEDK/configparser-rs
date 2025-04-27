@@ -6,6 +6,10 @@ use indexmap::IndexMap as Map;
 use std::collections::HashMap as Map;
 #[cfg(feature = "tokio")]
 use tokio::fs as async_fs;
+#[cfg(feature = "serde")]
+use serde::ser::{Serialize, Serializer};
+#[cfg(feature = "serde")]
+use serde::de::{Deserialize, Deserializer};
 
 use std::collections::HashMap;
 use std::convert::AsRef;
@@ -31,6 +35,57 @@ pub struct Ini {
     boolean_values: HashMap<bool, Vec<String>>,
     case_sensitive: bool,
     multiline: bool,
+}
+
+#[cfg(all(feature = "serde", not(feature = "indexmap")))]
+impl Serialize for Ini {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        // Delegate serialization to the internal map only
+        self.map.serialize(serializer)
+    }
+}
+
+#[cfg(all(feature = "serde", not(feature = "indexmap")))]
+impl<'de> Deserialize<'de> for Ini {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        // First, deserialize the raw map
+        let map = Map::<String, Map<String, Option<String>>>::deserialize(deserializer)
+            .map_err(serde::de::Error::custom)?;
+        // Build an Ini with defaults, then replace its map
+        let mut ini = Ini::new();
+        ini.map = map;
+        Ok(ini)
+    }
+}
+
+#[cfg(all(feature = "serde", feature = "indexmap"))]
+impl Serialize for Ini {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        // Delegate to IndexMap’s Serialize impl
+        serde::Serialize::serialize(&self.map, serializer)
+    }
+}
+
+#[cfg(all( feature = "serde", feature = "indexmap"))]
+impl<'de> Deserialize<'de> for Ini {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let map = serde::Deserialize::deserialize(deserializer)?;
+        let mut ini = Ini::new();
+        ini.map = map;
+        Ok(ini)
+    }
 }
 
 ///The `IniDefault` struct serves as a template to create other `Ini` objects from. It can be used to store and load
@@ -1262,7 +1317,7 @@ impl Ini {
     }
 }
 
-#[cfg(feature = "async-std")]
+#[cfg(feature = "tokio")]
 impl Ini {
     ///Loads a file asynchronously from a defined path, parses it and puts the hashmap into our struct.
     ///At one time, it only stores one configuration, so each call to `load()` or `read()` will clear the existing `Map`, if present.
