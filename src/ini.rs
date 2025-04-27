@@ -2,14 +2,14 @@
 //!See the [implementation](https://docs.rs/configparser/*/configparser/ini/struct.Ini.html) documentation for more details.
 #[cfg(feature = "indexmap")]
 use indexmap::IndexMap as Map;
+#[cfg(feature = "serde")]
+use serde::de::{Deserialize, Deserializer};
+#[cfg(feature = "serde")]
+use serde::ser::{Serialize, Serializer};
 #[cfg(not(feature = "indexmap"))]
 use std::collections::HashMap as Map;
 #[cfg(feature = "tokio")]
 use tokio::fs as async_fs;
-#[cfg(feature = "serde")]
-use serde::ser::{Serialize, Serializer};
-#[cfg(feature = "serde")]
-use serde::de::{Deserialize, Deserializer};
 
 use std::collections::HashMap;
 use std::convert::AsRef;
@@ -75,7 +75,7 @@ impl Serialize for Ini {
     }
 }
 
-#[cfg(all( feature = "serde", feature = "indexmap"))]
+#[cfg(all(feature = "serde", feature = "indexmap"))]
 impl<'de> Deserialize<'de> for Ini {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where

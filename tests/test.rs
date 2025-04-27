@@ -657,10 +657,11 @@ fn serde_roundtrip() -> Result<(), Box<dyn Error>> {
 
     // 2. Serialize to JSON
     let json = serde_json::to_string(&original)?;
-    
+
     // 3. Deserialize back
     let deserialized: Ini = serde_json::from_str(&json)?;
-    let map2 = deserialized.get_map()
+    let map2 = deserialized
+        .get_map()
         .expect("deserialized map should be non-empty");
 
     // 4a. Quick equality check on the entire map
@@ -669,10 +670,12 @@ fn serde_roundtrip() -> Result<(), Box<dyn Error>> {
     // 4b. Cross-check every section, key, and value
     for (section, secmap) in &map1 {
         // Ensure section exists
-        let sec2 = map2.get(section)
+        let sec2 = map2
+            .get(section)
             .unwrap_or_else(|| panic!("section `{}` missing", section));
         for (key, val1) in secmap {
-            let val2 = sec2.get(key)
+            let val2 = sec2
+                .get(key)
                 .unwrap_or_else(|| panic!("key `{}` missing in section `{}`", key, section));
             assert_eq!(
                 val1, val2,
@@ -694,10 +697,14 @@ fn serde_indexmap_roundtrip() -> Result<(), Box<dyn Error>> {
 
     let json = serde_json::to_string(&original)?;
     let deserialized: Ini = serde_json::from_str(&json)?;
-    let map2 = deserialized.get_map()
+    let map2 = deserialized
+        .get_map()
         .expect("deserialized map should be non-empty");
 
     // Because IndexMap preserves insertion order, we still use equality
-    assert_eq!(map1, map2, "IndexMap-backed maps must match in content and order");
+    assert_eq!(
+        map1, map2,
+        "IndexMap-backed maps must match in content and order"
+    );
     Ok(())
 }
