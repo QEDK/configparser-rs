@@ -2,7 +2,7 @@
 name = "configparser"
 version = "3.2.0"
 authors = ["QEDK <hi@qedk.xyz>"]
-edition = "2021"
+edition = "2024"
 description = "A simple configuration parsing utility with no dependencies that allows you to parse INI and ini-style syntax. You can use this to write Rust programs which can be customized by end users easily."
 homepage = "https://github.com/QEDK/configparser-rs"
 repository = "https://github.com/QEDK/configparser-rs"

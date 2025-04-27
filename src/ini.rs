@@ -498,7 +498,7 @@ impl Ini {
                     "couldn't read {}: {}",
                     &path.as_ref().display(),
                     why
-                ))
+                ));
             }
             Ok(s) => s,
         }) {
@@ -507,7 +507,7 @@ impl Ini {
                     "couldn't read {}: {}",
                     &path.as_ref().display(),
                     why
-                ))
+                ));
             }
             Ok(map) => map,
         };
@@ -541,7 +541,7 @@ impl Ini {
                     "couldn't read {}: {}",
                     &path.as_ref().display(),
                     why
-                ))
+                ));
             }
             Ok(s) => s,
         }) {
@@ -550,7 +550,7 @@ impl Ini {
                     "couldn't read {}: {}",
                     &path.as_ref().display(),
                     why
-                ))
+                ));
             }
             Ok(map) => map,
         };
@@ -865,7 +865,7 @@ impl Ini {
                         return Err(format!(
                             "line {}: Started with indentation but there is no current entry",
                             num,
-                        ))
+                        ));
                     }
                 };
 
@@ -1336,7 +1336,7 @@ impl Ini {
                     "couldn't read {}: {}",
                     &path.as_ref().display(),
                     why
-                ))
+                ));
             }
             Ok(s) => s,
         }) {
@@ -1345,7 +1345,7 @@ impl Ini {
                     "couldn't read {}: {}",
                     &path.as_ref().display(),
                     why
-                ))
+                ));
             }
             Ok(map) => map,
         };
@@ -1370,7 +1370,7 @@ impl Ini {
                     "couldn't read {}: {}",
                     &path.as_ref().display(),
                     why
-                ))
+                ));
             }
             Ok(s) => s,
         }) {
@@ -1379,7 +1379,7 @@ impl Ini {
                     "couldn't read {}: {}",
                     &path.as_ref().display(),
                     why
-                ))
+                ));
             }
             Ok(map) => map,
         };
