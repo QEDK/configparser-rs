@@ -188,6 +188,16 @@ You can activate it by adding it as a feature like this:
 configparser = { version = "3.2.0", features = ["tokio"] }
 ```
 
+## Override Defaults 
+
+You can change the default configuration options like this. See the API for more verbose documentation.
+
+```
+let mut default = IniDefault::default();
+default.multiline = true;
+let mut config = Ini::new_from_defaults(default);
+```
+
 ## 📜 License
 
 Licensed under either of
