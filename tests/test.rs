@@ -255,7 +255,7 @@ basic_option=basic_value
 }
 
 #[test]
-fn inline_comment_symbols() -> Result<(), Box<dyn Error>> {
+fn inline_comment_symbols_enabled() -> Result<(), Box<dyn Error>> {
     const FILE_CONTENTS: &str = "
 [basic_section]
 ; basic comment
@@ -317,6 +317,60 @@ empty_option=
         config.get("basic_section", "basic_option"),
         Some(String::from("value"))
     );
+    assert_eq!(
+        config.get("basic_section", "basic_with_comment"),
+        Some(String::from("value ; Simple comment"))
+    );
+    assert_eq!(
+        config.get("basic_section", "basic_with_extra_inline"),
+        Some(String::from("value ! comment"))
+    );
+
+    Ok(())
+}
+
+#[test]
+fn inline_comment_symbols_disabled() -> Result<(), Box<dyn Error>> {
+    use configparser::ini::IniDefault;
+
+    const FILE_CONTENTS: &str = "
+[basic_section]
+; basic comment
+ ; comment with space
+basic_option=value
+basic_with_comment=value ; Simple comment
+basic_with_comment_hash=value # Simple comment
+basic_with_extra_inline=value ! comment
+empty_option=
+";
+
+    let mut parser_options = IniDefault::default();
+    // true tested in inline_comment_symbols_enabled()
+    parser_options.enable_inline_comments = false;
+
+    let mut config = Ini::new_from_defaults(parser_options);
+    config.read(FILE_CONTENTS.to_owned())?;
+
+    assert_eq!(
+        config.get("basic_section", "basic_with_comment"),
+        Some(String::from("value ; Simple comment"))
+    );
+    assert_eq!(
+        config.get("basic_section", "basic_with_comment_hash"),
+        Some(String::from("value # Simple comment"))
+    );
+    assert_eq!(
+        config.get("basic_section", "basic_with_extra_inline"),
+        Some(String::from("value ! comment"))
+    );
+    assert_eq!(
+        config.get("basic_section", "empty_option"),
+        Some(String::from(""))
+    );
+
+    config.set_inline_comment_symbols(Some(&['!']));
+    config.read(FILE_CONTENTS.to_owned())?;
+
     assert_eq!(
         config.get("basic_section", "basic_with_comment"),
         Some(String::from("value ; Simple comment"))
