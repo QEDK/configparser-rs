@@ -848,9 +848,13 @@ impl Ini {
                 continue;
             }
 
-            let line = match line.find(|c: char| inline_comment_symbols.contains(&c)) {
-                Some(idx) => &line[..idx],
-                None => line,
+            let line = if self.enable_inline_comments {
+                match line.find(|c: char| inline_comment_symbols.contains(&c)) {
+                    Some(idx) => &line[..idx],
+                    None => line,
+                }
+            } else {
+                line
             };
 
             let trimmed = line.trim();
