@@ -188,14 +188,17 @@ You can activate it by adding it as a feature like this:
 configparser = { version = "3.2.0", features = ["tokio"] }
 ```
 
-## Override Defaults 
+## Override Options
 
-You can change the default configuration options like this. See the API for more verbose documentation.
+You can change the default configuration options like this.
+See the API for more verbose documentation.
 
 ```
-let mut default = IniDefault::default();
-default.multiline = true;
-let mut config = Ini::new_from_defaults(default);
+let mut parser_options = IniDefault::default();
+parser_options.multiline = true;
+parser_options.enable_inline_comments = false;
+
+let mut config = Ini::new_from_defaults(parser_options);
 ```
 
 ## 📜 License
@@ -224,7 +227,7 @@ Old changelogs are visible in the commit history.
   - Adds support for multi-line key-value pairs.
   - Adds `async-std` feature for asynchronous file operations.
   - Some performance optimizations.
-- 3.0.3 
+- 3.0.3
   - Add default empty line on empty strings.
   - Feature to append to existing `Ini` objects.
   - Minor lint fixes.
