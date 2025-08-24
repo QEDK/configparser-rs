@@ -35,6 +35,7 @@ pub struct Ini {
     boolean_values: HashMap<bool, Vec<String>>,
     case_sensitive: bool,
     multiline: bool,
+    enable_inline_comments: bool,
 }
 
 #[cfg(all(feature = "serde", not(feature = "indexmap")))]
@@ -163,6 +164,16 @@ pub struct IniDefault {
     ///assert_eq!(default.multiline, false);
     ///```
     pub multiline: bool,
+    ///Denotes if the `Ini` object recognizes inline comments.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///let default = config.defaults();
+    ///assert_eq!(default.enable_inline_comments, true);
+    ///```
+    pub enable_inline_comments: bool,
 }
 
 impl Default for IniDefault {
@@ -193,6 +204,7 @@ impl Default for IniDefault {
             .cloned()
             .collect(),
             case_sensitive: false,
+            enable_inline_comments: true, // compatibility w/ previous versions
         }
     }
 }
@@ -352,6 +364,7 @@ impl Ini {
             boolean_values: defaults.boolean_values,
             case_sensitive: defaults.case_sensitive,
             multiline: defaults.multiline,
+            enable_inline_comments: defaults.enable_inline_comments,
         }
     }
 
@@ -373,6 +386,7 @@ impl Ini {
             boolean_values: self.boolean_values.to_owned(),
             case_sensitive: self.case_sensitive,
             multiline: self.multiline,
+            enable_inline_comments: self.enable_inline_comments,
         }
     }
 
