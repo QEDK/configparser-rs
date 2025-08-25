@@ -204,7 +204,7 @@ impl Default for IniDefault {
             .cloned()
             .collect(),
             case_sensitive: false,
-            enable_inline_comments: true, // compatibility w/ previous versions
+            enable_inline_comments: true, // retain compatibility with previous versions
         }
     }
 }
