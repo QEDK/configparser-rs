@@ -528,6 +528,30 @@ impl Ini {
         Ok(self.map.clone())
     }
 
+    pub fn load_from_stream<R: std::io::Read>(
+        &mut self,
+        mut reader: R,
+    ) -> Result<Map<String, Map<String, Option<String>>>, String> {
+        let mut buf = String::new();
+        if let Err(err) = reader.read_to_string(&mut buf) {
+            return Err(format!(
+                "couldn't read from stream: {}",
+                err
+            ));
+        }
+
+        self.map = match self.parse(buf) {
+            Err(why) => {
+                return Err(format!(
+                    "couldn't read from stream: {}",
+                    why
+                ));
+            }
+            Ok(map) => map,
+        };
+        Ok(self.map.clone())
+    }
+
     ///Loads a file from a defined path, parses it and applies it to the existing hashmap in our struct.
     ///While `load()` will clear the existing `Map`, `load_and_append()` applies the new values on top of
     ///the existing hashmap, preserving previous values.
