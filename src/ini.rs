@@ -528,24 +528,39 @@ impl Ini {
         Ok(self.map.clone())
     }
 
+    /// Loads configuration data from any stream implementing `std::io::Read`, parses it, and applies it to the internal map.
+    ///
+    /// This function reads the entire stream into a string, parses it as an INI file, and updates the internal map.
+    /// On error, returns a descriptive message. The previous map is replaced with the new one.
+    ///
+    /// # Arguments
+    /// * `reader` - Any type that implements `std::io::Read`, such as a file, buffer, or network stream.
+    ///
+    /// # Returns
+    /// * `Result<Map<String, Map<String, Option<String>>>, String>` - The parsed map on success, or an error message on failure.
+    ///
+    /// # Example
+    /// ```rust
+    /// use std::fs::File;
+    /// let mut config = ConfigParser::new();
+    /// let file = File::open("settings.ini").unwrap();
+    /// config.load_from_stream(file).unwrap();
+    ///
+    /// let input = "[section]\nkey=value";
+    /// config.load_from_stream(input.as_bytes()).unwrap();
+    /// ```
     pub fn load_from_stream<R: std::io::Read>(
         &mut self,
         mut reader: R,
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
         let mut buf = String::new();
         if let Err(err) = reader.read_to_string(&mut buf) {
-            return Err(format!(
-                "couldn't read from stream: {}",
-                err
-            ));
+            return Err(format!("couldn't read from stream: {}", err));
         }
 
         self.map = match self.parse(buf) {
             Err(why) => {
-                return Err(format!(
-                    "couldn't read from stream: {}",
-                    why
-                ));
+                return Err(format!("couldn't read from stream: {}", why));
             }
             Ok(map) => map,
         };
