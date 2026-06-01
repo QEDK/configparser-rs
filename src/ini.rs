@@ -36,7 +36,7 @@ pub struct Ini {
     case_sensitive: bool,
     multiline: bool,
     enable_inline_comments: bool,
-    cascade_defaults: bool
+    cascade_defaults: bool,
 }
 
 #[cfg(all(feature = "serde", not(feature = "indexmap")))]
@@ -181,7 +181,7 @@ pub struct IniDefault {
     ///## Example
     ///```rust
     ///use configparser::ini::Ini;
-    /// 
+    ///
     ///let mut config = Ini::new();
     ///let default = config.defaults();
     ///assert_eq!(default.cascade_defaults, false);
@@ -218,7 +218,7 @@ impl Default for IniDefault {
             .collect(),
             case_sensitive: false,
             enable_inline_comments: true, // retain compatibility with previous versions
-            cascade_defaults: false,  // retain backwards compatibility
+            cascade_defaults: false,      // retain backwards compatibility
         }
     }
 }
@@ -1061,7 +1061,7 @@ impl Ini {
                     return self.getbool(&self.default_section, &key);
                 }
                 Ok(None)
-            },
+            }
         }
     }
 
@@ -1114,21 +1114,21 @@ impl Ini {
                             return self.getboolcoerce(&self.default_section, &key);
                         }
                         Ok(None)
-                    },
+                    }
                 },
                 None => {
                     if self.cascade_defaults && section != self.default_section {
                         return self.getboolcoerce(&self.default_section, &key);
                     }
                     Ok(None)
-                },
+                }
             },
             None => {
                 if self.cascade_defaults && section != self.default_section {
                     return self.getboolcoerce(&self.default_section, &key);
                 }
                 Ok(None)
-            },
+            }
         }
     }
 
@@ -1158,21 +1158,21 @@ impl Ini {
                             return self.getint(&self.default_section, &key);
                         }
                         Ok(None)
-                    },
+                    }
                 },
                 None => {
                     if self.cascade_defaults && section != self.default_section {
                         return self.getint(&self.default_section, &key);
                     }
                     Ok(None)
-                },
+                }
             },
             None => {
                 if self.cascade_defaults && section != self.default_section {
                     return self.getint(&self.default_section, &key);
                 }
                 Ok(None)
-            },
+            }
         }
     }
 
@@ -1202,21 +1202,21 @@ impl Ini {
                             return self.getuint(&self.default_section, &key);
                         }
                         Ok(None)
-                    },
+                    }
                 },
                 None => {
                     if self.cascade_defaults && section != self.default_section {
                         return self.getuint(&self.default_section, &key);
                     }
                     Ok(None)
-                },
+                }
             },
             None => {
                 if self.cascade_defaults && section != self.default_section {
                     return self.getuint(&self.default_section, &key);
                 }
                 Ok(None)
-            },
+            }
         }
     }
 
@@ -1246,21 +1246,21 @@ impl Ini {
                             return self.getfloat(&self.default_section, &key);
                         }
                         Ok(None)
-                    },
+                    }
                 },
                 None => {
                     if self.cascade_defaults && section != self.default_section {
                         return self.getfloat(&self.default_section, &key);
                     }
                     Ok(None)
-                },
+                }
             },
             None => {
                 if self.cascade_defaults && section != self.default_section {
                     return self.getfloat(&self.default_section, &key);
                 }
                 Ok(None)
-            },
+            }
         }
     }
 
