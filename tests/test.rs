@@ -507,7 +507,7 @@ fallback_float = -1.1
         Ok(Some(1))
     );
 
-    // and finally, test the float fallback
+    // test the float fallback
     assert_eq!(
         config.getfloat("default", "fallback_float"),
         Ok(Some(3.1415))
@@ -523,6 +523,34 @@ fallback_float = -1.1
     assert_eq!(
         config.getfloat("override_section", "fallback_float"),
         Ok(Some(-1.1))
+    );
+
+    // and finally, one last set of tests with cascade_defaults disabled to 
+    // ensure backwards compatibility
+    config.set_cascade_defaults(false);
+    assert_eq!(
+        config.get("fallback_section", "fallback_str"),
+        None
+    );
+    assert_eq!(
+        config.getbool("fallback_section", "fallback_bool"),
+        Ok(None)
+    );
+    assert_eq!(
+        config.getboolcoerce("fallback_section", "fallback_bool"),
+        Ok(None)
+    );
+    assert_eq!(
+        config.getint("fallback_section", "fallback_int"),
+        Ok(None)
+    );
+    assert_eq!(
+        config.getuint("fallback_section", "fallback_uint"),
+        Ok(None)
+    );
+    assert_eq!(
+        config.getfloat("fallback_section", "fallback_float"),
+        Ok(None)
     );
 
     Ok(())
