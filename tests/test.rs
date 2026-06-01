@@ -384,6 +384,151 @@ empty_option=
 }
 
 #[test]
+fn test_cascade_defaults() -> Result<(), Box<dyn Error>> {
+    use configparser::ini::IniDefault;
+
+    const FILE_CONTENTS: &str = "
+[DEFAULT]
+fallback_str = fallback value
+fallback_bool = true
+fallback_bool_c = 1
+fallback_int = -42
+fallback_uint = 42
+fallback_float = 3.1415
+
+[fallback_section]
+normal = section value
+other_bool = false
+other_int = -7
+other_uint = 7
+other_float = 1.1
+
+[override_section]
+other_key = some other value
+fallback_str = non-fallback value
+fallback_bool = false
+fallback_bool_c = 0
+fallback_int = -1
+fallback_uint = 1
+fallback_float = -1.1
+";
+
+    let mut parser_options = IniDefault::default();
+    // true tested in inline_comment_symbols_enabled()
+    parser_options.cascade_defaults = true;
+
+    let mut config = Ini::new_from_defaults(parser_options);
+    config.read(FILE_CONTENTS.to_owned())?;
+
+    assert!(config.defaults().cascade_defaults);
+    // test string values and basics
+    assert_eq!(
+        config.get("default", "fallback_str"),
+        Some(String::from("fallback value"))
+    );
+    assert_eq!(
+        config.get("fallback_section", "normal"),
+        Some(String::from("section value"))
+    );
+    assert_eq!(
+        config.get("fallback_section", "fallback_str"),
+        Some(String::from("fallback value"))
+    );
+    assert_eq!(
+        config.get("override_section", "fallback_str"),
+        Some(String::from("non-fallback value"))
+    );
+    assert_eq!(
+        config.get("override_section", "other_key"),
+        Some(String::from("some other value"))
+    );
+
+    // test bool parsing with fallback
+    assert_eq!(
+        config.getbool("default", "fallback_bool"),
+        Ok(Some(true))
+    );
+    assert_eq!(
+        config.getbool("fallback_section", "fallback_bool"),
+        Ok(Some(true))
+    );
+    assert_eq!(
+        config.getbool("fallback_section", "other_bool"),
+        Ok(Some(false))
+    );
+    assert_eq!(
+        config.getbool("override_section", "fallback_bool"),
+        Ok(Some(false))
+    );
+    assert_eq!(
+        config.getboolcoerce("default", "fallback_bool_c"),
+        Ok(Some(true))
+    );
+    assert_eq!(
+        config.getboolcoerce("fallback_section", "fallback_bool_c"),
+        Ok(Some(true))
+    );
+    assert_eq!(
+        config.getboolcoerce("override_section", "fallback_bool_c"),
+        Ok(Some(false))
+    );
+
+    // test the getint and getuint fallbacks
+    assert_eq!(
+        config.getint("default", "fallback_int"),
+        Ok(Some(-42))
+    );
+    assert_eq!(
+        config.getint("fallback_section", "fallback_int"),
+        Ok(Some(-42))
+    );
+    assert_eq!(
+        config.getint("fallback_section", "other_int"),
+        Ok(Some(-7))
+    );
+    assert_eq!(
+        config.getint("override_section", "fallback_int"),
+        Ok(Some(-1))
+    );
+    assert_eq!(
+        config.getuint("default", "fallback_uint"),
+        Ok(Some(42))
+    );
+    assert_eq!(
+        config.getuint("fallback_section", "fallback_uint"),
+        Ok(Some(42))
+    );
+    assert_eq!(
+        config.getuint("fallback_section", "other_uint"),
+        Ok(Some(7))
+    );
+    assert_eq!(
+        config.getuint("override_section", "fallback_uint"),
+        Ok(Some(1))
+    );
+
+    // and finally, test the float fallback
+    assert_eq!(
+        config.getfloat("default", "fallback_float"),
+        Ok(Some(3.1415))
+    );
+    assert_eq!(
+        config.getfloat("fallback_section", "fallback_float"),
+        Ok(Some(3.1415))
+    );
+    assert_eq!(
+        config.getfloat("fallback_section", "other_float"),
+        Ok(Some(1.1))
+    );
+    assert_eq!(
+        config.getfloat("override_section", "fallback_float"),
+        Ok(Some(-1.1))
+    );
+
+    Ok(())
+}
+
+#[test]
 #[cfg(feature = "indexmap")]
 fn sort_on_write() -> Result<(), Box<dyn Error>> {
     let mut config = Ini::new_cs();

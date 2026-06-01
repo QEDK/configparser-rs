@@ -36,6 +36,7 @@ pub struct Ini {
     case_sensitive: bool,
     multiline: bool,
     enable_inline_comments: bool,
+    cascade_defaults: bool
 }
 
 #[cfg(all(feature = "serde", not(feature = "indexmap")))]
@@ -174,6 +175,18 @@ pub struct IniDefault {
     ///assert_eq!(default.enable_inline_comments, true);
     ///```
     pub enable_inline_comments: bool,
+    ///Cascade defaults automatically.  If a key is not defined in a get*()
+    ///call, but exists in the [DEFAULT] section, the value in the [DEFAULT]
+    ///section will be returned.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    /// 
+    ///let mut config = Ini::new();
+    ///let default = config.defaults();
+    ///assert_eq!(default.cascade_defaults, false);
+    ///```
+    pub cascade_defaults: bool,
 }
 
 impl Default for IniDefault {
@@ -205,6 +218,7 @@ impl Default for IniDefault {
             .collect(),
             case_sensitive: false,
             enable_inline_comments: true, // retain compatibility with previous versions
+            cascade_defaults: false,  // retain backwards compatibility
         }
     }
 }
@@ -365,6 +379,7 @@ impl Ini {
             case_sensitive: defaults.case_sensitive,
             multiline: defaults.multiline,
             enable_inline_comments: defaults.enable_inline_comments,
+            cascade_defaults: defaults.cascade_defaults,
         }
     }
 
@@ -387,6 +402,7 @@ impl Ini {
             case_sensitive: self.case_sensitive,
             multiline: self.multiline,
             enable_inline_comments: self.enable_inline_comments,
+            cascade_defaults: self.cascade_defaults,
         }
     }
 
@@ -473,6 +489,26 @@ impl Ini {
     ///Returns nothing.
     pub fn set_multiline(&mut self, multiline: bool) {
         self.multiline = multiline;
+    }
+
+    ///Sets the behavior around the cascading of defaults.  If this is set
+    ///to `true`, a get*() call for a section without a matching key value will
+    ///attempt to get that key value from the [DEFAULT] section if it exists
+    ///there.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///config.set_cascade_defaults(true);
+    ///let map = config.load("tests/test_cascade_defaults.ini").unwrap();
+    ///
+    ///let val = config.get("mysection", "fallback_key");  // Will fall back to the [DEFAULT] section for "key"
+    ///assert_eq!(val, Some(String::from("fallback value")));
+    ///```
+    ///Returns nothing.   /// 
+    pub fn set_cascade_defaults(&mut self, cascade_defaults: bool) {
+        self.cascade_defaults = cascade_defaults;
     }
 
     ///Gets all the sections of the currently-stored `Map` in a vector.
@@ -1009,7 +1045,19 @@ impl Ini {
     ///Returns `Some(value)` of type `String` if value is found or else returns `None`.
     pub fn get(&self, section: &str, key: &str) -> Option<String> {
         let (section, key) = self.autocase(section, key);
-        self.map.get(&section)?.get(&key)?.clone()
+        let val = match self.map.get(&section) {
+            Some(secmap) => match secmap.get(&key) {
+                Some(val) => val.clone(),
+                None => None,
+            },
+            None => None,
+        };
+
+        if val.is_none() && self.cascade_defaults {
+            return self.map.get(&self.default_section)?.get(&key)?.clone();
+        }
+
+        val
     }
 
     ///Parses the stored value from the key stored in the defined section to a `bool`.
@@ -1034,11 +1082,26 @@ impl Ini {
                         Err(why) => Err(why.to_string()),
                         Ok(boolean) => Ok(Some(boolean)),
                     },
-                    None => Ok(None),
+                    None => {
+                        if self.cascade_defaults && section != self.default_section {
+                            return self.getbool(&self.default_section, &key);
+                        }
+                        Ok(None)
+                    }
                 },
-                None => Ok(None),
+                None => {
+                    if self.cascade_defaults && section != self.default_section {
+                        return self.getbool(&self.default_section, &key);
+                    }
+                    Ok(None)
+                }
             },
-            None => Ok(None),
+            None => {
+                if self.cascade_defaults && section != self.default_section {
+                    return self.getbool(&self.default_section, &key);
+                }
+                Ok(None)
+            },
         }
     }
 
@@ -1086,11 +1149,26 @@ impl Ini {
                             ))
                         }
                     }
-                    None => Ok(None),
+                    None => {
+                        if self.cascade_defaults && section != self.default_section {
+                            return self.getboolcoerce(&self.default_section, &key);
+                        }
+                        Ok(None)
+                    },
                 },
-                None => Ok(None),
+                None => {
+                    if self.cascade_defaults && section != self.default_section {
+                        return self.getboolcoerce(&self.default_section, &key);
+                    }
+                    Ok(None)
+                },
             },
-            None => Ok(None),
+            None => {
+                if self.cascade_defaults && section != self.default_section {
+                    return self.getboolcoerce(&self.default_section, &key);
+                }
+                Ok(None)
+            },
         }
     }
 
@@ -1115,11 +1193,26 @@ impl Ini {
                         Err(why) => Err(why.to_string()),
                         Ok(int) => Ok(Some(int)),
                     },
-                    None => Ok(None),
+                    None => {
+                        if self.cascade_defaults && section != self.default_section {
+                            return self.getint(&self.default_section, &key);
+                        }
+                        Ok(None)
+                    },
                 },
-                None => Ok(None),
+                None => {
+                    if self.cascade_defaults && section != self.default_section {
+                        return self.getint(&self.default_section, &key);
+                    }
+                    Ok(None)
+                },
             },
-            None => Ok(None),
+            None => {
+                if self.cascade_defaults && section != self.default_section {
+                    return self.getint(&self.default_section, &key);
+                }
+                Ok(None)
+            },
         }
     }
 
@@ -1144,11 +1237,26 @@ impl Ini {
                         Err(why) => Err(why.to_string()),
                         Ok(uint) => Ok(Some(uint)),
                     },
-                    None => Ok(None),
+                    None => {
+                        if self.cascade_defaults && section != self.default_section {
+                            return self.getuint(&self.default_section, &key);
+                        }
+                        Ok(None)
+                    },
                 },
-                None => Ok(None),
+                None => {
+                    if self.cascade_defaults && section != self.default_section {
+                        return self.getuint(&self.default_section, &key);
+                    }
+                    Ok(None)
+                },
             },
-            None => Ok(None),
+            None => {
+                if self.cascade_defaults && section != self.default_section {
+                    return self.getuint(&self.default_section, &key);
+                }
+                Ok(None)
+            },
         }
     }
 
@@ -1173,11 +1281,26 @@ impl Ini {
                         Err(why) => Err(why.to_string()),
                         Ok(float) => Ok(Some(float)),
                     },
-                    None => Ok(None),
+                    None => {
+                        if self.cascade_defaults && section != self.default_section {
+                            return self.getfloat(&self.default_section, &key);
+                        }
+                        Ok(None)
+                    },
                 },
-                None => Ok(None),
+                None => {
+                    if self.cascade_defaults && section != self.default_section {
+                        return self.getfloat(&self.default_section, &key);
+                    }
+                    Ok(None)
+                },
             },
-            None => Ok(None),
+            None => {
+                if self.cascade_defaults && section != self.default_section {
+                    return self.getfloat(&self.default_section, &key);
+                }
+                Ok(None)
+            },
         }
     }
 
