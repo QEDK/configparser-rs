@@ -444,10 +444,7 @@ fallback_float = -1.1
     );
 
     // test bool parsing with fallback
-    assert_eq!(
-        config.getbool("default", "fallback_bool"),
-        Ok(Some(true))
-    );
+    assert_eq!(config.getbool("default", "fallback_bool"), Ok(Some(true)));
     assert_eq!(
         config.getbool("fallback_section", "fallback_bool"),
         Ok(Some(true))
@@ -474,26 +471,17 @@ fallback_float = -1.1
     );
 
     // test the getint and getuint fallbacks
-    assert_eq!(
-        config.getint("default", "fallback_int"),
-        Ok(Some(-42))
-    );
+    assert_eq!(config.getint("default", "fallback_int"), Ok(Some(-42)));
     assert_eq!(
         config.getint("fallback_section", "fallback_int"),
         Ok(Some(-42))
     );
-    assert_eq!(
-        config.getint("fallback_section", "other_int"),
-        Ok(Some(-7))
-    );
+    assert_eq!(config.getint("fallback_section", "other_int"), Ok(Some(-7)));
     assert_eq!(
         config.getint("override_section", "fallback_int"),
         Ok(Some(-1))
     );
-    assert_eq!(
-        config.getuint("default", "fallback_uint"),
-        Ok(Some(42))
-    );
+    assert_eq!(config.getuint("default", "fallback_uint"), Ok(Some(42)));
     assert_eq!(
         config.getuint("fallback_section", "fallback_uint"),
         Ok(Some(42))
@@ -525,13 +513,10 @@ fallback_float = -1.1
         Ok(Some(-1.1))
     );
 
-    // and finally, one last set of tests with cascade_defaults disabled to 
+    // and finally, one last set of tests with cascade_defaults disabled to
     // ensure backwards compatibility
     config.set_cascade_defaults(false);
-    assert_eq!(
-        config.get("fallback_section", "fallback_str"),
-        None
-    );
+    assert_eq!(config.get("fallback_section", "fallback_str"), None);
     assert_eq!(
         config.getbool("fallback_section", "fallback_bool"),
         Ok(None)
@@ -540,10 +525,7 @@ fallback_float = -1.1
         config.getboolcoerce("fallback_section", "fallback_bool"),
         Ok(None)
     );
-    assert_eq!(
-        config.getint("fallback_section", "fallback_int"),
-        Ok(None)
-    );
+    assert_eq!(config.getint("fallback_section", "fallback_int"), Ok(None));
     assert_eq!(
         config.getuint("fallback_section", "fallback_uint"),
         Ok(None)
