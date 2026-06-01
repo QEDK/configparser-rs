@@ -506,7 +506,6 @@ impl Ini {
     ///let val = config.get("mysection", "fallback_key");  // Will fall back to the [DEFAULT] section for "key"
     ///assert_eq!(val, Some(String::from("fallback value")));
     ///```
-    ///Returns nothing.   /// 
     pub fn set_cascade_defaults(&mut self, cascade_defaults: bool) {
         self.cascade_defaults = cascade_defaults;
     }
