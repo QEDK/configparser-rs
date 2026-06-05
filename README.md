@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "3.2.0"
+configparser = "3.3.0"
 ```
 
 ## ➕ Supported datatypes
@@ -176,7 +176,7 @@ The `Ini` struct offers great support for type conversion and type setting safel
 You can activate it by adding it as a feature like this:
 ```TOML
 [dependencies]
-configparser = { version = "3.2.0", features = ["indexmap"] }
+configparser = { version = "3.3.0", features = ["indexmap"] }
 ```
 
  - *tokio*: Activating the `tokio` feature adds asynchronous functions for reading from (`load_async()`) and
@@ -185,7 +185,7 @@ configparser = { version = "3.2.0", features = ["indexmap"] }
 You can activate it by adding it as a feature like this:
 ```TOML
 [dependencies]
-configparser = { version = "3.2.0", features = ["tokio"] }
+configparser = { version = "3.3.0", features = ["tokio"] }
 ```
 
 ## Override Options
@@ -215,36 +215,3 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the LGPL-3.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
-
-## 🆕 Changelog
-
-Old changelogs are visible in the commit history.
-- 3.0.1
-  - Uses `CRLF` line endings for Windows files.
-  - Bumps crate to 2021 edition.
-  - Adds features to CI pipeline.
-- 3.0.2
-  - Adds support for multi-line key-value pairs.
-  - Adds `async-std` feature for asynchronous file operations.
-  - Some performance optimizations.
-- 3.0.3
-  - Add default empty line on empty strings.
-  - Feature to append to existing `Ini` objects.
-  - Minor lint fixes.
-- 3.0.4
-  - Adds pretty printing functionality
-  - Replaces `async-std` with `tokio` as the available async runtime
-  - *The `async-std` feature will be deprecated in a future release*
-- 3.1.0 (**STABLE**)
-  - `async-std` has been deprecated
-  - Fixes a bug where multiline values did not preserve newlines
-  - Fixes a bug where empty sections were removed
-  - Adds a feature to support inline comments
-- 3.2.0
-  - `async-std` has been removed
-  - 🎉 Implements serde support
-
-### 🔜 Future plans
-
-- Support for appending sections, coercing them as well.
-- Benchmarking against similar packages.
