@@ -541,13 +541,13 @@ impl Ini {
     ///
     /// # Example
     /// ```rust
-    /// use std::fs::File;
-    /// let mut config = ConfigParser::new();
-    /// let file = File::open("settings.ini").unwrap();
-    /// config.load_from_stream(file).unwrap();
+    /// use configparser::ini::Ini;
     ///
+    /// let mut config = Ini::new();
     /// let input = "[section]\nkey=value";
     /// config.load_from_stream(input.as_bytes()).unwrap();
+    ///
+    /// assert_eq!(config.get("section", "key").unwrap(), "value");
     /// ```
     pub fn load_from_stream<R: std::io::Read>(
         &mut self,
