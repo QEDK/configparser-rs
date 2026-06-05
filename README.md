@@ -171,7 +171,7 @@ The `Ini` struct offers great support for type conversion and type setting safel
   of `HashMap` to store the sections and keys. This ensures that insertion order is preserved when iterating on or
   serializing the Ini object.
   Due to the nature of indexmap, it offers mostly similar performance to stdlib HashMaps but with
-  [slower lookup times](https://github.com/bluss/indexmap#performance).
+  [slower lookup times](https://github.com/indexmap-rs/indexmap#performance).
 
 You can activate it by adding it as a feature like this:
 ```TOML
@@ -193,7 +193,7 @@ configparser = { version = "3.3.0", features = ["tokio"] }
 You can change the default configuration options like this.
 See the API for more verbose documentation.
 
-```
+```rust
 let mut parser_options = IniDefault::default();
 parser_options.multiline = true;
 parser_options.enable_inline_comments = false;
@@ -213,5 +213,5 @@ at your option.
 ### ✏ Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the LGPL-3.0 license, shall be dual licensed as above, without any
+for inclusion in the work by you, as defined in the [LGPL-3.0](LICENSE-LGPL) license, shall be dual licensed as above, without any
 additional terms or conditions.
