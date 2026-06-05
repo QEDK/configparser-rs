@@ -29,7 +29,7 @@ strings as well as files.
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-configparser = "3.3.0"
+configparser = "3.2.0"
 ```
 
 ## ➕ Supported datatypes
@@ -176,7 +176,7 @@ The `Ini` struct offers great support for type conversion and type setting safel
 You can activate it by adding it as a feature like this:
 ```TOML
 [dependencies]
-configparser = { version = "3.3.0", features = ["indexmap"] }
+configparser = { version = "3.2.0", features = ["indexmap"] }
 ```
 
  - *tokio*: Activating the `tokio` feature adds asynchronous functions for reading from (`load_async()`) and
@@ -185,7 +185,7 @@ configparser = { version = "3.3.0", features = ["indexmap"] }
 You can activate it by adding it as a feature like this:
 ```TOML
 [dependencies]
-configparser = { version = "3.3.0", features = ["tokio"] }
+configparser = { version = "3.2.0", features = ["tokio"] }
 ```
 
 ## Override Options
