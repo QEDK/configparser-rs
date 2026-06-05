@@ -42,5 +42,6 @@ jobs:
       - name: fmt 
         run: cargo fmt --all -- --check
 
-      - name: audit
-        run: cargo install cargo-audit && cargo audit
+      - uses: rustsec/audit-check@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
