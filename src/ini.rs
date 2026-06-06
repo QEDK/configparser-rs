@@ -644,10 +644,7 @@ impl Ini {
         };
 
         for (section, section_map) in loaded {
-            self.map
-                .entry(section)
-                .or_default()
-                .extend(section_map);
+            self.map.entry(section).or_default().extend(section_map);
         }
 
         Ok(self.map.clone())
@@ -713,10 +710,7 @@ impl Ini {
         let loaded = self.parse(input)?;
 
         for (section, section_map) in loaded {
-            self.map
-                .entry(section)
-                .or_default()
-                .extend(section_map);
+            self.map.entry(section).or_default().extend(section_map);
         }
 
         Ok(self.map.clone())
@@ -1590,10 +1584,7 @@ impl Ini {
         };
 
         for (section, section_map) in loaded {
-            self.map
-                .entry(section)
-                .or_default()
-                .extend(section_map);
+            self.map.entry(section).or_default().extend(section_map);
         }
 
         Ok(self.map.clone())
