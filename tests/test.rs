@@ -384,6 +384,7 @@ empty_option=
 }
 
 #[test]
+#[allow(clippy::approx_constant)]
 fn test_cascade_defaults() -> Result<(), Box<dyn Error>> {
     use configparser::ini::IniDefault;
 
@@ -951,7 +952,7 @@ fn serde_multiline_roundtrip() -> Result<(), Box<dyn Error>> {
 fn serde_case_sensitive_roundtrip() -> Result<(), Box<dyn Error>> {
     // 1. Load in case-sensitive mode
     let mut orig = Ini::new_cs();
-    let map1 = orig.load("tests/test.ini")?;
+    orig.load("tests/test.ini")?;
     // 2. Check that mixed-case keys work, lowercase doesn't
     let v1 = orig.get("default", "defaultvalues").unwrap();
     assert!(orig.get("default", "DefaultValues").is_none());

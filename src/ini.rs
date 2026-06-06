@@ -1094,28 +1094,12 @@ impl Ini {
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getbool(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
         let (section, key) = self.autocase(section, key);
-        match self.map.get(&section) {
-            Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => match inner.to_lowercase().parse::<bool>() {
-                        Err(why) => Err(why.to_string()),
-                        Ok(boolean) => Ok(Some(boolean)),
-                    },
-                    None => {
-                        if self.cascade_defaults && section != self.default_section {
-                            return self.getbool(&self.default_section, &key);
-                        }
-                        Ok(None)
-                    }
-                },
-                None => {
-                    if self.cascade_defaults && section != self.default_section {
-                        return self.getbool(&self.default_section, &key);
-                    }
-                    Ok(None)
-                }
+        match self.map.get(&section).and_then(|secmap| secmap.get(&key)) {
+            Some(Some(inner)) => match inner.to_lowercase().parse::<bool>() {
+                Err(why) => Err(why.to_string()),
+                Ok(boolean) => Ok(Some(boolean)),
             },
-            None => {
+            _ => {
                 if self.cascade_defaults && section != self.default_section {
                     return self.getbool(&self.default_section, &key);
                 }
@@ -1140,49 +1124,33 @@ impl Ini {
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getboolcoerce(&self, section: &str, key: &str) -> Result<Option<bool>, String> {
         let (section, key) = self.autocase(section, key);
-        match self.map.get(&section) {
-            Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => {
-                        let boolval = &inner.to_lowercase()[..];
-                        if self
-                            .boolean_values
-                            .get(&true)
-                            .unwrap()
-                            .iter()
-                            .any(|elem| elem == boolval)
-                        {
-                            Ok(Some(true))
-                        } else if self
-                            .boolean_values
-                            .get(&false)
-                            .unwrap()
-                            .iter()
-                            .any(|elem| elem == boolval)
-                        {
-                            Ok(Some(false))
-                        } else {
-                            Err(format!(
-                                "Unable to parse value into bool at {}:{}",
-                                section, key
-                            ))
-                        }
-                    }
-                    None => {
-                        if self.cascade_defaults && section != self.default_section {
-                            return self.getboolcoerce(&self.default_section, &key);
-                        }
-                        Ok(None)
-                    }
-                },
-                None => {
-                    if self.cascade_defaults && section != self.default_section {
-                        return self.getboolcoerce(&self.default_section, &key);
-                    }
-                    Ok(None)
+        match self.map.get(&section).and_then(|secmap| secmap.get(&key)) {
+            Some(Some(inner)) => {
+                let boolval = &inner.to_lowercase()[..];
+                if self
+                    .boolean_values
+                    .get(&true)
+                    .unwrap()
+                    .iter()
+                    .any(|elem| elem == boolval)
+                {
+                    Ok(Some(true))
+                } else if self
+                    .boolean_values
+                    .get(&false)
+                    .unwrap()
+                    .iter()
+                    .any(|elem| elem == boolval)
+                {
+                    Ok(Some(false))
+                } else {
+                    Err(format!(
+                        "Unable to parse value into bool at {}:{}",
+                        section, key
+                    ))
                 }
-            },
-            None => {
+            }
+            _ => {
                 if self.cascade_defaults && section != self.default_section {
                     return self.getboolcoerce(&self.default_section, &key);
                 }
@@ -1205,28 +1173,12 @@ impl Ini {
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getint(&self, section: &str, key: &str) -> Result<Option<i64>, String> {
         let (section, key) = self.autocase(section, key);
-        match self.map.get(&section) {
-            Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => match inner.parse::<i64>() {
-                        Err(why) => Err(why.to_string()),
-                        Ok(int) => Ok(Some(int)),
-                    },
-                    None => {
-                        if self.cascade_defaults && section != self.default_section {
-                            return self.getint(&self.default_section, &key);
-                        }
-                        Ok(None)
-                    }
-                },
-                None => {
-                    if self.cascade_defaults && section != self.default_section {
-                        return self.getint(&self.default_section, &key);
-                    }
-                    Ok(None)
-                }
+        match self.map.get(&section).and_then(|secmap| secmap.get(&key)) {
+            Some(Some(inner)) => match inner.parse::<i64>() {
+                Err(why) => Err(why.to_string()),
+                Ok(int) => Ok(Some(int)),
             },
-            None => {
+            _ => {
                 if self.cascade_defaults && section != self.default_section {
                     return self.getint(&self.default_section, &key);
                 }
@@ -1249,28 +1201,12 @@ impl Ini {
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getuint(&self, section: &str, key: &str) -> Result<Option<u64>, String> {
         let (section, key) = self.autocase(section, key);
-        match self.map.get(&section) {
-            Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => match inner.parse::<u64>() {
-                        Err(why) => Err(why.to_string()),
-                        Ok(uint) => Ok(Some(uint)),
-                    },
-                    None => {
-                        if self.cascade_defaults && section != self.default_section {
-                            return self.getuint(&self.default_section, &key);
-                        }
-                        Ok(None)
-                    }
-                },
-                None => {
-                    if self.cascade_defaults && section != self.default_section {
-                        return self.getuint(&self.default_section, &key);
-                    }
-                    Ok(None)
-                }
+        match self.map.get(&section).and_then(|secmap| secmap.get(&key)) {
+            Some(Some(inner)) => match inner.parse::<u64>() {
+                Err(why) => Err(why.to_string()),
+                Ok(uint) => Ok(Some(uint)),
             },
-            None => {
+            _ => {
                 if self.cascade_defaults && section != self.default_section {
                     return self.getuint(&self.default_section, &key);
                 }
@@ -1293,28 +1229,12 @@ impl Ini {
     ///If the parsing fails, it returns an `Err(string)`.
     pub fn getfloat(&self, section: &str, key: &str) -> Result<Option<f64>, String> {
         let (section, key) = self.autocase(section, key);
-        match self.map.get(&section) {
-            Some(secmap) => match secmap.get(&key) {
-                Some(val) => match val {
-                    Some(inner) => match inner.parse::<f64>() {
-                        Err(why) => Err(why.to_string()),
-                        Ok(float) => Ok(Some(float)),
-                    },
-                    None => {
-                        if self.cascade_defaults && section != self.default_section {
-                            return self.getfloat(&self.default_section, &key);
-                        }
-                        Ok(None)
-                    }
-                },
-                None => {
-                    if self.cascade_defaults && section != self.default_section {
-                        return self.getfloat(&self.default_section, &key);
-                    }
-                    Ok(None)
-                }
+        match self.map.get(&section).and_then(|secmap| secmap.get(&key)) {
+            Some(Some(inner)) => match inner.parse::<f64>() {
+                Err(why) => Err(why.to_string()),
+                Ok(float) => Ok(Some(float)),
             },
-            None => {
+            _ => {
                 if self.cascade_defaults && section != self.default_section {
                     return self.getfloat(&self.default_section, &key);
                 }
