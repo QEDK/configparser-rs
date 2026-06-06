@@ -643,11 +643,11 @@ impl Ini {
             Ok(map) => map,
         };
 
-        for (section, section_map) in loaded.iter() {
+        for (section, section_map) in loaded {
             self.map
-                .entry(section.clone())
+                .entry(section)
                 .or_default()
-                .extend(section_map.clone());
+                .extend(section_map);
         }
 
         Ok(self.map.clone())
@@ -712,11 +712,11 @@ impl Ini {
     ) -> Result<Map<String, Map<String, Option<String>>>, String> {
         let loaded = self.parse(input)?;
 
-        for (section, section_map) in loaded.iter() {
+        for (section, section_map) in loaded {
             self.map
-                .entry(section.clone())
+                .entry(section)
                 .or_default()
-                .extend(section_map.clone());
+                .extend(section_map);
         }
 
         Ok(self.map.clone())
@@ -819,12 +819,21 @@ impl Ini {
             indent: usize,
         ) {
             let delimiter = if space_around_delimiters { " = " } else { "=" };
+            let empty_delimiter = delimiter.trim_end();
+            // Precompute the multiline indentation once rather than rebuilding
+            // it for every continuation line. Stays empty (no allocation) when
+            // multiline output is disabled.
+            let indent_str = if multiline {
+                " ".repeat(indent)
+            } else {
+                String::new()
+            };
             for (key, val) in outmap.iter() {
                 out.push_str(key);
 
                 if let Some(value) = val {
                     if value.is_empty() {
-                        out.push_str(delimiter.trim_end());
+                        out.push_str(empty_delimiter);
                     } else {
                         out.push_str(delimiter);
                     }
@@ -837,7 +846,7 @@ impl Ini {
                         for line in lines {
                             out.push_str(LINE_ENDING);
                             if !line.is_empty() {
-                                out.push_str(" ".repeat(indent).as_ref());
+                                out.push_str(&indent_str);
                                 out.push_str(line);
                             }
                         }
@@ -892,6 +901,10 @@ impl Ini {
             .unwrap_or_else(|| self.comment_symbols.as_ref());
         let mut map: Map<String, Map<String, Option<String>>> = Map::new();
         let mut section = self.default_section.clone();
+        // Tracks whether `section` is already present in `map`. Section headers
+        // always insert their section, so the only section that can still be
+        // missing is the (lazily created) default section.
+        let mut section_exists = false;
         let mut current_key: Option<String> = None;
 
         let caser = |val: &str| {
@@ -908,13 +921,12 @@ impl Ini {
         for (num, raw_line) in input.lines().enumerate() {
             let line = raw_line.trim();
 
-            // If the line is _just_ a comment, skip it entirely.
-            let line = match line.find(|c: char| self.comment_symbols.contains(&c)) {
-                Some(0) => continue,
-                Some(_) | None => line,
-            };
-
-            let line = line.trim();
+            // If the line is _just_ a comment, skip it entirely. Only the first
+            // character can make this a full-line comment, so there's no need to
+            // scan the whole line.
+            if line.starts_with(|c: char| self.comment_symbols.contains(&c)) {
+                continue;
+            }
 
             // Skip empty lines, but keep track of them for multiline values.
             if line.is_empty() {
@@ -922,33 +934,45 @@ impl Ini {
                 continue;
             }
 
-            let line = if self.enable_inline_comments {
+            // Strip a trailing inline comment if enabled. `line` is already
+            // trimmed on both ends, so only the comment-stripped slice needs to
+            // be re-trimmed.
+            let trimmed = if self.enable_inline_comments {
                 match line.find(|c: char| inline_comment_symbols.contains(&c)) {
-                    Some(idx) => &line[..idx],
+                    Some(idx) => line[..idx].trim(),
                     None => line,
                 }
             } else {
                 line
             };
 
-            let trimmed = line.trim();
+            if trimmed.starts_with('[') {
+                match trimmed.rfind(']') {
+                    Some(end) => {
+                        section = caser(trimmed[1..end].trim());
 
-            match (trimmed.find('['), trimmed.rfind(']')) {
-                (Some(0), Some(end)) => {
-                    section = caser(trimmed[1..end].trim());
+                        map.entry(section.clone()).or_default();
+                        section_exists = true;
 
-                    map.entry(section.clone()).or_default();
-
-                    continue;
+                        continue;
+                    }
+                    None => {
+                        return Err(format!(
+                            "line {}: Found opening bracket for section name but no closing bracket",
+                            num
+                        ));
+                    }
                 }
-                (Some(0), None) => {
-                    return Err(format!(
-                        "line {}: Found opening bracket for section name but no closing bracket",
-                        num
-                    ));
-                }
-                _ => {}
             }
+
+            // Ensure the current section exists, then take a mutable handle to
+            // it. Using `get_mut` on the common path avoids cloning the section
+            // name on every single line.
+            if !section_exists {
+                map.entry(section.clone()).or_default();
+                section_exists = true;
+            }
+            let valmap = map.get_mut(&section).unwrap();
 
             if raw_line.starts_with(char::is_whitespace) && self.multiline {
                 let key = match current_key.as_ref() {
@@ -960,8 +984,6 @@ impl Ini {
                         ));
                     }
                 };
-
-                let valmap = map.entry(section.clone()).or_default();
 
                 let val = valmap
                     .entry(key.clone())
@@ -988,8 +1010,6 @@ impl Ini {
                     }
                 }
             } else {
-                let valmap = map.entry(section.clone()).or_default();
-
                 match trimmed.find(&self.delimiters[..]) {
                     Some(delimiter) => {
                         let key = caser(trimmed[..delimiter].trim());
@@ -997,7 +1017,11 @@ impl Ini {
                         if key.is_empty() {
                             return Err(format!("line {}:{}: Key cannot be empty", num, delimiter));
                         } else {
-                            current_key = Some(key.clone());
+                            // `current_key` is only read when stitching together
+                            // multiline values, so only clone the key then.
+                            if self.multiline {
+                                current_key = Some(key.clone());
+                            }
 
                             let value = trimmed[delimiter + 1..].trim().to_owned();
 
@@ -1006,7 +1030,9 @@ impl Ini {
                     }
                     None => {
                         let key = caser(trimmed);
-                        current_key = Some(key.clone());
+                        if self.multiline {
+                            current_key = Some(key.clone());
+                        }
 
                         valmap.insert(key, None);
                     }
@@ -1563,11 +1589,11 @@ impl Ini {
             Ok(map) => map,
         };
 
-        for (section, section_map) in loaded.iter() {
+        for (section, section_map) in loaded {
             self.map
-                .entry(section.clone())
-                .or_insert_with(Map::new)
-                .extend(section_map.clone());
+                .entry(section)
+                .or_default()
+                .extend(section_map);
         }
 
         Ok(self.map.clone())
