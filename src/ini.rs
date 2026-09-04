@@ -1017,7 +1017,13 @@ impl Ini {
                                 current_key = Some(key.clone());
                             }
 
-                            let value = trimmed[delimiter + 1..].trim().to_owned();
+                            // `delimiter` is a byte offset and may itself be multi-byte, so advance by
+                            // its UTF-8 length.
+                            let delimiter_len = trimmed[delimiter..]
+                                .chars()
+                                .next()
+                                .map_or(1, char::len_utf8);
+                            let value = trimmed[delimiter + delimiter_len..].trim().to_owned();
 
                             valmap.insert(key, Some(value));
                         }

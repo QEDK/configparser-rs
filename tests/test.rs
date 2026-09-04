@@ -973,3 +973,18 @@ fn serde_case_sensitive_roundtrip() -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+#[test]
+fn multibyte_delimiter_does_not_panic() -> Result<(), Box<dyn Error>> {
+    use configparser::ini::IniDefault;
+
+    // A multi-byte delimiter must not split on a non-char boundary.
+    let mut defaults = IniDefault::default();
+    defaults.delimiters = vec!['\u{00a7}']; // section sign, 2 bytes in UTF-8
+
+    let mut config = Ini::new_from_defaults(defaults);
+    config.read(String::from("[s]\nkey\u{00a7}value\n"))?;
+
+    assert_eq!(config.get("s", "key"), Some(String::from("value")));
+    Ok(())
+}
