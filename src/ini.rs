@@ -485,9 +485,8 @@ impl Ini {
         self.inline_comment_symbols = symlist.map(|val| val.to_vec());
     }
 
-    ///Sets multiline string support. A line indented deeper than the key before it
-    ///continues that key's value, so indented keys still parse as keys as long as
-    ///continuation lines are indented further. A section header ends the value.
+    ///Sets multiline string support. A line continues the previous key's value when it is
+    ///indented deeper than that key's line; a section header ends the value.
     ///It must be set before `load()` or `read()` is called in order to take effect.
     ///## Example
     ///```rust
@@ -873,21 +872,16 @@ impl Ini {
             .unwrap_or_else(|| self.comment_symbols.as_ref());
         let mut map: Map<String, Map<String, Option<String>>> = Map::new();
         let mut section = self.default_section.clone();
-        // Section headers always insert their section, so the only section that
-        // can still be missing is the lazily created default section.
+        // only the default section is created lazily
         let mut section_exists = false;
-        // The key an indented line continues (multiline only) and the indentation
-        // of the line that defined it. Like Python's configparser, a line only
-        // continues a value when it is indented deeper than its key.
+        // a line continues `current_key` only if indented deeper than the line that set it
         let mut current_key: Option<String> = None;
         let mut current_indent = 0usize;
-        // Blank lines since the last entry, preserved inside multiline values.
         let mut blank_lines = 0usize;
 
         for (num, raw_line) in (1..).zip(input.lines()) {
             let line = raw_line.trim();
 
-            // Only the first character can make this a full-line comment.
             if line.starts_with(|c: char| self.comment_symbols.contains(&c)) {
                 continue;
             }
@@ -916,7 +910,6 @@ impl Ini {
                 section = self.casefold(trimmed[1..end].trim()).into_owned();
                 map.entry(section.clone()).or_default();
                 section_exists = true;
-                // A header ends any multiline value in progress.
                 current_key = None;
                 blank_lines = 0;
                 continue;
@@ -934,8 +927,6 @@ impl Ini {
                 .filter(|_| self.multiline && indent > current_indent);
 
             if let Some(key) = continued {
-                // `current_key` is only ever set right after inserting it into
-                // this section's map, so it is always present.
                 let val = valmap
                     .get_mut(key)
                     .expect("multiline key missing from its section");
@@ -951,7 +942,7 @@ impl Ini {
                         if key.is_empty() {
                             return Err(format!("line {}:{}: Key cannot be empty", num, idx));
                         }
-                        // `idx` is a byte offset and the delimiter may be multi-byte.
+                        // delimiter may be multi-byte
                         let delimiter_len = trimmed[idx..].chars().next().map_or(1, char::len_utf8);
                         (key, Some(trimmed[idx + delimiter_len..].trim().to_owned()))
                     }
@@ -971,8 +962,7 @@ impl Ini {
         Ok(map)
     }
 
-    ///Lowercases `val` unless the object is case-sensitive. Borrows when the input is
-    ///already lowercase ASCII, which is the common case for lookups.
+    ///Lowercases `val` unless case-sensitive. Borrows already-lowercase ASCII input.
     fn casefold<'a>(&self, val: &'a str) -> Cow<'a, str> {
         if self.case_sensitive || val.bytes().all(|b| b.is_ascii() && !b.is_ascii_uppercase()) {
             Cow::Borrowed(val)
