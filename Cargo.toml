@@ -1,6 +1,6 @@
 [package]
 name = "configparser"
-version = "3.2.0"
+version = "3.3.0"
 authors = ["QEDK <hi@qedk.xyz>"]
 edition = "2024"
 rust-version = "1.85"
