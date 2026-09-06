@@ -988,3 +988,96 @@ fn multibyte_delimiter_does_not_panic() -> Result<(), Box<dyn Error>> {
     assert_eq!(config.get("s", "key"), Some(String::from("value")));
     Ok(())
 }
+
+#[test]
+fn default_ini_parses_like_new() -> Result<(), Box<dyn Error>> {
+    let mut config = Ini::default();
+    config.read(String::from("[S]\nKey = value ; note"))?;
+    assert_eq!(config.get("s", "key"), Some(String::from("value")));
+    Ok(())
+}
+
+#[test]
+fn load_defaults_applies_every_field() {
+    use configparser::ini::IniDefault;
+
+    let mut defaults = IniDefault::default();
+    defaults.multiline = true;
+    defaults.enable_inline_comments = false;
+    defaults.cascade_defaults = true;
+
+    let mut config = Ini::new();
+    config.load_defaults(defaults.clone());
+    assert_eq!(config.defaults(), defaults);
+}
+
+#[test]
+fn multiline_ends_at_section_header() -> Result<(), Box<dyn Error>> {
+    let mut config = Ini::new();
+    config.set_multiline(true);
+    config.read(String::from(
+        "[a]
+key = first
+
+[b]
+    other = value
+    another = one",
+    ))?;
+
+    assert_eq!(config.get("a", "key"), Some(String::from("first")));
+    assert_eq!(config.get("b", "other"), Some(String::from("value")));
+    assert_eq!(config.get("b", "another"), Some(String::from("one")));
+    Ok(())
+}
+
+#[test]
+fn multiline_continuation_must_be_indented_past_its_key() -> Result<(), Box<dyn Error>> {
+    let mut config = Ini::new();
+    config.set_multiline(true);
+    config.read(String::from(
+        "[s]
+    key = line one
+        line two
+    next = value",
+    ))?;
+
+    assert_eq!(
+        config.get("s", "key"),
+        Some(String::from("line one\nline two"))
+    );
+    assert_eq!(config.get("s", "next"), Some(String::from("value")));
+    Ok(())
+}
+
+#[test]
+fn parse_errors_use_one_based_line_numbers() {
+    let mut config = Ini::new();
+    let err = config.read(String::from("[unclosed")).unwrap_err();
+    assert!(err.starts_with("line 1:"), "{err}");
+}
+
+#[test]
+fn getboolcoerce_with_partial_boolean_values() -> Result<(), Box<dyn Error>> {
+    use configparser::ini::IniDefault;
+    use std::collections::HashMap;
+
+    let mut defaults = IniDefault::default();
+    defaults.boolean_values = HashMap::from([(true, vec![String::from("aye")])]);
+
+    let mut config = Ini::new_from_defaults(defaults);
+    config.read(String::from("[s]\nyes = AYE\nno = nay"))?;
+    assert_eq!(config.getboolcoerce("s", "yes")?, Some(true));
+    assert!(config.getboolcoerce("s", "no").is_err());
+    Ok(())
+}
+
+#[test]
+fn getbool_rejects_non_bools() -> Result<(), Box<dyn Error>> {
+    let mut config = Ini::new();
+    config.read(String::from("[s]\na = TRUE\nb = False\nc = yes"))?;
+    assert_eq!(config.getbool("s", "a")?, Some(true));
+    assert_eq!(config.getbool("s", "b")?, Some(false));
+    assert!(config.getbool("s", "c").is_err());
+    assert_eq!(config.getbool("s", "missing")?, None);
+    Ok(())
+}
