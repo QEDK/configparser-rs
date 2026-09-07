@@ -25,7 +25,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
-          components: rustfmt
+          components: rustfmt, clippy
 
       - uses: Swatinem/rust-cache@v2
         with:
@@ -39,6 +39,9 @@ jobs:
 
       - name: fmt 
         run: cargo fmt --all -- --check
+      
+      - name: clippy
+        run: cargo clippy --all-features -- -D warnings
 
       - uses: rustsec/audit-check@v2
         with:
