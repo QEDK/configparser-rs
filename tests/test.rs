@@ -1049,3 +1049,44 @@ fn bool_getters_reject_unknown_values() -> Result<(), Box<dyn Error>> {
     assert!(config.getbool("s", "yes").is_err());
     Ok(())
 }
+
+#[test]
+fn get_section() -> Result<(), Box<dyn Error>> {
+    let mut config = Ini::new();
+    config.load("tests/test.ini")?;
+
+    let topsecret = config.get_section("TopSecret").unwrap();
+    assert_eq!(
+        topsecret.keys().cloned().collect::<HashSet<_>>(),
+        HashSet::from([
+            String::from("kfc"),
+            String::from("colon"),
+            String::from("empty string"),
+            String::from("none string"),
+            String::from("password"),
+        ])
+    );
+    assert_eq!(
+        topsecret["kfc"].as_deref(),
+        Some("the secret herb is orega-")
+    );
+    assert_eq!(topsecret["none string"], None);
+    assert_eq!(config.get_section("missing"), None);
+
+    for key in config.get_section("values").unwrap().keys() {
+        config.setstr("values", key, Some("updated"));
+    }
+    assert_eq!(config.get("values", "float").unwrap(), "updated");
+    assert_eq!(config.get("values", "bool").unwrap(), "updated");
+
+    let mut config_cs = Ini::new_cs();
+    config_cs.load("tests/test.ini")?;
+    assert_eq!(config_cs.get_section("TopSecret"), None);
+    assert!(
+        config_cs
+            .get_section("topsecret")
+            .unwrap()
+            .contains_key("KFC")
+    );
+    Ok(())
+}

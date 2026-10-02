@@ -1218,6 +1218,30 @@ impl Ini {
         &mut self.map
     }
 
+    ///Returns a clone of the `Map` stored in the defined section, with all of its keys and values.
+    ///Like `get()`, it processes the section name to make case-insensitive access *if* the default constructor is used.
+    ///## Example
+    ///```rust
+    ///use configparser::ini::Ini;
+    ///
+    ///let mut config = Ini::new();
+    ///config.read(String::from(
+    ///  "[section]
+    ///  key=value
+    ///  valueless"));
+    ///let section = config.get_section("section").unwrap();
+    ///assert_eq!(section.len(), 2);
+    /////The clone does not borrow `config`, so we can update it while iterating:
+    ///for key in section.keys() {
+    ///  config.setstr("section", key, Some("updated"));
+    ///}
+    ///assert_eq!(config.get("section", "valueless").unwrap(), "updated");
+    ///```
+    ///Returns `Some(section_map)` if the section exists or else, `None`.
+    pub fn get_section(&self, section: &str) -> Option<Map<String, Option<String>>> {
+        self.map.get(&*self.casefold(section)).cloned()
+    }
+
     ///Sets an `Option<String>` in the `Map` stored in our struct. If a particular section or key does not exist, it will be automatically created.
     ///An existing value in the map  will be overwritten. You can also set `None` safely.
     ///## Example
